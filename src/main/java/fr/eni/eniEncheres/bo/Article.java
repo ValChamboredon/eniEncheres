@@ -1,13 +1,15 @@
 package fr.eni.eniEncheres.bo;
 
+import java.time.LocalDate;
+
 public class Article {
 
     //attributs
     private int noArticle;
     private String nomArticle;
     private String description;
-    private Date dateDebutEncheres;
-    private Date dateFinEncheres;
+    private LocalDate dateDebutEncheres;
+    private LocalDate dateFinEncheres;
     private float miseAPrix;
     private float prixVente;
     private int etatVente;
@@ -17,7 +19,7 @@ public class Article {
 
     }
 
-    public Article(int noArticle, String nomArticle, String description, Date dateDebutEncheres, Date dateFinEncheres, float miseAPrix, float prixVente, int etatVente) {
+    public Article(int noArticle, String nomArticle, String description, LocalDate dateDebutEncheres, LocalDate dateFinEncheres, float miseAPrix, float prixVente, int etatVente) {
         this.noArticle = noArticle;
         this.nomArticle = nomArticle;
         this.description = description;
@@ -53,19 +55,19 @@ public class Article {
         this.description = description;
     }
 
-    public Date getDateDebutEncheres() {
+    public LocalDate getDateDebutEncheres() {
         return dateDebutEncheres;
     }
 
-    public void setDateDebutEncheres(Date dateDebutEncheres) {
+    public void setDateDebutEncheres(LocalDate dateDebutEncheres) {
         this.dateDebutEncheres = dateDebutEncheres;
     }
 
-    public Date getDateFinEncheres() {
+    public LocalDate getDateFinEncheres() {
         return dateFinEncheres;
     }
 
-    public void setDateFinEncheres(Date dateFinEncheres) {
+    public void setDateFinEncheres(LocalDate dateFinEncheres) {
         this.dateFinEncheres = dateFinEncheres;
     }
 
