@@ -15,7 +15,8 @@ public class Article {
     private float prixVente;
     private String etatVente;
 
-    private Utilisateur vendeur;             
+    
+    private Utilisateur utilisateur;             
     private Categorie categorie;             
     private Retrait lieuRetrait;            
     private List<Enchere> encheres; 
