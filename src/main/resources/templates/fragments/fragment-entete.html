@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="ISO-8859-1">
-<title>Insert title here</title>
 </head>
 <body>
-
+    <header th:fragment="entete">
+        <nav class="navbar">
+            <div class="container">
+                <a th:href="@{/}">ENI-Enchères</a>
+                <div>
+                    <a th:href="@{/inscription}">S'inscrire</a>
+                    <a th:href="@{/connexion}">Se connecter</a>
+                </div>
+            </div>
+        </nav>
+    </header>
 </body>
 </html>

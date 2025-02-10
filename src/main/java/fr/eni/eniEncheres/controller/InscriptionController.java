@@ -7,7 +7,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import fr.eni.eniEncheres.bll.contexte.ContexteService;
+import fr.eni.eniEncheres.bll.UtilisateurService;
 import fr.eni.eniEncheres.bo.Utilisateur;
 import jakarta.validation.Valid;
 
@@ -16,10 +16,10 @@ import jakarta.validation.Valid;
 public class InscriptionController {
 	
 	@Autowired
-	private ContexteService contexteService;
+	private UtilisateurService utilisateurService;
 
-	public InscriptionController(ContexteService contexteService) {
-		this.contexteService = contexteService;
+	public InscriptionController(UtilisateurService utilisateurService) {
+		this.utilisateurService = utilisateurService;
 	}
 	
 	@GetMapping ("/inscription")
@@ -29,17 +29,23 @@ public class InscriptionController {
 	}
 	
 	@PostMapping("/inscription")
-	public String inscrireUtilisateur(@Valid Utlisateur utilisateur, BindingResult result, Model model) {
+	public String inscrireUtilisateur(@Valid Utilisateur utilisateur, BindingResult result, Model model) {
 		if (result.hasErrors()) {
-			return
+			return "inscription";
 		}
+		if(utilisateurService.pseudoExistant(utilisateur.getPseudo())) {
+			model.addAttribute("erreur", "Le pseudo est déjà utilisé.");
+			return "inscription";
+		}
+		if(utilisateurService.emailExistant(utilisateur.getEmail())) {
+			model.addAttribute("erreur", "L'e-mail est déjà utilisé.");
+			return "inscription";
+		}
+		utilisateurService.enregistrer(utilisateur);
+		return "redirect:/connexion";
 	}
 	
 
 }
 
-//En tant qu’utilisateur, je peux m’inscrire sur la plateforme Enchères.org.
-//Le pseudo doit être unique sur toute la plateforme, ainsi que l’email. 
-//Le pseudo n’accepte que des caractères alphanumériques. 
-//Si la création du profil est validée, l’utilisateur est dirigé vers la page d’accueil (liste des enchères).
-//Le crédit initial est de 0
+
