@@ -3,7 +3,7 @@ package fr.eni.eniEncheres.bo;
 import java.time.LocalDate;
 import java.util.List;
 
-public class Article {
+public class ArticleVendu {
 
     //attributs
     private int noArticle;
@@ -19,13 +19,13 @@ public class Article {
     private Categorie categorie;             
     private Retrait lieuRetrait;            
     private List<Enchere> encheres; 
-    
+
     //constructeur
-    public Article() {
+    public ArticleVendu() {
 
     }
 
-    public Article(int noArticle, String nomArticle, String description, LocalDate dateDebutEncheres, LocalDate dateFinEncheres, float miseAPrix, float prixVente, String etatVente) {
+    public ArticleVendu(int noArticle, String nomArticle, String description, LocalDate dateDebutEncheres, LocalDate dateFinEncheres, float miseAPrix, float prixVente, String etatVente) {
         this.noArticle = noArticle;
         this.nomArticle = nomArticle;
         this.description = description;
@@ -101,6 +101,37 @@ public class Article {
         this.etatVente = etatVente;
     }
 
+    public Utilisateur getVendeur() {
+        return vendeur;
+    }
+
+    public void setVendeur(Utilisateur vendeur) {
+        this.vendeur = vendeur;
+    }
+
+    public Categorie getCategorie() {
+        return categorie;
+    }
+
+    public void setCategorie(Categorie categorie) {
+        this.categorie = categorie;
+    }
+
+    public Retrait getLieuRetrait() {
+        return lieuRetrait;
+    }
+
+    public void setLieuRetrait(Retrait lieuRetrait) {
+        this.lieuRetrait = lieuRetrait;
+    }
+
+    public List<Enchere> getEncheres() {
+        return encheres;
+    }
+
+    public void setEncheres(List<Enchere> encheres) {
+        this.encheres = encheres;
+    }
     
 
 }
