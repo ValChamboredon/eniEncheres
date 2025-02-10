@@ -1,8 +1,10 @@
 package fr.eni.eniEncheres.bll;
 
+import org.springframework.stereotype.Service;
+
 import fr.eni.eniEncheres.bo.Utilisateur;
 import fr.eni.eniEncheres.dal.UtilisateurDAO;
-
+@Service
 public class UtilisateurServiceImpl implements UtilisateurService {
 	
 	private UtilisateurDAO utlisateurDAO;
@@ -12,9 +14,6 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 		this.utlisateurDAO = utlisateurDAO;
 	}
 	
-	private void inscrire(Utilisateur utlisateur) {
-		
-
-	}
+	
 
 }

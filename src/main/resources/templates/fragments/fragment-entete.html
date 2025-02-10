@@ -1,12 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-
-<meta charset="UTF-8">
-
-<title>Insert title here</title>
-</head>
-<body>
-
-</body>
-</html>
+<header th:fragment="entete">
+    <nav class="bg-gradient-to-r from-blue-900 to-blue-700 p-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <h1>eni enchère</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+            	<p class="text-white"><a th:href="@{/insciption}" class="hover:underline">S'inscrire</a></p>
+                <p class="text-white"><a th:href="@{/connexion}" class="hover:underline">Se connecter</a></p>
+                
+            </div>
+        </div>
+    </nav>
+</header>

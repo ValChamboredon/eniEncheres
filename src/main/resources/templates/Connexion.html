@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projet enchere login</title>
+</head>
+<body >
+
+    <div th:replace="~{/fragments/fragment-entete :: entete}"></div>
+    
+    <main >
+        <div >
+            <h1 >Se connecter</h1>
+            <form th:action="@{/login}" method="POST">
+              
+                <div class="mb-4">
+                    <label for="idUsername" >Email</label>
+                    <input id="idUsername" type="text" name="username" >
+                </div>
+                <div class="mb-6">
+                    <label for="idPassword">Mot de passe</label>
+                    <input id="idPassword" type="password" name="password">
+                </div>
+                <div>
+                    <button type="submit" >Se connecter</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    
+    
+
+</body>
+</html>
