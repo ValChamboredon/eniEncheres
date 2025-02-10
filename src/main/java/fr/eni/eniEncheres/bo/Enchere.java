@@ -3,7 +3,7 @@ package fr.eni.eniEncheres.bo;
 import java.time.LocalDateTime;
 
 public class Enchere {
-	private Integer idEnchere;
+	private Integer noEnchere;
     private LocalDateTime dateEnchere;
     private Integer montantEnchere;
     
@@ -17,12 +17,12 @@ public class Enchere {
         this.article = article;
     }
 
-	public Integer getIdEnchere() {
-		return idEnchere;
+	public Integer getNoEnchere() {
+		return noEnchere;
 	}
 
-	public void setIdEnchere(Integer idEnchere) {
-		this.idEnchere = idEnchere;
+	public void setNoEnchere(Integer idEnchere) {
+		this.noEnchere = idEnchere;
 	}
 
 	public LocalDateTime getDateEnchere() {
