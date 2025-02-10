@@ -5,6 +5,7 @@ import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -38,9 +39,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> {
             auth
-                .requestMatchers(HttpMethod.GET, "/", "/inscription", "/css/**", "/images/**").permitAll()
-                .anyRequest().authenticated();
+                .anyRequest().permitAll();
+              
         })
+        .httpBasic(Customizer.withDefaults())
         .formLogin(form -> {
             form.loginPage("/connexion").permitAll();
             form.defaultSuccessUrl("/accueil", true);
@@ -53,4 +55,7 @@ public class SecurityConfig {
  
         return http.build();
     }
+    
+ 
+   
 }

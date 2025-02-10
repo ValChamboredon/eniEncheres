@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.naming.spi.DirectoryManager;
-
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.zaxxer.hikari.hibernate.HikariConnectionProvider;
@@ -16,6 +16,16 @@ import fr.eni.eniEncheres.bo.Utilisateur;
 @Repository
 public class UtilisateurDAOImpl implements UtilisateurDAO {
 
+	//Request SQL	
+
+		private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+		public UtilisateurDAOImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+			this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+		}
+
+	
+	
 	private static final String INSERT = "INSERT INTO UTILISATEURS (pseudo, nom, prenom, email, telephone, rue, code_postal, ville, mot_de_passe, credit, administrateur) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 	private static final String CHECK_PSEUDO = "SELECT COUNT(*) FROM UTILISATEURS WHERE pseudo = ?";
 	private static final String CHECK_EMAIL = "SELECT COUNT(*) FROM UTILISATEURS WHERE email = ?";
