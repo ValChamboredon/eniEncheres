@@ -1,6 +1,7 @@
 package fr.eni.eniEncheres.bo;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class Article {
 
@@ -12,14 +13,19 @@ public class Article {
     private LocalDate dateFinEncheres;
     private float miseAPrix;
     private float prixVente;
-    private int etatVente;
+    private String etatVente;
 
+    private Utilisateur vendeur;             
+    private Categorie categorie;             
+    private Retrait lieuRetrait;            
+    private List<Enchere> encheres; 
+    
     //constructeur
     public Article() {
 
     }
 
-    public Article(int noArticle, String nomArticle, String description, LocalDate dateDebutEncheres, LocalDate dateFinEncheres, float miseAPrix, float prixVente, int etatVente) {
+    public Article(int noArticle, String nomArticle, String description, LocalDate dateDebutEncheres, LocalDate dateFinEncheres, float miseAPrix, float prixVente, String etatVente) {
         this.noArticle = noArticle;
         this.nomArticle = nomArticle;
         this.description = description;
@@ -87,11 +93,11 @@ public class Article {
         this.prixVente = prixVente;
     }
 
-    public int getEtatVente() {
+    public String getEtatVente() {
         return etatVente;
     }
 
-    public void setEtatVente(int etatVente) {
+    public void setEtatVente(String etatVente) {
         this.etatVente = etatVente;
     }
 
