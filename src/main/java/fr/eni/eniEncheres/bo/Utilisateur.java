@@ -19,7 +19,7 @@ public class Utilisateur {
 	private boolean administrateur;
 	
 	//Relations
-	private List<Article> article;
+	private List<ArticleVendu> article;
 	private List<Enchere> encheres;
 	
 	//Constructeurs
@@ -136,6 +136,22 @@ public class Utilisateur {
 
 	public void setAdministrateur(boolean administrateur) {
 		this.administrateur = administrateur;
+	}
+
+	public List<ArticleVendu> getArticle() {
+		return article;
+	}
+
+	public void setArticle(List<ArticleVendu> article) {
+		this.article = article;
+	}
+
+	public List<Enchere> getEncheres() {
+		return encheres;
+	}
+
+	public void setEncheres(List<Enchere> encheres) {
+		this.encheres = encheres;
 	}
 	
 	
