@@ -18,8 +18,10 @@ public class Utilisateur {
 	private int credit;
 	private boolean administrateur;
 	
+	//Relations
 	private List<Article> article;
 	private List<Enchere> encheres;
+	
 	//Constructeurs
 	public Utilisateur() {
 	}
