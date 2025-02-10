@@ -1,5 +1,7 @@
 package fr.eni.eniEncheres.bo;
 
+import java.util.List;
+
 public class Utilisateur {
 
 	
@@ -16,6 +18,8 @@ public class Utilisateur {
 	private int credit;
 	private boolean administrateur;
 	
+	private List<Article> article;
+	private List<Enchere> encheres;
 	//Constructeurs
 	public Utilisateur() {
 	}
