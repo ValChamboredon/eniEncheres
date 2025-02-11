@@ -10,5 +10,10 @@ public interface UtilisateurService {
 	boolean pseudoExistant(String pseudo);
 
 	boolean emailExistant(String email);
+	
+	Utilisateur getUtilisateurById(int noUtilisateur);
+	Utilisateur getUtilisateurByEmail(String email);
+	void supprimerByEmail(String email);
+	
 
 }

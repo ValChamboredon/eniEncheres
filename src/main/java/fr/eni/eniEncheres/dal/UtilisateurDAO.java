@@ -1,12 +1,16 @@
 package fr.eni.eniEncheres.dal;
 
 
+
 import org.springframework.stereotype.Repository;
 
 import fr.eni.eniEncheres.bo.Utilisateur;
 
-@Repository
 
+
+import fr.eni.eniEncheres.bo.Utilisateur;
+
+@Repository
 public interface UtilisateurDAO {
 
 	void save(Utilisateur utilisateur);
@@ -14,6 +18,11 @@ public interface UtilisateurDAO {
 	boolean existsByEmail(String email);
 	
 
-
-
+	
+	Utilisateur read(int noUtilisateur);
+	
+	Utilisateur getUtilisateur(String email);
+	void supprimerByEmail(String email);
+	
+	
 }
