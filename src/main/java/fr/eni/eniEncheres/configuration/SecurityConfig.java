@@ -36,17 +36,18 @@ public class SecurityConfig {
 			auth.anyRequest().permitAll();
 		});
 
-		security.formLogin(formLogin -> {
+		security
+			.formLogin(formLogin -> {
 				formLogin
 						.loginPage("/connexion")
 						.defaultSuccessUrl("/inscription",true);
-		});
-		
-		security.logout(logout -> {
-				logout.logoutUrl("deconnexion")
+		})
+			.logout((logout) ->
+				logout
+					.invalidateHttpSession(true)
+					.logoutRequestMatcher(new AntPathRequestMatcher("/deconnexion", "GET"))
 					.logoutSuccessUrl("/")
-					.deleteCookies("JSESSIONID");
-		});
+        );
 		
 		return security.build();
 	}

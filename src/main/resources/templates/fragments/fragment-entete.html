@@ -6,8 +6,10 @@
             </div>
 
             <div class="flex items-center space-x-4">
-                <p class="text-white"><a th:href="@{/inscription}" class="hover:underline">S'inscrire</a></p>
-                <p class="text-white"><a th:href="@{/connexion}" class="hover:underline">Se connecter</a></p>           
+                <p sec:authorize="!isAuthenticated" class="text-white"><a th:href="@{/inscription}" class="hover:underline">S'inscrire</a></p>
+                <p sec:authorize="!isAuthenticated" class="text-white"><a th:href="@{/connexion}" class="hover:underline">Se connecter</a></p>
+                <p sec:authorize="isAuthenticated" class="text-white"><a th:href="@{/profil}" class="hover:underline">profil</a></p>  
+                <p sec:authorize="isAuthenticated" class="text-white"><a th:href="@{/deconnexion}" class="hover:underline">Se déconnecter</a></p>           
         </div>
     </nav>
 </header>
