@@ -4,9 +4,11 @@
             <div class="flex items-center">
                 <h1>eni enchère</h1>
             </div>
-            <div class="flex items-center space-x-4">
-            	<p class="text-white"><a th:href="@{/insciption}" class="hover:underline">S'inscrire</a></p>
-                <p class="text-white"><a th:href="@{/connexion}" class="hover:underline">Se connecter</a></p>
+            <div >
+            	<p ><a th:href="@{/insciption}" >S'inscrire</a></p>
+                <p ><a th:href="@{/connexion}" >Se connecter</a></p>
+                <p sec:authorize="!isAuthenticated()"><a th:href="@{/connexion}" >Se connecter</a></p>
+				<p sec:authorize="isAuthenticated()"><a th:href="@{/deconnexion}" >Déconnexion</a></p>
                 
             </div>
         </div>
