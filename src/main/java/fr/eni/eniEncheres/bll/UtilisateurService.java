@@ -1,11 +1,12 @@
 package fr.eni.eniEncheres.bll;
 
 import fr.eni.eniEncheres.bo.Utilisateur;
+import fr.eni.eniEncheres.exception.BusinessException;
 import jakarta.validation.Valid;
 
 public interface UtilisateurService {
 
-	void enregistrer(@Valid Utilisateur utilisateur);
+	void enregistrer(@Valid Utilisateur utilisateur)throws BusinessException;
 
 	boolean pseudoExistant(String pseudo);
 

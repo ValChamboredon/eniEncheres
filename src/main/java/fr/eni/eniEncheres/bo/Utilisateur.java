@@ -1,26 +1,67 @@
 package fr.eni.eniEncheres.bo;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.data.annotation.Transient;
+
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 public class Utilisateur {
 
 	
 	private int noUtilisateur;
+	
+	@NotBlank(message = "{FormulaireProfil.pseudo.NotBlank}")
+	@Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Le pseudonyme doit contenir uniquement des caractères alphanumériques.")
 	private String pseudo;
+	
+	@NotBlank(message = "{FormulaireProfil.nom.NotBlank}")
+	@Pattern(regexp = "^[a-zA-ZÀ-ÿ]+([ '-][a-zA-ZÀ-ÿ]+)*$", message = "Le nom ne peut pas contenir de chiffre ou de caractères spéciaux.")
 	private String nom;
+
+	@NotBlank(message = "{FormulaireProfil.prenom.NotBlank}")
+	@Pattern(regexp = "^[a-zA-ZÀ-ÿ]+([ '-][a-zA-ZÀ-ÿ]+)*$", message = "Le prénom ne peut pas contenir de chiffre ou de caractères spéciaux.")
 	private String prenom;
+
+	@NotBlank(message = "{FormulaireProfil.email.NotBlank}")
+	 @Pattern(regexp = "^[\\w\\-\\.]+@([\\w-]+\\.)+[\\w-]{2,}$", message = "L'adresse mail n'est pas valide.")
 	private String email;
+
+	@Pattern(regexp = "^(\\+33|0)[1-9](\\d{2}){4}$",message = "{FormulaireProfil.telephone.Format}")
 	private String telephone;
+
+	@NotBlank(message = "{FormulaireProfil.rue.NotBlank}")
 	private String rue;
+
+	@NotBlank(message = "{FormulaireProfil.codePostal.NotBlank}")
+	@Pattern(regexp = "^\\d{5}$", message = "Le code postal doit comprendre 5 chiffres.")
 	private String codePostal;
+
+	@NotBlank(message = "{FormulaireProfil.ville.NotBlank}")
 	private String ville;
+
+	@NotBlank(message = "{FormulaireProfil.motDePasse.NotBlank}")
+	@Size(min = 8, message = "{FormulaireProfil.motDePasse.Size}")
 	private String motDePasse;
+	
+	@Transient
+	private String confirmationMotDePasse;
+
+	@AssertTrue(message= "Les mots de passe ne correspondent pas.")
+	public boolean isMotDePasseValide() {
+		return motDePasse!=null && motDePasse.equals(confirmationMotDePasse);
+	}
+	
 	private int credit;
 	private boolean administrateur;
 	
 	//Relations
-	private List<ArticleVendu> article;
-	private List<Enchere> encheres;
+	private List<ArticleVendu> article = new ArrayList<ArticleVendu>();
+	private List<Enchere> encheres = new ArrayList<Enchere>();
 	
 	//Constructeurs
 	public Utilisateur() {
@@ -152,6 +193,14 @@ public class Utilisateur {
 
 	public void setEncheres(List<Enchere> encheres) {
 		this.encheres = encheres;
+	}
+
+	public String getConfirmationMotDePasse() {
+		return confirmationMotDePasse;
+	}
+
+	public void setConfirmationMotDePasse(String confirmationMotDePasse) {
+		this.confirmationMotDePasse = confirmationMotDePasse;
 	}
 	
 	

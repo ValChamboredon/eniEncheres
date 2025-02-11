@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class LoginController {
     @GetMapping("/connexion")
     public String login(){
-        return "Connexion";
+        return "connexion";
     }
 }
