@@ -5,11 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.naming.spi.DirectoryManager;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-
-import com.zaxxer.hikari.hibernate.HikariConnectionProvider;
 
 import fr.eni.eniEncheres.bo.Utilisateur;
 

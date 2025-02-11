@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail de l'Article</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <main class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6 text-center" th:text="${article.nomArticle}"></h1>
+        
+        <div class="mb-6">
+            <p class="mb-2"><strong>Description:</strong> <span th:text="${article.description}"></span></p>
+            <p class="mb-2"><strong>Catégorie:</strong> <span th:text="${article.categorie.libelle}"></span></p>
+            <p class="mb-2"><strong>Meilleure offre:</strong> <span th:text="${article.prixVente}"></span></p>
+            <p class="mb-2"><strong>Mise à prix:</strong> <span th:text="${article.miseAPrix}"></span></p>
+            <p class="mb-2"><strong>Fin de l'enchère:</strong> <span th:text="${article.dateFinEncheres}"></span></p>
+            <p class="mb-2"><strong>Retrait:</strong> <span th:text="${article.lieuRetrait.rue + ', ' + article.lieuRetrait.codePostal + ' ' + article.lieuRetrait.ville}"></span></p>
+            <p class="mb-2"><strong>Vendeur:</strong> <span th:text="${article.vendeur.pseudo}"></span></p>
+        </div>
+
+        <div th:if="${session.user != null && session.user.noUtilisateur != article.vendeur.noUtilisateur}" class="mb-6">
+            <h2 class="text-xl font-semibold mb-4">Faire une enchère</h2>
+            <form th:action="@{/encheres/add}" method="post">
+                <input type="hidden" name="noArticle" th:value="${article.noArticle}">
+                <div class="flex space-x-4">
+                    <input type="number" name="montantEnchere" th:min="${article.prixVente + 1}" step="1" required class="flex-grow px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Enchérir</button>
+                </div>
+            </form>
+        </div>
+
+        <a href="/articles" class="text-indigo-600 hover:text-indigo-900">Retour à la liste</a>
+    </main>
+</body>
+</html>
