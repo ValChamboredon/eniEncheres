@@ -31,8 +31,9 @@ public class CategorieDAOImpl implements CategorieDAO {
 
     @Override
     public Categorie findById(int id) {
-        String sql = "SELECT no_categorie, libelle FROM Categorie WHERE no_categorie = ?";
-        return jdbcTemplate.queryForObject(sql, categorieRowMapper, id);
+        String sql = "SELECT no_categorie, libelle FROM CATEGORIES WHERE no_categorie = ?";
+        List<Categorie> categories = jdbcTemplate.query(sql, categorieRowMapper, id);
+        return categories.isEmpty() ? null : categories.get(0);
     }
 
     @Override
@@ -55,7 +56,14 @@ public class CategorieDAOImpl implements CategorieDAO {
 
     @Override
     public void delete(int id) {
-        String sql = "DELETE FROM Categorie WHERE no_categorie = ?";
+        String sqlCheck = "SELECT COUNT(*) FROM ARTICLES_VENDUS WHERE no_categorie = ?";
+        int count = jdbcTemplate.queryForObject(sqlCheck, Integer.class, id);
+        if (count > 0) {
+            throw new IllegalStateException("Impossible de supprimer une catégorie utilisée.");
+        }
+        
+        String sql = "DELETE FROM CATEGORIES WHERE no_categorie = ?";
         jdbcTemplate.update(sql, id);
     }
+
 }

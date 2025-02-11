@@ -10,7 +10,7 @@ public class Enchere {
     private Utilisateur utilisateur;
     private ArticleVendu article;
     
-    public Enchere(LocalDateTime dateEnchere, Integer montantEnchere, Utilisateur utilisateur, ArticleVendu article) {
+    public Enchere() {
         this.dateEnchere = dateEnchere;
         this.montantEnchere = montantEnchere;
         this.utilisateur = utilisateur;

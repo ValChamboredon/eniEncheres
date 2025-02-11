@@ -5,19 +5,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BusinessException extends Exception {
-
-	private List<String> clesErreurs;
-
-	public List<String> getClesErreurs() {
-		return clesErreurs;
-	}
-	
-	public void addCleErreur(String cleErreur) {
-		if(clesErreurs == null) {
-			clesErreurs= new ArrayList<String>();
-		}
-		
-		clesErreurs.add(cleErreur);
-	}
-	
+    private static final long serialVersionUID = 1L;
+    private List<String> clesErreurs;
+ 
+    public BusinessException() {
+        this.clesErreurs = new ArrayList<>();
+    }
+ 
+    
+   
+    //  constructeur qui prend un message unique
+    public BusinessException(String message) {
+        super(message);
+        this.clesErreurs = new ArrayList<>();
+        this.clesErreurs.add(message);
+    }
+    
+    
+    public BusinessException(List<String> erreurs) {
+        super("Erreur de validation: " + erreurs);  // Ajout d'un message dans l'exception
+        this.clesErreurs = erreurs;
+    }
+ 
+    public List<String> getClesErreurs() {
+        return clesErreurs;
+    }
+ 
+    public void addCleErreur(String cleErreur) {
+        clesErreurs.add(cleErreur);
+    }
 }
+ 
