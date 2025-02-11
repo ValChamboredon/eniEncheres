@@ -13,6 +13,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.zaxxer.hikari.hibernate.HikariConnectionProvider;
@@ -32,45 +34,38 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 
 		
 		//Request SQL
-		private static final String INSERT = "INSERT INTO UTILISATEURS (pseudo, nom, prenom, email, telephone, rue, code_postal, ville, mot_de_passe, credit, administrateur) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+		private static final String INSERT = "INSERT INTO UTILISATEURS (pseudo, nom, prenom, email, telephone, rue, code_postal, ville, mot_de_passe, credit, administrateur) VALUES (:pseudo,:nom,:prenom,:email,:telephone,:rue,:codePostal,:ville,:motDePasse,:credit,:administrateur)";
+		private static final String UPDATE = "UPDATE UTILISATEURS SET pseudo = :pseudo, nom = :nom, prenom = :prenom, email = :email, telephone = :telephone, rue = :rue, code_postal = :codePostal, ville = :ville, mot_de_passe = :motDePasse, credit = :credit, administrateur = :administrateur WHERE email = :email";
 		private static final String CHECK_PSEUDO = "SELECT COUNT(*) FROM UTILISATEURS WHERE pseudo = ?";
 		private static final String CHECK_EMAIL = "SELECT COUNT(*) FROM UTILISATEURS WHERE email = ?";
+		private static final String DELETE = "DELETE FROM UTILISATEURS WHERE email = :email";
 		
 		
 		private final String GET = "SELECT no_utilisateur, pseudo, nom, prenom, email, telephone, rue, code_postal, ville, mot_de_passe FROM UTILISATEURS WHERE email = ?";
 		private final String FIND_BY_ID="SELECT * FROM UTILISATEURS WHERE no_utilisateur =:id";
+		private final String FIND_BY_EMAIL = "SELECT * FROM UTILISATEURS WHERE email = :email";
 		
 		
 		
 		@Override
-		 public void save(Utilisateur utilisateur) {
-	        try (Connection conn = ConnectionProvider.getConnection()) {
-	            PreparedStatement stmt = conn.prepareStatement(INSERT, PreparedStatement.RETURN_GENERATED_KEYS);
-	            
-	            stmt.setString(1, utilisateur.getPseudo());
-	            stmt.setString(2, utilisateur.getNom());
-	            stmt.setString(3, utilisateur.getPrenom());
-	            stmt.setString(4, utilisateur.getEmail());
-	            stmt.setString(5, utilisateur.getTelephone());
-	            stmt.setString(6, utilisateur.getRue());
-	            stmt.setString(7, utilisateur.getCodePostal());
-	            stmt.setString(8, utilisateur.getVille());
-	            stmt.setString(9, utilisateur.getMotDePasse());
-	            stmt.setInt(10, utilisateur.getCredit());
-	            stmt.setBoolean(11, utilisateur.isAdministrateur());
-	            
-	            stmt.executeUpdate();
-	            
-	            // Récupération de l'ID généré
-	            ResultSet rs = stmt.getGeneratedKeys();
-	            if(rs.next()) {
-	                utilisateur.setNoUtilisateur(rs.getInt(1));
-	            }
-	            
-	        } catch (SQLException e) {
-	            throw new RuntimeException("Erreur lors de l'enregistrement de l'utilisateur", e);
-	        }
-	    }
+		public void save(Utilisateur utilisateur) {
+			
+			MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+			namedParameters.addValue("pseudo", utilisateur.getPseudo());
+			namedParameters.addValue("nom", utilisateur.getNom());
+			namedParameters.addValue("prenom", utilisateur.getPrenom());
+			namedParameters.addValue("email", utilisateur.getEmail());
+			namedParameters.addValue("telephone", utilisateur.getTelephone());
+			namedParameters.addValue("rue", utilisateur.getRue());
+			namedParameters.addValue("codePostal", utilisateur.getCodePostal());
+			namedParameters.addValue("ville", utilisateur.getVille());
+			namedParameters.addValue("motDePasse", utilisateur.getMotDePasse()); // à haché
+			namedParameters.addValue("credit", utilisateur.getCredit());
+			namedParameters.addValue("administrateur", utilisateur.isAdministrateur());
+	 
+			namedParameterJdbcTemplate.update(UPDATE, namedParameters);
+	 
+		}
 		
 		@Override
 		public boolean existsByEmail(String email) {
@@ -114,16 +109,18 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 
 		@Override
 		public Utilisateur getUtilisateur(String email) {
-			//TODO
-			return null;
+			MapSqlParameterSource namedParameterSource = new MapSqlParameterSource();
+			namedParameterSource.addValue("email", email);
+			return namedParameterJdbcTemplate.queryForObject(FIND_BY_EMAIL, namedParameterSource, new UtilisateurRowMapper());
 		}
 
 
 
 		@Override
 		public void supprimerByEmail(String email) {
-			// TODO Auto-generated method stub
-			
+			MapSqlParameterSource namedParameterSource = new MapSqlParameterSource();
+			namedParameterSource.addValue("email", email);
+			namedParameterJdbcTemplate.update(DELETE, namedParameterSource);
 		}
 	
 		class UtilisateurRowMapper implements RowMapper<Utilisateur> {

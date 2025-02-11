@@ -5,10 +5,5 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class EnchereController {
-	
-	@GetMapping("/profil")
-	public String showProfil() {
-		return "profil";
-	}
 
 }

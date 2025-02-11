@@ -9,55 +9,59 @@
 	<div th:replace="~{/fragments/fragment-entete :: entete}"></div>
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h2 class="text-xl font-bold mb-4">Profil</h2>
-        <form action="#" method="POST" class="space-y-4">
+        <form th:action="@{/profil}" method="POST" class="space-y-4">
             <div>
                 <label class="block font-medium">Pseudo</label>
-                <input type="text" name="pseudo" class="w-full p-2 border rounded-lg" required>
+                <input type="text" name="pseudo" class="w-full p-2 border rounded-lg" th:value="${utilisateur.pseudo}" required>
             </div>
             <div>
                 <label class="block font-medium">Nom</label>
-                <input type="text" name="nom" class="w-full p-2 border rounded-lg" required>
+                <input type="text" name="nom" class="w-full p-2 border rounded-lg" th:value="${utilisateur.nom}" required>
             </div>
             <div>
                 <label class="block font-medium">Prénom</label>
-                <input type="text" name="prenom" class="w-full p-2 border rounded-lg" required>
+                <input type="text" name="prenom" class="w-full p-2 border rounded-lg" th:value="${utilisateur.prenom}" required>
             </div>
             <div>
                 <label class="block font-medium">Email</label>
-                <input type="email" name="email" class="w-full p-2 border rounded-lg" required>
+                <input type="email" name="email" class="w-full p-2 border rounded-lg" th:value="${utilisateur.email}" required>
             </div>
             <div>
                 <label class="block font-medium">Téléphone</label>
-                <input type="tel" name="telephone" class="w-full p-2 border rounded-lg" required>
+                <input type="tel" name="telephone" class="w-full p-2 border rounded-lg" th:value="${utilisateur.telephone}" required>
             </div>
             <div>
                 <label class="block font-medium">Rue</label>
-                <input type="text" name="rue" class="w-full p-2 border rounded-lg" required>
+                <input type="text" name="rue" class="w-full p-2 border rounded-lg" th:value="${utilisateur.rue}" required>
             </div>
             <div>
                 <label class="block font-medium">Code Postal</label>
-                <input type="text" name="code_postal" class="w-full p-2 border rounded-lg" required>
+                <input type="text" name="code_postal" class="w-full p-2 border rounded-lg" th:value="${utilisateur.codePostal}" required>
             </div>
             <div>
                 <label class="block font-medium">Ville</label>
-                <input type="text" name="ville" class="w-full p-2 border rounded-lg" required>
+                <input type="text" name="ville" class="w-full p-2 border rounded-lg" th:value="${utilisateur.ville}" required>
             </div>
             <div>
                 <label class="block font-medium">Mot de passe</label>
-                <input type="password" name="mot_de_passe" class="w-full p-2 border rounded-lg" required>
+                <input type="password" name="mot_de_passe" class="w-full p-2 border rounded-lg" th:value="${utilisateur.motDePasse}" required>
             </div>
             <div>
                 <label class="block font-medium">Crédit</label>
-                <input type="number" name="credit" class="w-full p-2 border rounded-lg" required>
+                <input type="number" name="credit" class="w-full p-2 border rounded-lg" th:value="${utilisateur.credit}" required>
             </div>
             <div>
                 <label class="block font-medium">Administrateur</label>
-                <select name="administrateur" class="w-full p-2 border rounded-lg">
-                    <option value="0">Non</option>
-                    <option value="1">Oui</option>
-                </select>
+					<select name="administrateur" class="w-full p-2 border rounded-lg">
+					    <option value="false" th:selected="${not utilisateur.administrateur}">Non</option>
+					    <option value="true" th:selected="${utilisateur.administrateur}">Oui</option>
+					</select>
             </div>
-            <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600">Envoyer</button>
+            <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600">Modifier les infos</button>
+        </form>
+        <form th:action="@{/profil/supprimer}" method="post">
+        	<input type="hidden" name="email" th:value="${utilisateur.email}" />
+        	<button type="submit" class="w-full bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50 mt-4">Supprimer le compte</button>
         </form>
     </div>
 </body>
