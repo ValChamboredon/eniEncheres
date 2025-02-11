@@ -59,8 +59,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 
 	@Override
 	public Utilisateur getUtilisateurById(int noUtilisateur) {
-		// TODO Auto-generated method stub
-		return null;
+		return utilisateurDAO.read(noUtilisateur);
 	}
 
 

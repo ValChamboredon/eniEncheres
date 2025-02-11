@@ -20,20 +20,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
  
-    private final String SELECT_USER = "SELECT email, password, enabled FROM users WHERE email=?";
-    private final String SELECT_ROLES = "SELECT u.email, r.role FROM users u INNER JOIN user_roles ur ON u.id = ur.user_id INNER JOIN roles r ON ur.role_id = r.id WHERE u.email=?";
- 
-    @Bean
-    public UserDetailsManager userDetailsManager(DataSource dataSource) {
-        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-        jdbcUserDetailsManager.setUsersByUsernameQuery(SELECT_USER);
-        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(SELECT_ROLES);
-        return jdbcUserDetailsManager;
-    }
- 
-    @Bean
+    //@Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -51,7 +39,7 @@ public class SecurityConfig {
 		security.formLogin(formLogin -> {
 				formLogin
 						.loginPage("/connexion")
-						.defaultSuccessUrl("/");
+						.defaultSuccessUrl("/inscription",true);
 		});
 		
 		security.logout(logout -> {
@@ -71,12 +59,12 @@ public class SecurityConfig {
 
 	    // Requête pour charger un utilisateur
 	    userManager.setUsersByUsernameQuery(
-	        "SELECT pseudo AS username, mot_de_passe AS password, administrateur AS enabled FROM UTILISATEURS WHERE pseudo = ?"
+	        "SELECT email AS username, mot_de_passe AS password, 1 AS enabled FROM UTILISATEURS WHERE email = ?"
 	    );
 
 	    // Requête pour charger les rôles
 	    userManager.setAuthoritiesByUsernameQuery(
-	        "SELECT pseudo AS username, 'ROLE_USER' AS authority FROM UTILISATEURS WHERE pseudo = ?"
+	        "SELECT email AS username, 'ROLE_USER' AS authority FROM UTILISATEURS WHERE email = ?"
 	    );
 
 	    return userManager;

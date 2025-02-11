@@ -28,8 +28,7 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 				this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
 			}
 			
-			@Autowired
-			private JdbcTemplate jdbcTemplate2;
+		
 
 		
 		//Request SQL
@@ -39,6 +38,9 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 		
 		
 		private final String GET = "SELECT no_utilisateur, pseudo, nom, prenom, email, telephone, rue, code_postal, ville, mot_de_passe FROM UTILISATEURS WHERE email = ?";
+		private final String FIND_BY_ID="SELECT * FROM UTILISATEURS WHERE no_utilisateur =:id";
+		
+		
 		
 		@Override
 		 public void save(Utilisateur utilisateur) {
@@ -104,14 +106,16 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 
 		@Override
 		public Utilisateur read(int noUtilisateur) {
-			// TODO Auto-generated method stub
-			return null;
+			MapSqlParameterSource namedParameterSource = new MapSqlParameterSource();
+			namedParameterSource.addValue("id", noUtilisateur);
+			return namedParameterJdbcTemplate.queryForObject(FIND_BY_ID, namedParameterSource,new UtilisateurRowMapper());
 		}
 
 
 		@Override
 		public Utilisateur getUtilisateur(String email) {
-			return jdbcTemplate2.queryForObject(GET, new UtilisateurRowMapper(), email);
+			//TODO
+			return null;
 		}
 
 
