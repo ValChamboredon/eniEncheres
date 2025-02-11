@@ -34,11 +34,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 
 	@Override
 	public void enregistrer(@Valid Utilisateur utilisateur) {
-		utilisateur.setCredit(0);
-		utilisateur.setAdministrateur(false);
-		
 		utilisateurDAO.save(utilisateur);
-		
 	}
 
 
@@ -72,8 +68,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 
 	@Override
 	public void supprimerByEmail(String email) {
-		// TODO Auto-generated method stub
-		
+		utilisateurDAO.supprimerByEmail(email);
 	}
 
 
