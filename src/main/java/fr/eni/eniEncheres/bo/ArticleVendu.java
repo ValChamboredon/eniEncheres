@@ -25,7 +25,7 @@ public class ArticleVendu {
 
     }
 
-    public ArticleVendu(int noArticle, String nomArticle, String description, LocalDate dateDebutEncheres, LocalDate dateFinEncheres, float miseAPrix, float prixVente, String etatVente) {
+    public ArticleVendu(int noArticle, String nomArticle, String description, LocalDate dateDebutEncheres, LocalDate dateFinEncheres, float miseAPrix, float prixVente, EtatVente etatVente) {
         this.noArticle = noArticle;
         this.nomArticle = nomArticle;
         this.description = description;
