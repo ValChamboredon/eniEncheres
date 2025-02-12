@@ -18,20 +18,7 @@ public class ProfilController {
 	public ProfilController(UtilisateurService utilisateurService) {
 		this.utilisateurService = utilisateurService;
 	}
-	
-//	@GetMapping
-//	public Utilisateur getProfilUtilisateur() {
-//		//récupérer email de l'utilisateur
-//		Authentication authentification = SecurityContextHolder.getContext().getAuthentication();
-//		String email = authentification.getName();
-//		
-//		//récupérer l'utilisateur en base de données
-//		Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(email);
-//		
-//		return utilisateur;
-//		
-//	}
-	
+		
 	@GetMapping("/profil")
 	public String afficherProfil(Model model) {
 		//récupérer email de l'utilisateur
@@ -79,7 +66,7 @@ public class ProfilController {
 		utilisateur.setAdministrateur(administrateur);
 		
 		//mettre à jour la bdd
-		utilisateurService.enregistrer(utilisateur);
+		utilisateurService.modifier(utilisateur);
 		
 		//ajouter utilisateur au model
 		model.addAttribute("utilisateur", utilisateur);

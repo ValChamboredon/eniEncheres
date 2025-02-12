@@ -20,10 +20,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class SecurityConfig {
  
-    //@Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	
  
     @Bean
 	SecurityFilterChain getFilterChain(HttpSecurity security) throws Exception {
@@ -39,7 +36,7 @@ public class SecurityConfig {
 			.formLogin(formLogin -> {
 				formLogin
 						.loginPage("/connexion")
-						.defaultSuccessUrl("/inscription",true);
+						.defaultSuccessUrl("/",true);
 		})
 			.logout((logout) ->
 				logout
@@ -54,21 +51,22 @@ public class SecurityConfig {
 
     
     @Bean
-	UserDetailsManager users(DataSource dataSource) {
-	    JdbcUserDetailsManager userManager = new JdbcUserDetailsManager(dataSource);
+    UserDetailsManager users(DataSource dataSource) {
+        JdbcUserDetailsManager userManager = new JdbcUserDetailsManager(dataSource);
 
-	    // Requête pour charger un utilisateur
-	    userManager.setUsersByUsernameQuery(
-	        "SELECT email AS username, mot_de_passe AS password, 1 AS enabled FROM UTILISATEURS WHERE email = ?"
-	    );
+        // Requête pour charger un utilisateur
+        userManager.setUsersByUsernameQuery(
+            "SELECT email AS username, mot_de_passe AS password, 1 AS enabled FROM UTILISATEURS WHERE email = ?"
+        );
 
-	    // Requête pour charger les rôles
-	    userManager.setAuthoritiesByUsernameQuery(
-	        "SELECT email AS username, 'ROLE_USER' AS authority FROM UTILISATEURS WHERE email = ?"
-	    );
+        // Requête pour charger les rôles
+        userManager.setAuthoritiesByUsernameQuery(
+            "SELECT email AS username, 'ROLE_USER' AS authority FROM UTILISATEURS WHERE email = ?"
+        );
 
-	    return userManager;
-	}
+        return userManager;
+    }
+
  
    
 }
