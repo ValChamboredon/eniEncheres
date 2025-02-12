@@ -1,4 +1,4 @@
-package fr.eni.eniEncheres.dal;
+package fr.eni.eniEncheres.dal.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,5 +15,4 @@ public class CategorieRowMapper implements RowMapper<Categorie> {
         categorie.setLibelle(rs.getString("libelle"));
         return categorie;
     }
-
 }

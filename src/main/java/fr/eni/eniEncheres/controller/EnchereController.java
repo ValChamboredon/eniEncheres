@@ -3,57 +3,39 @@ package fr.eni.eniEncheres.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import fr.eni.eniEncheres.bll.EnchereService;
 import fr.eni.eniEncheres.bo.Enchere;
-import fr.eni.eniEncheres.exception.BusinessException;
 
-@Controller
+@RestController
 @RequestMapping("/encheres")
 public class EnchereController {
 
+    private final EnchereService enchereService;
+
     @Autowired
-    private EnchereService enchereService;
-    @PostMapping("/nouvelle")
-    public String placerEnchere(@ModelAttribute Enchere enchere, BindingResult result, Model model) {
-        if (!isUserAuthenticated()) {
-            model.addAttribute("erreur", "Vous devez être connecté pour enchérir.");
-            return "redirect:/connexion";
-        }
-
-        if (result.hasErrors()) {
-            model.addAttribute("erreur", "Données invalides.");
-            return "formulaireEnchere";
-        }
-
-        try {
-            enchereService.creerEnchere(enchere);
-        } catch (BusinessException e) {
-            model.addAttribute("erreur", e.getMessage());
-            return "formulaireEnchere";
-        }
-
-        return "redirect:/articles/" + enchere.getArticle().getNoArticle();
+    public EnchereController(EnchereService enchereService) {
+        this.enchereService = enchereService;
     }
 
-    private boolean isUserAuthenticated() {
-        return true; // Ajouter la logique d’authentification
+    @PostMapping("/nouvelle") //Ajoute une nouvelle enchère
+    public void ajouterEnchere(@RequestBody Enchere enchere) {
+        enchereService.ajouterEnchere(enchere);
     }
 
-    @GetMapping("/article/{noArticle}")
-    public String voirEncheresParArticle(@PathVariable int noArticle, Model model) {
-        List<Enchere> encheres = enchereService.obtenirEncheresParArticle(noArticle);
-        model.addAttribute("encheres", encheres);
-        return "listeEncheres";
+    @GetMapping("/article/{id}") //Récupère toutes les enchères sur un article
+    public List<Enchere> getEncheresParArticle(@PathVariable int id) {
+        return enchereService.getEncheresParArticle(id);
     }
 
-    // Autres méthodes pertinentes
+    @GetMapping("/max/{id}") //Récupère l'enchère la plus haute
+    public Enchere getMeilleureEnchere(@PathVariable int id) {
+        return enchereService.getEnchereMaxParArticle(id);
+    }
 }

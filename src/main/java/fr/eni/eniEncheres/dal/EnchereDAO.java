@@ -1,11 +1,14 @@
+// Interface DAO pour la gestion des enchères
 package fr.eni.eniEncheres.dal;
 
-import fr.eni.eniEncheres.bo.Enchere;
 import java.util.List;
 
+import fr.eni.eniEncheres.bo.Enchere;
+
 public interface EnchereDAO {
-	
-    void save(Enchere enchere);
-    List<Enchere> findByArticleId(int noArticle);
-    Enchere findHighestBidByArticleId(int noArticle);
+    void ajouterEnchere(Enchere enchere);
+    List<Enchere> getEncheresParArticle(int noArticle);
+    Enchere getEnchereMaxParArticle(int noArticle);
+    void supprimerEncheresParArticle(int noArticle);
+    void mettreAJourEnchere(Enchere enchere);
 }

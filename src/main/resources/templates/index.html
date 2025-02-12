@@ -1,16 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil - ENI Enchères</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-	<div th:replace="~{/fragments/fragment-entete :: entete}"></div>
-	
-	
-	
-	
-	
+<body class="bg-gray-100">
+    <div class="container mx-auto p-8">
+        <h1 class="text-3xl font-bold text-center mb-6">Liste des Enchères</h1>
+        
+        <table class="min-w-full bg-white shadow-md rounded">
+            <thead class="bg-blue-500 text-white">
+                <tr>
+                    <th class="py-2 px-4">Nom de l'article</th>
+                    <th class="py-2 px-4">Prix actuel</th>
+                    <th class="py-2 px-4">Fin de l'enchère</th>
+                    <th class="py-2 px-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="article : ${articles}" class="border-b">
+                    <td class="py-2 px-4" th:text="${article.nomArticle}"></td>
+                    <td class="py-2 px-4" th:text="${article.prixVente}"></td>
+                    <td class="py-2 px-4" th:text="${article.dateFinEncheres}"></td>
+                    <td class="py-2 px-4">
+                        <a th:href="@{/articles/{id}(id=${article.noArticle})}" class="text-blue-500 hover:underline">Détails</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="mt-4 text-center">
+            <a href="/articles/new" class="bg-blue-500 text-white px-4 py-2 rounded">Ajouter un article</a>
+        </div>
+    </div>
 </body>
 </html>

@@ -3,37 +3,29 @@ package fr.eni.eniEncheres.dal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 
 import fr.eni.eniEncheres.bo.ArticleVendu;
 
+@Repository
 public class ArticleDAOImpl implements ArticleDAO {
 	
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public ArticleVendu getArticleById(int id) {
-		String sql = "SELECT * FROM ARTICLES_VENDUS WHERE no_article = ?";
-		return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, rowNum) ->
-			new ArticleVendu(
-					rs.getInt("no_article"),
-					rs.getString("nom_article"),
-					rs.getString("description"),
-					rs.getDate("date_debut_encheres").toLocalDate(),
-					rs.getDate("date_fin_encheres").toLocalDate(),
-					rs.getFloat("prix_initial"),
-					rs.getFloat("prix_vente"),
-					rs.getString("etat_vente")
-					)
-		);
+		String sql = "SELECT * FROM ARTICLES_VENDUS WHERE no_article = :id";
+		MapSqlParameterSource params = new MapSqlParameterSource("id", id);
+		return namedParameterJdbcTemplate.queryForObject(sql, params, new BeanPropertyRowMapper<>(ArticleVendu.class));
 	}
 
 	@Override
@@ -93,40 +85,20 @@ public class ArticleDAOImpl implements ArticleDAO {
         jdbcTemplate.update(sql, id);
 	}
 
-	@SuppressWarnings("deprecation")
+
 	@Override
 	public List<ArticleVendu> getArticlesByCategory(int categoryId) {
-		String sql = "SELECT * FROM ARTICLES_VENDUS WHERE no_categorie = ?";
-        return jdbcTemplate.query(sql, new Object[]{categoryId}, (rs, rowNum) ->
-                new ArticleVendu(
-                        rs.getInt("no_article"),
-                        rs.getString("nom_article"),
-                        rs.getString("description"),
-                        rs.getDate("date_debut_encheres").toLocalDate(),
-                        rs.getDate("date_fin_encheres").toLocalDate(),
-                        rs.getFloat("prix_initial"),
-                        rs.getFloat("prix_vente"),
-                        rs.getString("etat_vente")
-                )
-        );
+		String sql = "SELECT * FROM ARTICLES_VENDUS WHERE no_categorie = :categoryId";
+		MapSqlParameterSource params = new MapSqlParameterSource("categoryId", categoryId);
+	    return namedParameterJdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(ArticleVendu.class));
 	}
 
-	@SuppressWarnings("deprecation")
+	
 	@Override
 	public List<ArticleVendu> getArticlesByUser(int userId) {
-		 String sql = "SELECT * FROM ARTICLES_VENDUS WHERE no_utilisateur = ?";
-	        return jdbcTemplate.query(sql, new Object[]{userId}, (rs, rowNum) ->
-	                new ArticleVendu(
-	                        rs.getInt("no_article"),
-	                        rs.getString("nom_article"),
-	                        rs.getString("description"),
-	                        rs.getDate("date_debut_encheres").toLocalDate(),
-	                        rs.getDate("date_fin_encheres").toLocalDate(),
-	                        rs.getFloat("prix_initial"),
-	                        rs.getFloat("prix_vente"),
-	                        rs.getString("etat_vente")
-	                )
-	        );
+		 String sql = "SELECT * FROM ARTICLES_VENDUS WHERE no_utilisateur = :userId";
+		 MapSqlParameterSource params = new MapSqlParameterSource("userId", userId);
+		 return namedParameterJdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(ArticleVendu.class));  
 	}
 
 	@Override
@@ -146,21 +118,13 @@ public class ArticleDAOImpl implements ArticleDAO {
         );
 	}
 
-	@SuppressWarnings("deprecation")
+
 	@Override
 	public List<ArticleVendu> searchArticles(String keyword, int categoryId) {
-		String sql = "SELECT * FROM ARTICLES_VENDUS WHERE nom_article LIKE ? AND (? = 0 OR no_categorie = ?)";
-        return jdbcTemplate.query(sql, new Object[]{"%" + keyword + "%", categoryId, categoryId}, (rs, rowNum) ->
-                new ArticleVendu(
-                        rs.getInt("no_article"),
-                        rs.getString("nom_article"),
-                        rs.getString("description"),
-                        rs.getDate("date_debut_encheres").toLocalDate(),
-                        rs.getDate("date_fin_encheres").toLocalDate(),
-                        rs.getFloat("prix_initial"),
-                        rs.getFloat("prix_vente"),
-                        rs.getString("etat_vente")
-                )
-        );
+		String sql = "SELECT * FROM ARTICLES_VENDUS WHERE nom_article LIKE :keyword AND (:categoryId = 0 OR no_categorie = :categoryId)";
+		MapSqlParameterSource params = new MapSqlParameterSource();
+	    params.addValue("keyword", "%" + keyword + "%");
+	    params.addValue("categoryId", categoryId);
+	    return namedParameterJdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(ArticleVendu.class));
 	}
 }

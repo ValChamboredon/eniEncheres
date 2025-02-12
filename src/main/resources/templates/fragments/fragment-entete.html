@@ -2,12 +2,14 @@
     <nav class="bg-gradient-to-r from-blue-900 to-blue-700 p-4 shadow-lg">
         <div class="flex items-center justify-between">
             <div class="flex items-center">
-                <h1 class="text-white text-2xl font-bold">eni enchère</h1>
+                <h1 class="text-white text-2xl font-bold"><a th:href="@{/}">eni enchère</a></h1>
             </div>
 
             <div class="flex items-center space-x-4">
-                <p class="text-white"><a th:href="@{/inscription}" class="hover:underline">S'inscrire</a></p>
-                <p class="text-white"><a th:href="@{/connexion}" class="hover:underline">Se connecter</a></p>           
+                <p sec:authorize="!isAuthenticated" class="text-white"><a th:href="@{/inscription}" class="hover:underline">S'inscrire</a></p>
+                <p sec:authorize="!isAuthenticated" class="text-white"><a th:href="@{/connexion}" class="hover:underline">Se connecter</a></p>
+                <p sec:authorize="isAuthenticated" class="text-white"><a th:href="@{/profil}" class="hover:underline">profil</a></p>  
+                <p sec:authorize="isAuthenticated" class="text-white"><a th:href="@{/deconnexion}" class="hover:underline">Se déconnecter</a></p>           
         </div>
     </nav>
 </header>

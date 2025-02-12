@@ -1,15 +1,14 @@
+//Interface DAO pour la gestion des catégories
 package fr.eni.eniEncheres.dal;
 
-import fr.eni.eniEncheres.bo.Categorie;
 import java.util.List;
 
+import fr.eni.eniEncheres.bo.Categorie;
+
 public interface CategorieDAO {
-	
-	
-    Categorie findById(int id);
-    List<Categorie> findAll();
-    
-    void save(Categorie categorie);
-    void update(Categorie categorie);
-    void delete(int id);
+ void ajouterCategorie(Categorie categorie);
+ Categorie getCategorieById(int noCategorie);
+ List<Categorie> getAllCategories();
+ void supprimerCategorie(int noCategorie);
+ void mettreAJourCategorie(Categorie categorie);
 }

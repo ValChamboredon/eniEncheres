@@ -18,7 +18,7 @@ public class ArticleVendu {
     private Utilisateur vendeur;             
     private Categorie categorie;             
     private Retrait lieuRetrait;            
-    private List<Enchere> encheres; 
+    private List<Enchere> encheres;
 
     //constructeur
     public ArticleVendu() {
@@ -132,6 +132,7 @@ public class ArticleVendu {
     public void setEncheres(List<Enchere> encheres) {
         this.encheres = encheres;
     }
-    
 
-}
+
+	}
+

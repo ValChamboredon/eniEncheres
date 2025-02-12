@@ -1,28 +1,16 @@
 package fr.eni.eniEncheres.dal;
 
-
-
-import org.springframework.stereotype.Repository;
+import java.util.List;
 
 import fr.eni.eniEncheres.bo.Utilisateur;
 
-
-
-import fr.eni.eniEncheres.bo.Utilisateur;
-
-@Repository
 public interface UtilisateurDAO {
-
-	void save(Utilisateur utilisateur);
-	boolean existsByPseudo(String pseudo);
-	boolean existsByEmail(String email);
-	
-
-	
-	Utilisateur read(int noUtilisateur);
-	
-	Utilisateur getUtilisateur(String email);
-	void supprimerByEmail(String email);
-	
-	
+    void ajouterUtilisateur(Utilisateur utilisateur);
+    Utilisateur getUtilisateurById(int noUtilisateur);
+    Utilisateur getUtilisateurByEmail(String email);
+    Utilisateur getUtilisateurByPseudo(String pseudo); // ✅ Nouvelle méthode
+    List<Utilisateur> getAllUtilisateurs();
+    void supprimerUtilisateur(int noUtilisateur);
+    void supprimerByEmail(String email); // ✅ Nouvelle méthode
+    void mettreAJourUtilisateur(Utilisateur utilisateur);
 }

@@ -2,8 +2,9 @@ package fr.eni.eniEncheres.controller.converter;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-import fr.eni.eniEncheres.bo.Categorie;
+
 import fr.eni.eniEncheres.bll.CategorieService;
+import fr.eni.eniEncheres.bo.Categorie;
 
 @Component
 public class StringToCategorieConverter implements Converter<String, Categorie> {

@@ -1,70 +1,70 @@
+/**
+ * Implémentation du service métier pour la gestion des enchères.
+ * Gère la logique métier et interagit avec la couche DAO pour la persistance des enchères.
+ */
 package fr.eni.eniEncheres.bll;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import fr.eni.eniEncheres.bo.ArticleVendu;
 import fr.eni.eniEncheres.bo.Enchere;
-import fr.eni.eniEncheres.bo.Utilisateur;
-import fr.eni.eniEncheres.dal.ArticleDAO;
 import fr.eni.eniEncheres.dal.EnchereDAO;
-import fr.eni.eniEncheres.dal.UtilisateurDAO;
-import fr.eni.eniEncheres.exception.BusinessException;
 
+/**
+ * Annotation @Service permet à Spring de gérer cette classe comme un service métier.
+ */
 @Service
 public class EnchereServiceImpl implements EnchereService {
 
-	 @Autowired
-	 private EnchereDAO enchereDAO;
+    // Dépendance vers le DAO pour interagir avec la base de données.
+    private final EnchereDAO enchereDAO;
 
-	 @Autowired
-	 private ArticleDAO articleDAO;
-
-	 @Autowired
-	    private UtilisateurDAO utilisateurDAO;
-
-    
-    @Override
-    @Transactional
-    public void creerEnchere(Enchere enchere) throws BusinessException {
-        ArticleVendu articleVendu = articleDAO.getArticleById(enchere.getArticle().getNoArticle());
-        Utilisateur utilisateur = utilisateurDAO.read(enchere.getUtilisateur().getNoUtilisateur());
-
-        if (articleVendu == null || utilisateur == null) {
-            throw new BusinessException("Article ou utilisateur non trouvé.");
-        }
-
-        if (enchere.getMontantEnchere() <= articleVendu.getPrixVente()) {
-            throw new BusinessException("Le montant de l'enchère doit être supérieur au prix actuel.");
-        }
-
-        if (utilisateur.getCredit() < enchere.getMontantEnchere()) {
-            throw new BusinessException("Crédits insuffisants pour placer l'enchère.");
-        }
-
-        // Mise à jour du prix de vente de l'article
-        articleVendu.setPrixVente(enchere.getMontantEnchere());
-        articleDAO.update(articleVendu);
-
-        // Déduction des crédits de l'utilisateur
-        utilisateur.setCredit(utilisateur.getCredit() - enchere.getMontantEnchere());
-        utilisateurDAO.update(utilisateur);
-
-        // Enregistrement de l'enchère
-        enchereDAO.save(enchere);
+    /**
+     * Injection de dépendance via le constructeur.
+     * @param enchereDAO DAO des enchères.
+     */
+    @Autowired
+    public EnchereServiceImpl(EnchereDAO enchereDAO) {
+        this.enchereDAO = enchereDAO;
     }
 
-
-
+    /**
+     * Ajoute une enchère.
+     */
     @Override
-    public Enchere obtenirEnchereLaPlusHaute(int noArticle) {
-        List<Enchere> encheres = enchereDAO.findByArticleId(noArticle);
-        return encheres.stream()
-                       .max((e1, e2) -> e1.getMontantEnchere().compareTo(e2.getMontantEnchere()))
-                       .orElse(null);
+    public void ajouterEnchere(Enchere enchere) {
+        enchereDAO.ajouterEnchere(enchere);
     }
 
+    /**
+     * Récupère toutes les enchères pour un article donné.
+     */
+    @Override
+    public List<Enchere> getEncheresParArticle(int noArticle) {
+        return enchereDAO.getEncheresParArticle(noArticle);
+    }
+
+    /**
+     * Récupère l'enchère la plus élevée pour un article donné.
+     */
+    @Override
+    public Enchere getEnchereMaxParArticle(int noArticle) {
+        return enchereDAO.getEnchereMaxParArticle(noArticle);
+    }
+
+    /**
+     * Supprime toutes les enchères d'un article donné.
+     */
+    @Override
+    public void supprimerEncheresParArticle(int noArticle) {
+        enchereDAO.supprimerEncheresParArticle(noArticle);
+    }
+
+    /**
+     * Met à jour une enchère existante.
+     */
+    @Override
+    public void mettreAJourEnchere(Enchere enchere) {
+        enchereDAO.mettreAJourEnchere(enchere);
+    }
 }
