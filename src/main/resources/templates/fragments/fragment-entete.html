@@ -2,7 +2,13 @@
     <nav class="bg-gradient-to-r from-blue-900 to-blue-700 p-4 shadow-lg">
         <div class="flex items-center justify-between">
             <div class="flex items-center">
-                <h1 class="text-white text-2xl font-bold"><a th:href="@{/}">eni enchère</a></h1>
+            
+            <!-- Itération 1 navigation l'utilisateur peut cliquer sur le h1 pour qu'il soit redirigé vers l'accueil QUE si il est connecté -->
+                <h1 class="text-white text-2xl font-bold">
+                    <a th:href="${#authorization.expression('isAuthenticated()')} ? @{/} : null"
+                       th:if="${#authorization.expression('isAuthenticated()')}">ENI-Enchères</a>
+                    <span th:unless="${#authorization.expression('isAuthenticated()')}">ENI-Enchères</span>
+                </h1>
             </div>
 
             <div class="flex items-center space-x-4">
@@ -10,6 +16,7 @@
                 <p sec:authorize="!isAuthenticated" class="text-white"><a th:href="@{/connexion}" class="hover:underline">Se connecter</a></p>
                 <p sec:authorize="isAuthenticated" class="text-white"><a th:href="@{/profil}" class="hover:underline">profil</a></p>  
                 <p sec:authorize="isAuthenticated" class="text-white"><a th:href="@{/deconnexion}" class="hover:underline">Se déconnecter</a></p>           
+            </div>
         </div>
     </nav>
 </header>

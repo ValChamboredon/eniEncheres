@@ -23,7 +23,12 @@
             <div class="mb-4">
                 <label for="categorie" class="block text-gray-700">Catégorie:</label>
                 <select id="categorie" th:field="*{categorie.noCategorie}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <!-- Add category options dynamically -->
+                    <select id="categorie" th:field="*{categorie.noCategorie}" required class="...">
+   						 <option th:each="categorie : ${categories}" 
+     						       th:value="${categorie.noCategorie}" 
+   						         th:text="${categorie.libelle}">
+ 					   </option>
+					</select>
                 </select>
             </div>
             <div class="mb-4">
