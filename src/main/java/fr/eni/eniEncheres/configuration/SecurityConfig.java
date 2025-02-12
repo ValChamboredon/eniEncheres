@@ -20,58 +20,49 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class SecurityConfig {
  
-	
- 
     @Bean
-	SecurityFilterChain getFilterChain(HttpSecurity security) throws Exception {
+    SecurityFilterChain getFilterChain(HttpSecurity security) throws Exception {
+        security.authorizeHttpRequests(auth -> {
+            // Configurez d'abord les correspondances spécifiques
+            auth.requestMatchers("/css/*", "/images/*").permitAll();
+            auth.requestMatchers("/", "/articles", "/inscription", "/connexion").permitAll();
+            
+            // Protégez les routes qui nécessitent une authentification
+            auth.requestMatchers("/profil/**", "/encheres/**", "/articles/new", "/articles/edit/**").authenticated();
+            
+            // Utilisez anyRequest() en dernier
+            auth.anyRequest().authenticated();
+        });
 
-		security.authorizeHttpRequests(auth -> {
-			auth.requestMatchers(HttpMethod.GET, "/css/*").permitAll();
-			auth.requestMatchers(HttpMethod.GET, "/images/*").permitAll();
+        security
+            .formLogin(formLogin -> {
+                formLogin
+                    .loginPage("/connexion")
+                    .defaultSuccessUrl("/", true);
+            })
+            .logout(logout ->
+                logout
+                    .invalidateHttpSession(true)
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/deconnexion", "GET"))
+                    .logoutSuccessUrl("/")
+            );
+        
+        return security.build();
+    }
 
-			auth.anyRequest().permitAll();
-			auth.requestMatchers("/", "/articles", "/articles/{id}").permitAll();
-		    auth.requestMatchers("/inscription", "/connexion").anonymous();
-		    auth.requestMatchers("/encheres/**", "/profil/**").authenticated();
-		    auth.anyRequest().denyAll();
-		});
-
-		security
-			.formLogin(formLogin -> {
-				formLogin
-						.loginPage("/connexion")
-						.defaultSuccessUrl("/",true);
-		})
-			.logout((logout) ->
-				logout
-					.invalidateHttpSession(true)
-					.logoutRequestMatcher(new AntPathRequestMatcher("/deconnexion", "GET"))
-					.logoutSuccessUrl("/")
-        );
-		
-		return security.build();
-	}
-
-
-    
     @Bean
     UserDetailsManager users(DataSource dataSource) {
         JdbcUserDetailsManager userManager = new JdbcUserDetailsManager(dataSource);
 
-        // Requête pour charger un utilisateur
         userManager.setUsersByUsernameQuery(
             "SELECT email AS username, mot_de_passe AS password, 1 AS enabled FROM UTILISATEURS WHERE email = ?"
         );
 
-        // Requête pour charger les rôles
         userManager.setAuthoritiesByUsernameQuery(
             "SELECT email AS username, 'ROLE_USER' AS authority FROM UTILISATEURS WHERE email = ?"
         );
 
         return userManager;
     }
-
- 
-   
 }
 
