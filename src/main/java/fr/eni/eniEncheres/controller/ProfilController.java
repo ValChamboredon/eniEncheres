@@ -10,6 +10,9 @@ import org.springframework.ui.Model;
 import fr.eni.eniEncheres.bll.UtilisateurService;
 import fr.eni.eniEncheres.bo.Utilisateur;
 
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 @Controller
 public class ProfilController {
 	
@@ -29,55 +32,82 @@ public class ProfilController {
 		Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(email);
 		model.addAttribute("utilisateur", utilisateur);
 		
-		System.out.println(utilisateur);
-		
 		return "profil";
 	}
 	
-	@PostMapping("/profil")
-	public String modifierProfil (	@RequestParam("pseudo") String pseudo,
-									@RequestParam("nom") String nom,
-									@RequestParam("prenom") String prenom,
-									@RequestParam("email") String email,
-									@RequestParam("telephone") String telephone,
-									@RequestParam("rue") String rue,
-									@RequestParam("code_postal") String codePostal,
-									@RequestParam("ville") String ville,
-									@RequestParam("mot_de_passe") String motDePasse,
-									@RequestParam("credit") int credit,
-									@RequestParam("administrateur") boolean administrateur,
-									Model model) {
+	@PostMapping("/profil/detail")
+	public String modifierProfil(
+	    @RequestParam("pseudo") String pseudo,
+	    @RequestParam("nom") String nom,
+	    @RequestParam("prenom") String prenom,
+	    @RequestParam("email") String email,
+	    @RequestParam("telephone") String telephone,
+	    @RequestParam("rue") String rue,
+	    @RequestParam("code_postal") String codePostal,
+	    @RequestParam("ville") String ville,
+	    @RequestParam("mot_de_passe") String motDePasse,
+	    @RequestParam("nouveau_mot_de_passe") String motDePasseNouveau,
+	    @RequestParam("confirmer_mot_de_passe") String motDePasseConfirme,
+	    @RequestParam("credit") int credit,
+	    Model model) {
+
+	    // Récupérer l'email de l'utilisateur connecté
+	    Authentication authentification = SecurityContextHolder.getContext().getAuthentication();
+	    String currentEmail = authentification.getName();
+	    Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(currentEmail);
+
+	    // Vérifier si le mot de passe actuel est correct
+	    if (!PasswordEncoderFactories.createDelegatingPasswordEncoder().matches(motDePasse, utilisateur.getMotDePasse())) {
+	        return "redirect:/profil?errorMotDePasse";  // Le mot de passe actuel est incorrect
+	    }
+
+	    // Si un nouveau mot de passe est fourni, vérifier s'il correspond à la confirmation
+	    if (motDePasseNouveau != null && !motDePasseNouveau.isEmpty()) {
+	        if (!motDePasseNouveau.equals(motDePasseConfirme)) {
+	            return "redirect:/profil?errorMotDePasseMismatch";  // Les mots de passe ne correspondent pas
+	        }
+	        // Encoder et changer le mot de passe
+	        utilisateur.setMotDePasse(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(motDePasseNouveau));
+	    }
+
+	    // Mettre à jour les autres informations de l'utilisateur
+	    utilisateur.setPseudo(pseudo);
+	    utilisateur.setNom(nom);
+	    utilisateur.setPrenom(prenom);
+	    utilisateur.setEmail(email);
+	    utilisateur.setTelephone(telephone);
+	    utilisateur.setRue(rue);
+	    utilisateur.setCodePostal(codePostal);
+	    utilisateur.setVille(ville);
+	    utilisateur.setCredit(credit);
+
+	    // Mettre à jour l'utilisateur dans la base de données
+	    utilisateurService.modifier(utilisateur);
+
+	    // Ajouter l'utilisateur au modèle pour l'afficher dans la vue
+	    model.addAttribute("utilisateur", utilisateur);
+
+	    return "profil";  // Retourner à la page profil après modification
+	}
+
+	
+	@GetMapping("/profil/detail")
+	public String afficherProfilDetail(Model model) {
 		//récupérer email de l'utilisateur
 		Authentication authentification = SecurityContextHolder.getContext().getAuthentication();
-		String currentEmail = authentification.getName();
-		Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(currentEmail);
+		String email = authentification.getName();
 		
-		//attribuer à l'utilisateur les modifications du formulaire
-		utilisateur.setPseudo(pseudo);
-		utilisateur.setNom(nom);
-		utilisateur.setPrenom(prenom);
-		utilisateur.setEmail(email);
-		utilisateur.setTelephone(telephone);
-		utilisateur.setRue(rue);
-		utilisateur.setCodePostal(codePostal);
-		utilisateur.setVille(ville);
-		utilisateur.setMotDePasse(motDePasse);
-		utilisateur.setCredit(credit);
-		utilisateur.setAdministrateur(administrateur);
-		
-		//mettre à jour la bdd
-		utilisateurService.modifier(utilisateur);
-		
-		//ajouter utilisateur au model
+		//récupérer l'utilisateur en base de données
+		Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(email);
 		model.addAttribute("utilisateur", utilisateur);
 		
-		return "profil";
+		return "profil-detail";
 	}
 	
-	@PostMapping("/profil/supprimer")
+	@PostMapping("/profil/detail/supprimer")
 	public String supprimerCompte(@RequestParam("email") String email){
 		utilisateurService.supprimerByEmail(email);
-		return "redirect:/";
+		return "redirect:/deconnexion";
 	}
 
 }
