@@ -26,6 +26,7 @@ public class BusinessException extends Exception {
         clesErreurs.add(cleErreur);
     }
 
+    
 }
 
 

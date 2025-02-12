@@ -3,14 +3,29 @@ package fr.eni.eniEncheres.bo;
 import java.time.LocalDate;
 import java.util.List;
 
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 public class ArticleVendu {
 
     //attributs
     private int noArticle;
+    @NotBlank(message = "Le nom de l'article ne peut pas être vide")
     private String nomArticle;
     private String description;
+    @NotNull(message = "La date de début des enchères est obligatoire")
     private LocalDate dateDebutEncheres;
+    @NotNull(message = "La date de fin des enchères est obligatoire")
     private LocalDate dateFinEncheres;
+    @AssertTrue(message = "La date de fin d'enchères doit être après la date de début")
+    public boolean isValidDateRange() {
+        return dateFinEncheres != null && dateDebutEncheres != null 
+               && dateFinEncheres.isAfter(dateDebutEncheres);
+    }
+    @NotNull(message = "La mise à prix ne peut pas être nulle")
+    @Positive(message = "La mise à prix doit être positive")
     private float miseAPrix;
     private float prixVente;
 

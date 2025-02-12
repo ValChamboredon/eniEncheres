@@ -17,4 +17,5 @@ public interface ArticleService {
 	List<ArticleVendu> searchArticles(String keyword, int categoryId);
 	List<ArticleVendu> getArticlesTermines();
 	void demarrerVente(int noArticle) throws BusinessException;
+	List<ArticleVendu> getArticlesEnVente();
 }
