@@ -17,6 +17,8 @@ public class Enchere {
         this.article = article;
     }
 
+	public Enchere() 	{}
+
 	public Integer getNoEnchere() {
 		return noEnchere;
 	}

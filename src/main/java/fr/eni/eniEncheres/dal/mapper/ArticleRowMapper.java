@@ -1,4 +1,4 @@
-package fr.eni.eniEncheres.dal;
+package fr.eni.eniEncheres.dal.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 
 import fr.eni.eniEncheres.bo.ArticleVendu;
