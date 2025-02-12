@@ -1,5 +1,6 @@
 package fr.eni.eniEncheres.dal;
  
+import java.util.ArrayList;
 import java.util.List;
  
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,8 +105,18 @@ public class ArticleDAOImpl implements ArticleDAO {
  
 	@Override
 	public List<ArticleVendu> getArticlesEnVente() {
-	    String sql = "SELECT * FROM ARTICLES_VENDUS WHERE etat_vente = 'EN_COURS'";
-	    return jdbcTemplate.query(sql, new ArticleRowMapper());
+	    try {
+	        String sql = "SELECT av.*, u.pseudo as vendeur_pseudo, c.libelle as categorie_libelle " +
+	                     "FROM ARTICLES_VENDUS av " +
+	                     "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur " +
+	                     "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie " +
+	                     "WHERE av.etat_vente = 'EN_COURS'";
+	        return jdbcTemplate.query(sql, new ArticleRowMapper());
+	    } catch (Exception e) {
+	    	System.err.println("Erreur SQL : " + e.getMessage());
+	        e.printStackTrace();
+	        return new ArrayList<>();
+	    }
 	}
  
 

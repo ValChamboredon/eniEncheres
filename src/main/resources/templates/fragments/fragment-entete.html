@@ -1,21 +1,29 @@
 <header th:fragment="entete">
     <nav class="bg-gradient-to-r from-blue-900 to-blue-700 p-4 shadow-lg">
-        <div class="flex items-center justify-between">
+        <div class="container mx-auto flex items-center justify-between">
             <div class="flex items-center">
-            
-            <!-- Itération 1 navigation l'utilisateur peut cliquer sur le h1 pour qu'il soit redirigé vers l'accueil QUE si il est connecté -->
                 <h1 class="text-white text-2xl font-bold">
-                    <a th:href="${#authorization.expression('isAuthenticated()')} ? @{/} : null"
-                       th:if="${#authorization.expression('isAuthenticated()')}">ENI-Enchères</a>
-                    <span th:unless="${#authorization.expression('isAuthenticated()')}">ENI-Enchères</span>
+                    <a th:href="${#authentication.authenticated} ? @{/articles} : @{/}" 
+                       class="hover:text-gray-200 transition">
+                        ENI-Enchères
+                    </a>
                 </h1>
             </div>
 
             <div class="flex items-center space-x-4">
-                <p sec:authorize="!isAuthenticated" class="text-white"><a th:href="@{/inscription}" class="hover:underline">S'inscrire</a></p>
-                <p sec:authorize="!isAuthenticated" class="text-white"><a th:href="@{/connexion}" class="hover:underline">Se connecter</a></p>
-                <p sec:authorize="isAuthenticated" class="text-white"><a th:href="@{/profil}" class="hover:underline">profil</a></p>  
-                <p sec:authorize="isAuthenticated" class="text-white"><a th:href="@{/deconnexion}" class="hover:underline">Se déconnecter</a></p>           
+                <!-- Options pour utilisateur non connecté -->
+                <div th:if="${!#authentication.authenticated}">
+                    <a th:href="@{/inscription}" class="text-white hover:underline mr-4">S'inscrire</a>
+                    <a th:href="@{/connexion}" class="text-white hover:underline">Se connecter</a>
+                </div>
+
+                <!-- Options pour utilisateur connecté -->
+                <div th:if="${#authentication.authenticated}" class="flex items-center space-x-4">
+                    <a th:href="@{/articles}" class="text-white hover:underline">Enchères</a>
+                    <a th:href="@{/articles/new}" class="text-white hover:underline">Vendre un article</a>
+                    <a th:href="@{/profil}" class="text-white hover:underline">Mon profil</a>
+                    <a th:href="@{/deconnexion}" class="text-white hover:underline">Déconnexion</a>
+                </div>
             </div>
         </div>
     </nav>

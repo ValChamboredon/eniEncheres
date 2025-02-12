@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des Enchères</title>
+    <title>Liste des enchères</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
@@ -11,38 +11,81 @@
 
     <main class="container mx-auto p-4">
         <div class="bg-white p-6 rounded-lg shadow-md">
-            <div class="mb-4">
+        	 <div th:if="${articles.isEmpty()}" class="text-center text-gray-500">
+                Aucune enchère en cours actuellement.
+            </div>
+            <form th:action="@{/articles/search}" method="get" class="space-y-4">
                 <div class="flex space-x-4">
-                    <input type="text" placeholder="Le nom de l'article contient" 
+                    <input type="text" name="keyword" 
+                           placeholder="Le nom de l'article contient" 
                            class="flex-grow border rounded px-3 py-2">
                     
-                    <select class="border rounded px-3 py-2">
-                        <option>Toutes</option>
+                    <select name="categoryId" class="border rounded px-3 py-2">
+                        <option value="0">Toutes</option>
                         <option th:each="categorie : ${categories}" 
                                 th:value="${categorie.noCategorie}" 
                                 th:text="${categorie.libelle}">
                         </option>
                     </select>
                     
-                    <button class="bg-blue-500 text-white px-4 py-2 rounded">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
                         Rechercher
                     </button>
                 </div>
-            </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div th:each="article : ${articles}" class="border p-4 rounded">
-                    <div class="flex">
-                        <div class="w-1/3 border mr-4">
-                            <!-- Placeholder for image -->
-                            <div class="w-full h-32 bg-gray-200"></div>
-                        </div>
-                        <div class="w-2/3">
-                            <h3 th:text="${article.nomArticle}" class="font-bold text-lg"></h3>
-                            <p>Prix : <span th:text="${article.prixVente}"></span> points</p>
-                            <p>Fin de l'enchère : <span th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}"></span></p>
-                            <p>Vendeur : <span th:text="${article.vendeur.pseudo}"></span></p>
-                        </div>
+                <div class="flex space-x-4">
+                    <label class="flex items-center">
+                        <input type="radio" name="typeRecherche" value="achats" checked 
+                               class="mr-2">
+                        Achats
+                    </label>
+                    <div class="ml-4 space-x-2">
+                        <label>
+                            <input type="checkbox" name="enchereOuverte" 
+                                   class="mr-1">Enchères ouvertes
+                        </label>
+                        <label>
+                            <input type="checkbox" name="mesEncheresEnCours" 
+                                   class="mr-1">Mes enchères en cours
+                        </label>
+                        <label>
+                            <input type="checkbox" name="mesEncheresRemportees" 
+                                   class="mr-1">Mes enchères remportées
+                        </label>
+                    </div>
+
+                    <label class="flex items-center ml-auto">
+                        <input type="radio" name="typeRecherche" value="mesVentes" 
+                               class="mr-2">
+                        Mes ventes
+                    </label>
+                    <div class="ml-4 space-x-2">
+                        <label>
+                            <input type="checkbox" name="ventesEnCours" 
+                                   class="mr-1">Ventes en cours
+                        </label>
+                        <label>
+                            <input type="checkbox" name="ventesNonDebutees" 
+                                   class="mr-1">Ventes non débutées
+                        </label>
+                        <label>
+                            <input type="checkbox" name="ventesTerminees" 
+                                   class="mr-1">Ventes terminées
+                        </label>
+                    </div>
+                </div>
+            </form>
+
+            <div class="grid grid-cols-2 gap-4 mt-6">
+                <div th:each="article : ${articles}" class="border p-4 rounded flex">
+                    <div class="w-1/3 border mr-4 bg-gray-200">
+                        <!-- Image placeholder -->
+                    </div>
+                    <div class="w-2/3">
+                        <h3 th:text="${article.nomArticle}" class="font-bold text-lg"></h3>
+                        <p>Prix : <span th:text="${article.prixVente}"></span> points</p>
+                        <p>Fin de l'enchère : <span th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}"></span></p>
+                        <p>Vendeur : <span th:text="${article.vendeur.pseudo}"></span></p>
                     </div>
                 </div>
             </div>

@@ -110,6 +110,7 @@ public class ArticleServiceImpl implements ArticleService {
 	    } catch (Exception e) {
 	        // Gérer l'exception (log, etc.)
 	        System.err.println("Erreur lors de la récupération des articles en vente : " + e.getMessage());
+	        return new ArrayList<>();
 	    }
 	    
 	    return articlesEnCours;

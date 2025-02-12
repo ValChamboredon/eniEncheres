@@ -27,6 +27,8 @@ public class SecurityConfig {
             // Protégez les routes qui nécessitent une authentification
             auth.requestMatchers("/profil/**", "/encheres/**", "/articles/new", "/articles/edit/**").authenticated();
             
+            auth.requestMatchers("/", "/encheres", "/articles").permitAll();
+            
             // Utilisez anyRequest() en dernier
             auth.anyRequest().authenticated();
         });
