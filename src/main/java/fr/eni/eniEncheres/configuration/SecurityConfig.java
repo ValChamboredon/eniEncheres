@@ -30,6 +30,10 @@ public class SecurityConfig {
 			auth.requestMatchers(HttpMethod.GET, "/images/*").permitAll();
 
 			auth.anyRequest().permitAll();
+			auth.requestMatchers("/", "/articles", "/articles/{id}").permitAll();
+		    auth.requestMatchers("/inscription", "/connexion").anonymous();
+		    auth.requestMatchers("/encheres/**", "/profil/**").authenticated();
+		    auth.anyRequest().denyAll();
 		});
 
 		security

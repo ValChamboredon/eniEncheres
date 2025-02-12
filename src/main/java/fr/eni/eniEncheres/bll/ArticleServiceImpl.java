@@ -1,7 +1,9 @@
 package fr.eni.eniEncheres.bll;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -84,6 +86,33 @@ public class ArticleServiceImpl implements ArticleService {
 	    }
 		article.setEtatVente(EtatVente.EN_COURS);
 		articleDAO.updateArticle(article);
+	}
+
+	@Override
+	public List<ArticleVendu> getArticlesEnVente() {
+	    // Récupérer tous les articles dont l'état de vente est EN_COURS
+	    // et dont la date de début d'enchères est passée et la date de fin d'enchères est future
+	    List<ArticleVendu> articlesEnCours = new ArrayList<>();
+	    
+	    try {
+	        // Récupérer tous les articles en vente
+	        articlesEnCours = articleDAO.getArticlesEnVente();
+	        
+	        // Filtrage supplémentaire pour s'assurer que les dates correspondent
+	        LocalDate now = LocalDate.now();
+	        articlesEnCours = articlesEnCours.stream()
+	            .filter(article -> 
+	                article.getEtatVente() == EtatVente.EN_COURS &&
+	                !now.isBefore(article.getDateDebutEncheres()) &&
+	                now.isBefore(article.getDateFinEncheres())
+	            )
+	            .collect(Collectors.toList());
+	    } catch (Exception e) {
+	        // Gérer l'exception (log, etc.)
+	        System.err.println("Erreur lors de la récupération des articles en vente : " + e.getMessage());
+	    }
+	    
+	    return articlesEnCours;
 	}
 	
 	

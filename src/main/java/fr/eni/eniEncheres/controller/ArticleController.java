@@ -30,9 +30,10 @@ public class ArticleController {
 	private EnchereService enchereService;
 	
 	@GetMapping
-	public String listArticles(Model model) {
-		model.addAttribute("articles", articleService.getAllArticles());
-		return "listeArticles";
+	public String listArticlesEnCours(Model model) {
+	    List<ArticleVendu> articlesEnCours = articleService.getArticlesEnVente();
+	    model.addAttribute("articles", articlesEnCours);
+	    return "listeArticles";
 	}
 	
 	@GetMapping("/{id}")
