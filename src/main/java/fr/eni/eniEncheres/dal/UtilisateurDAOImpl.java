@@ -71,7 +71,7 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 		namedParameters.addValue("rue", utilisateur.getRue());
 		namedParameters.addValue("codePostal", utilisateur.getCodePostal());
 		namedParameters.addValue("ville", utilisateur.getVille());
-		namedParameters.addValue("motDePasse", utilisateur.getMotDePasse()); // à haché
+		namedParameters.addValue("motDePasse", utilisateur.getMotDePasse());
 		namedParameters.addValue("credit", utilisateur.getCredit());
 		namedParameters.addValue("administrateur", utilisateur.isAdministrateur());
 
