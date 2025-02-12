@@ -48,13 +48,10 @@ public class Utilisateur {
 	@Size(min = 8, message = "{FormulaireProfil.motDePasse.Size}")
 	private String motDePasse;
 	
-	@Transient
+	
 	private String confirmationMotDePasse;
 
-	@AssertTrue(message= "Les mots de passe ne correspondent pas.")
-	public boolean isMotDePasseValide() {
-		return motDePasse!=null && motDePasse.equals(confirmationMotDePasse);
-	}
+	
 	
 	private int credit;
 	private boolean administrateur;

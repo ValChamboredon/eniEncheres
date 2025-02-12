@@ -21,10 +21,10 @@
 
     <form th:action="@{/inscription}" th:object="${utilisateur}" method="post" class="max-w-lg mx-auto bg-white p-6 rounded shadow-md">
         
-        <!-- Affichage des erreurs globales -->
+        <!-- Affichage des erreurs globales 
         <ul th:if="${#fields.hasGlobalErrors()}" class="text-red-600">
             <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
-        </ul>
+        </ul> -->
 
         <div class="mb-4">
             <label for="pseudo">Pseudo :</label>
@@ -84,8 +84,8 @@
             <label for="confirmationMotDePasse">Confirmation :</label>
             <input type="password" id="confirmationMotDePasse" th:field="*{confirmationMotDePasse}" class="border px-3 py-2 w-full" required>
 
-            <!-- ✅ Affichage de l'erreur spécifique si les mots de passe ne correspondent pas -->
-            <span class="text-red-600" th:if="${erreurConfirmation}" th:text="${erreurConfirmation}"></span>
+            <!-- ✅ Affichage de l'erreur spécifique si les mots de passe ne correspondent pas 
+            <span class="text-red-600" th:if="${erreurConfirmation}" th:text="${erreurConfirmation}"></span>-->
         </div>
 
         <!-- Boutons d'action -->

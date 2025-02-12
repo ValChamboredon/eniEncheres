@@ -24,7 +24,9 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 	     
 	}
 
-
+/**
+ * Méthode permettant de d'enregistrer un utilisateur
+ */
 	@Override
 	public void enregistrer(@Valid Utilisateur utilisateur) throws BusinessException {
 		System.out.println("début enregistrer");
@@ -41,9 +43,9 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 	    }
 
 	    // Vérifier si les mots de passe correspondent
-	    System.out.println("🟡 Vérification du mot de passe : " + utilisateur.getMotDePasse());
-	    System.out.println("🟡 Vérification de la confirmation : " + utilisateur.getConfirmationMotDePasse());
-	    System.out.println("🔍 Valeur actuelle de confirmationMotDePasse : " + utilisateur.getConfirmationMotDePasse());
+	    System.out.println("mot de passe : " + utilisateur.getMotDePasse());
+	    System.out.println("confirmation : " + utilisateur.getConfirmationMotDePasse());
+	    
 
 	    if (!utilisateur.getMotDePasse().equals(utilisateur.getConfirmationMotDePasse())) {
 	        erreurs.add("Les mots de passe ne correspondent pas.");
@@ -66,14 +68,6 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 	    // Sauvegarde en base
 	    utilisateurDAO.save(utilisateur);
 	}
-
-
-
-
-
-
-	
-
 
 	@Override
     public boolean pseudoExistant(String pseudo) {

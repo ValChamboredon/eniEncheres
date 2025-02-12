@@ -49,7 +49,7 @@ public class InscriptionController {
 	            // erreur de mot de passe, on l'ajoute au modèle
 	            if (messageErreur.equals("Les mots de passe ne correspondent pas.")) {
 	                model.addAttribute("erreurConfirmation", messageErreur);
-	                System.out.println("✅ Ajout de l'erreur confirmation dans le modèle : " + messageErreur);
+	                System.out.println("Ajout de l'erreur confirmation dans le modèle : " + messageErreur);
 
 	            } else {
 	                result.reject("globalError", messageErreur); 
