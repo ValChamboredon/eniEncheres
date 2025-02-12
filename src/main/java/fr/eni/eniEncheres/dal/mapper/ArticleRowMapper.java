@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.RowMapper;
 import fr.eni.eniEncheres.bo.ArticleVendu;
 import fr.eni.eniEncheres.bo.Categorie;
 import fr.eni.eniEncheres.bo.Enchere;
+import fr.eni.eniEncheres.bo.EtatVente;
 import fr.eni.eniEncheres.bo.Retrait;
 import fr.eni.eniEncheres.bo.Utilisateur;
 
@@ -24,6 +25,9 @@ public class ArticleRowMapper implements RowMapper<ArticleVendu> {
 		article.setNoArticle(rs.getInt("no_article"));
 		article.setNomArticle(rs.getString("nom_article"));
 		article.setDescription(rs.getString("description"));
+		
+		String etatVenteStr = rs.getString("etat_vente");
+	    article.setEtatVente(EtatVente.valueOf(etatVenteStr));
 		
 		
 		LocalDate dateDebutEncheres = rs.getDate("date_debut_encheres").toLocalDate();

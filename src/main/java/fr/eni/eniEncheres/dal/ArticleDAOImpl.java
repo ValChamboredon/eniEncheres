@@ -104,21 +104,11 @@ public class ArticleDAOImpl implements ArticleDAO {
  
 	@Override
 	public List<ArticleVendu> getArticlesEnVente() {
-		String sql = "SELECT * FROM ARTICLES_VENDUS WHERE etat_vente = 'EN_COURS'";
-		return jdbcTemplate.query(sql, (rs, rowNum) ->
-	    new ArticleVendu(
-	        rs.getInt("no_article"),
-	        rs.getString("nom_article"),
-	        rs.getString("description"),
-	        rs.getDate("date_debut_encheres").toLocalDate(),
-	        rs.getDate("date_fin_encheres").toLocalDate(),
-	        rs.getFloat("prix_initial"),
-	        rs.getFloat("prix_vente"),
-	        EtatVente.valueOf(rs.getString("etat_vente").toUpperCase())
-	    )
-	);
+	    String sql = "SELECT * FROM ARTICLES_VENDUS WHERE etat_vente = 'EN_COURS'";
+	    return jdbcTemplate.query(sql, new ArticleRowMapper());
+	}
  
-}
+
  
  
  

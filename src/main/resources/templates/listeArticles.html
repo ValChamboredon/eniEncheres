@@ -3,49 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des Articles</title>
+    <title>Liste des Enchères</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 p-8">
-    <main class="bg-white p-8 rounded-lg shadow-md max-w-4xl mx-auto">
-        <h1 class="text-2xl font-bold mb-6 text-center">Liste des Articles</h1>
-        
-        <form th:action="@{/articles/search}" method="get" class="mb-6">
-            <div class="flex space-x-4">
-                <input type="text" name="keyword" placeholder="Rechercher un article" class="flex-grow px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                <select name="categoryId" class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <option value="0">Toutes les catégories</option>
-                    <option th:each="categorie : ${categories}" 
-        				    th:value="${categorie.noCategorie}" 
-    				        th:text="${categorie.libelle}">
-  					 </option>
-                </select>
-                <button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Rechercher</button>
-            </div>
-        </form>
+<body class="bg-gray-100">
+    <div th:replace="~{fragments/fragment-entete :: entete}"></div>
 
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fin de l'enchère</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendeur</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                <tr th:each="article : ${articles}">
-                    <td class="px-6 py-4 whitespace-nowrap" th:text="${article.nomArticle}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap" th:text="${article.prixVente}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap" th:text="${article.dateFinEncheres}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap" th:text="${article.vendeur.pseudo}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <a th:href="@{/articles/{id}(id=${article.noArticle})}" class="text-indigo-600 hover:text-indigo-900">Détails</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <main class="container mx-auto p-4">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="mb-4">
+                <div class="flex space-x-4">
+                    <input type="text" placeholder="Le nom de l'article contient" 
+                           class="flex-grow border rounded px-3 py-2">
+                    
+                    <select class="border rounded px-3 py-2">
+                        <option>Toutes</option>
+                        <option th:each="categorie : ${categories}" 
+                                th:value="${categorie.noCategorie}" 
+                                th:text="${categorie.libelle}">
+                        </option>
+                    </select>
+                    
+                    <button class="bg-blue-500 text-white px-4 py-2 rounded">
+                        Rechercher
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div th:each="article : ${articles}" class="border p-4 rounded">
+                    <div class="flex">
+                        <div class="w-1/3 border mr-4">
+                            <!-- Placeholder for image -->
+                            <div class="w-full h-32 bg-gray-200"></div>
+                        </div>
+                        <div class="w-2/3">
+                            <h3 th:text="${article.nomArticle}" class="font-bold text-lg"></h3>
+                            <p>Prix : <span th:text="${article.prixVente}"></span> points</p>
+                            <p>Fin de l'enchère : <span th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}"></span></p>
+                            <p>Vendeur : <span th:text="${article.vendeur.pseudo}"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 </body>
 </html>
