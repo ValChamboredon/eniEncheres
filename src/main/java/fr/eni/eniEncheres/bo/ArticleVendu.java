@@ -13,19 +13,19 @@ public class ArticleVendu {
     private LocalDate dateFinEncheres;
     private float miseAPrix;
     private float prixVente;
-    private String etatVente;
 
     private Utilisateur vendeur;             
     private Categorie categorie;             
     private Retrait lieuRetrait;            
     private List<Enchere> encheres;
+    private EtatVente etatVente;
 
     //constructeur
     public ArticleVendu() {
 
     }
 
-    public ArticleVendu(int noArticle, String nomArticle, String description, LocalDate dateDebutEncheres, LocalDate dateFinEncheres, float miseAPrix, float prixVente, String etatVente) {
+    public ArticleVendu(int noArticle, String nomArticle, String description, LocalDate dateDebutEncheres, LocalDate dateFinEncheres, float miseAPrix, float prixVente, EtatVente etatVente) {
         this.noArticle = noArticle;
         this.nomArticle = nomArticle;
         this.description = description;
@@ -93,11 +93,11 @@ public class ArticleVendu {
         this.prixVente = prixVente;
     }
 
-    public String getEtatVente() {
+    public Enum<EtatVente> getEtatVente() {
         return etatVente;
     }
 
-    public void setEtatVente(String etatVente) {
+    public void setEtatVente(EtatVente etatVente) {
         this.etatVente = etatVente;
     }
 
@@ -132,7 +132,6 @@ public class ArticleVendu {
     public void setEncheres(List<Enchere> encheres) {
         this.encheres = encheres;
     }
+    
 
-
-	}
-
+}

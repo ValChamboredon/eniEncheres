@@ -4,11 +4,12 @@ package fr.eni.eniEncheres.dal;
 import java.util.List;
 
 import fr.eni.eniEncheres.bo.Categorie;
+import fr.eni.eniEncheres.exception.BusinessException;
 
 public interface CategorieDAO {
- void ajouterCategorie(Categorie categorie);
- Categorie getCategorieById(int noCategorie);
- List<Categorie> getAllCategories();
- void supprimerCategorie(int noCategorie);
- void mettreAJourCategorie(Categorie categorie);
+ void ajouterCategorie(Categorie categorie) throws BusinessException;
+ Categorie getCategorieById(int noCategorie) throws BusinessException;
+ List<Categorie> getAllCategories() throws BusinessException;
+ void supprimerCategorie(int noCategorie) throws BusinessException;
+ void mettreAJourCategorie(Categorie categorie) throws BusinessException;
 }

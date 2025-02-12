@@ -10,6 +10,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import fr.eni.eniEncheres.bo.ArticleVendu;
+import fr.eni.eniEncheres.bo.EtatVente;
+import fr.eni.eniEncheres.dal.mapper.ArticleRowMapper;
 
 @Repository
 public class ArticleDAOImpl implements ArticleDAO {
@@ -25,7 +27,7 @@ public class ArticleDAOImpl implements ArticleDAO {
 	public ArticleVendu getArticleById(int id) {
 		String sql = "SELECT * FROM ARTICLES_VENDUS WHERE no_article = :id";
 		MapSqlParameterSource params = new MapSqlParameterSource("id", id);
-		return namedParameterJdbcTemplate.queryForObject(sql, params, new BeanPropertyRowMapper<>(ArticleVendu.class));
+		return namedParameterJdbcTemplate.queryForObject(sql, params, new ArticleRowMapper());
 	}
 
 	@Override
@@ -40,8 +42,7 @@ public class ArticleDAOImpl implements ArticleDAO {
                 rs.getDate("date_fin_encheres").toLocalDate(),
                 rs.getFloat("prix_initial"),
                 rs.getFloat("prix_vente"),
-                rs.getString("etat_vente")
-        	)
+                EtatVente.valueOf(rs.getString("etat_vente"))        	)
 		);
 	}
 
@@ -104,19 +105,21 @@ public class ArticleDAOImpl implements ArticleDAO {
 	@Override
 	public List<ArticleVendu> getArticlesEnVente() {
 		String sql = "SELECT * FROM ARTICLES_VENDUS WHERE etat_vente = 'EN_COURS'";
-        return jdbcTemplate.query(sql, (rs, rowNum) ->
-                new ArticleVendu(
-                        rs.getInt("no_article"),
-                        rs.getString("nom_article"),
-                        rs.getString("description"),
-                        rs.getDate("date_debut_encheres").toLocalDate(),
-                        rs.getDate("date_fin_encheres").toLocalDate(),
-                        rs.getFloat("prix_initial"),
-                        rs.getFloat("prix_vente"),
-                        rs.getString("etat_vente")
-                )
-        );
-	}
+		return jdbcTemplate.query(sql, (rs, rowNum) ->
+	    new ArticleVendu(
+	        rs.getInt("no_article"),
+	        rs.getString("nom_article"),
+	        rs.getString("description"),
+	        rs.getDate("date_debut_encheres").toLocalDate(),
+	        rs.getDate("date_fin_encheres").toLocalDate(),
+	        rs.getFloat("prix_initial"),
+	        rs.getFloat("prix_vente"),
+	        EtatVente.valueOf(rs.getString("etat_vente").toUpperCase())
+	    )
+	);
+
+}
+
 
 
 	@Override
@@ -126,5 +129,11 @@ public class ArticleDAOImpl implements ArticleDAO {
 	    params.addValue("keyword", "%" + keyword + "%");
 	    params.addValue("categoryId", categoryId);
 	    return namedParameterJdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(ArticleVendu.class));
+	}
+	
+	@Override
+	public List<ArticleVendu> getArticlesTermines() {
+		String sql = "SELECT * FROM ARTICLES_VENDUS WHERE date_fin_encheres < GETDATE()";
+	    return jdbcTemplate.query(sql, new ArticleRowMapper());
 	}
 }

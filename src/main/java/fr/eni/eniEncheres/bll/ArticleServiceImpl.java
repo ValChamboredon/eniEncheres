@@ -1,12 +1,15 @@
 package fr.eni.eniEncheres.bll;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.eni.eniEncheres.bo.ArticleVendu;
+import fr.eni.eniEncheres.bo.EtatVente;
 import fr.eni.eniEncheres.dal.ArticleDAO;
+import fr.eni.eniEncheres.exception.BusinessException;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -55,6 +58,32 @@ public class ArticleServiceImpl implements ArticleService {
 	@Override
 	public List<ArticleVendu> searchArticles(String keyword, int categoryId) {
 		return articleDAO.searchArticles(keyword, categoryId);
+	}
+	
+	@Override
+	public List<ArticleVendu> getArticlesTermines() {
+	    return articleDAO.getArticlesTermines();
+	}
+
+	@Override
+	public void demarrerVente(int noArticle) throws BusinessException {
+		ArticleVendu article = articleDAO.getArticleById(noArticle);
+		
+		BusinessException be = new BusinessException();
+		
+		if(article.getEtatVente() != EtatVente.CREEE) {
+			be.addCleErreur("ERR_VENTE_DEJA_DEMARREE");
+		}
+	
+		LocalDate now = LocalDate.now();
+		if (now.isBefore(article.getDateDebutEncheres())) {
+			be.addCleErreur("ERR_DATE_DEBUT_FUTURE");
+		}
+		if (!be.getClesErreurs().isEmpty()) {
+	        throw be;
+	    }
+		article.setEtatVente(EtatVente.EN_COURS);
+		articleDAO.updateArticle(article);
 	}
 	
 	

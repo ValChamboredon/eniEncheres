@@ -1,79 +1,95 @@
-/**
- * Implémentation du service de gestion des catégories.
- * Cette classe fournit les opérations métier sur les catégories (CRUD).
- * 
- * @author Mariami
- * @version 1.0
- */
 package fr.eni.eniEncheres.bll;
 
 import fr.eni.eniEncheres.bo.Categorie;
 import fr.eni.eniEncheres.dal.CategorieDAO;
+import fr.eni.eniEncheres.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
-/**
- * Annotation @Service permet à Spring de gérer cette classe en tant que service.
- */
 @Service
 public class CategorieServiceImpl implements CategorieService {
 
-    // Dépendance vers la couche DAO pour interagir avec la base de données.
     private final CategorieDAO categorieDAO;
 
-    /**
-     * Injection de dépendance de `CategorieDAO` via le constructeur.
-     * @param categorieDAO DAO des catégories.
-     */
     @Autowired
     public CategorieServiceImpl(CategorieDAO categorieDAO) {
         this.categorieDAO = categorieDAO;
     }
 
-    /**
-     * Ajoute une nouvelle catégorie à la base.
-     * @param categorie La catégorie à ajouter.
-     */
     @Override
-    public void ajouterCategorie(Categorie categorie) {
+    public void ajouterCategorie(Categorie categorie) throws BusinessException {
+        BusinessException be = new BusinessException();
+        
+        // Validation du libellé
+        if (categorie.getLibelle() == null || categorie.getLibelle().trim().isEmpty()) {
+            be.addCleErreur("ERR_CATEGORIE_LIBELLE_OBLIGATOIRE");
+        }
+        
+        if (be.getClesErreurs() != null && !be.getClesErreurs().isEmpty()) {
+            throw be;
+        }
+        
         categorieDAO.ajouterCategorie(categorie);
     }
 
-    /**
-     * Récupère une catégorie spécifique par son identifiant.
-     * @param noCategorie Identifiant de la catégorie.
-     * @return La catégorie correspondante.
-     */
     @Override
-    public Categorie getCategorieById(int noCategorie) {
+    public Categorie getCategorieById(int noCategorie) throws BusinessException {
+        if (noCategorie <= 0) {
+            BusinessException be = new BusinessException();
+            be.addCleErreur("ERR_CATEGORIE_ID_INVALIDE");
+            throw be;
+        }
         return categorieDAO.getCategorieById(noCategorie);
     }
 
-    /**
-     * Récupère toutes les catégories disponibles.
-     * @return Liste de toutes les catégories.
-     */
     @Override
-    public List<Categorie> getAllCategories() {
+    public List<Categorie> getAllCategories() throws BusinessException {
         return categorieDAO.getAllCategories();
     }
 
-    /**
-     * Supprime une catégorie de la base.
-     * @param noCategorie Identifiant de la catégorie à supprimer.
-     */
     @Override
-    public void supprimerCategorie(int noCategorie) {
-        categorieDAO.supprimerCategorie(noCategorie);
+    public void supprimerCategorie(int noCategorie) throws BusinessException {
+        BusinessException be = new BusinessException();
+        
+        if (noCategorie <= 0) {
+            be.addCleErreur("ERR_CATEGORIE_ID_INVALIDE");
+        }
+        
+        // On vérifie que la catégorie existe
+        Categorie categorie = categorieDAO.getCategorieById(noCategorie);
+        if (categorie == null) {
+            be.addCleErreur("ERR_CATEGORIE_INEXISTANTE");
+        }
+        
+        if (be.getClesErreurs() != null && !be.getClesErreurs().isEmpty()) {
+            throw be;
+        }
+        
+        try {
+            categorieDAO.supprimerCategorie(noCategorie);
+        } catch (IllegalStateException e) {
+            be.addCleErreur("ERR_CATEGORIE_UTILISEE");
+            throw be;
+        }
     }
 
-    /**
-     * Met à jour une catégorie existante.
-     * @param categorie La catégorie mise à jour.
-     */
     @Override
-    public void mettreAJourCategorie(Categorie categorie) {
+    public void mettreAJourCategorie(Categorie categorie) throws BusinessException {
+        BusinessException be = new BusinessException();
+        
+        if (categorie.getNoCategorie() <= 0) {
+            be.addCleErreur("ERR_CATEGORIE_ID_INVALIDE");
+        }
+        
+        if (categorie.getLibelle() == null || categorie.getLibelle().trim().isEmpty()) {
+            be.addCleErreur("ERR_CATEGORIE_LIBELLE_OBLIGATOIRE");
+        }
+        
+        if (be.getClesErreurs() != null && !be.getClesErreurs().isEmpty()) {
+            throw be;
+        }
+        
         categorieDAO.mettreAJourCategorie(categorie);
     }
 }

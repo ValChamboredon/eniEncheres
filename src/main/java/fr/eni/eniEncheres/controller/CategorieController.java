@@ -1,24 +1,17 @@
 package fr.eni.eniEncheres.controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import fr.eni.eniEncheres.bll.CategorieService;
 import fr.eni.eniEncheres.bo.Categorie;
+import fr.eni.eniEncheres.exception.BusinessException;
 
-@RestController
+@Controller
 @RequestMapping("/categories")
 public class CategorieController {
-
     private final CategorieService categorieService;
 
     @Autowired
@@ -27,23 +20,39 @@ public class CategorieController {
     }
 
     @GetMapping
-    public List<Categorie> getAllCategories() {
-        return categorieService.getAllCategories();
+    public String getAllCategories(Model model) throws BusinessException {
+        model.addAttribute("categories", categorieService.getAllCategories());
+        return "categories/liste";
     }
 
-    @PostMapping
-    public void ajouterCategorie(@RequestBody Categorie categorie) {
+    @GetMapping("/ajouter")
+    public String afficherFormulaireAjout(Model model) {
+        model.addAttribute("categorie", new Categorie());
+        return "categories/formulaire";
+    }
+
+    @PostMapping("/ajouter")
+    public String ajouterCategorie(@ModelAttribute Categorie categorie) throws BusinessException {
         categorieService.ajouterCategorie(categorie);
+        return "redirect:/categories";
     }
 
-    @PutMapping("/{id}")
-    public void mettreAJourCategorie(@PathVariable int id, @RequestBody Categorie categorie) {
+    @GetMapping("/modifier/{id}")
+    public String afficherFormulaireModification(@PathVariable int id, Model model) throws BusinessException {
+        model.addAttribute("categorie", categorieService.getCategorieById(id));
+        return "categories/formulaire";
+    }
+
+    @PostMapping("/modifier/{id}")
+    public String modifierCategorie(@PathVariable int id, @ModelAttribute Categorie categorie) throws BusinessException {
         categorie.setNoCategorie(id);
         categorieService.mettreAJourCategorie(categorie);
+        return "redirect:/categories";
     }
 
-    @DeleteMapping("/{id}")
-    public void supprimerCategorie(@PathVariable int id) {
+    @GetMapping("/supprimer/{id}")
+    public String supprimerCategorie(@PathVariable int id) throws BusinessException {
         categorieService.supprimerCategorie(id);
+        return "redirect:/categories";
     }
 }

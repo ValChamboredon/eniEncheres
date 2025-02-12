@@ -1,5 +1,6 @@
 package fr.eni.eniEncheres.controller;
 
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.eni.eniEncheres.bll.EnchereService;
 import fr.eni.eniEncheres.bo.Enchere;
+import fr.eni.eniEncheres.exception.BusinessException;
 
 @RestController
 @RequestMapping("/encheres")
@@ -24,18 +26,18 @@ public class EnchereController {
         this.enchereService = enchereService;
     }
 
-    @PostMapping("/nouvelle") //Ajoute une nouvelle enchère
-    public void ajouterEnchere(@RequestBody Enchere enchere) {
+    @PostMapping("/nouvelle")
+    public void ajouterEnchere(@RequestBody Enchere enchere) throws BusinessException {
         enchereService.ajouterEnchere(enchere);
     }
 
-    @GetMapping("/article/{id}") //Récupère toutes les enchères sur un article
-    public List<Enchere> getEncheresParArticle(@PathVariable int id) {
+    @GetMapping("/article/{id}")
+    public List<Enchere> getEncheresParArticle(@PathVariable int id) throws BusinessException {
         return enchereService.getEncheresParArticle(id);
     }
 
-    @GetMapping("/max/{id}") //Récupère l'enchère la plus haute
-    public Enchere getMeilleureEnchere(@PathVariable int id) {
+    @GetMapping("/max/{id}")
+    public Enchere getMeilleureEnchere(@PathVariable int id) throws BusinessException {
         return enchereService.getEnchereMaxParArticle(id);
     }
 }

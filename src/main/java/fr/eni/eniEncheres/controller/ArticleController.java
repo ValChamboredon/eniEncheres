@@ -1,5 +1,7 @@
 package fr.eni.eniEncheres.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -12,7 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import fr.eni.eniEncheres.bll.ArticleService;
+import fr.eni.eniEncheres.bll.EnchereService;
 import fr.eni.eniEncheres.bo.ArticleVendu;
+import fr.eni.eniEncheres.bo.Enchere;
+import fr.eni.eniEncheres.exception.BusinessException;
 
 @Controller
 @RequestMapping("articles")
@@ -21,6 +26,9 @@ public class ArticleController {
 	@Autowired
 	private ArticleService articleService;
 	
+	@Autowired
+	private EnchereService enchereService;
+	
 	@GetMapping
 	public String listArticles(Model model) {
 		model.addAttribute("articles", articleService.getAllArticles());
@@ -28,9 +36,12 @@ public class ArticleController {
 	}
 	
 	@GetMapping("/{id}")
-	public String getArticle(@PathVariable int id, Model model) {
-		model.addAttribute("article", articleService.getArticleById(id));
-		return "detailArticle";
+	public String getArticle(@PathVariable int id, Model model) throws BusinessException {
+	    ArticleVendu article = articleService.getArticleById(id);
+	    List<Enchere> encheres = enchereService.getEncheresParArticle(id);
+	    model.addAttribute("article", article);
+	    model.addAttribute("encheres", encheres);
+	    return "detailArticle";
 	}
 	
 	@PreAuthorize("isAuthenticated()")

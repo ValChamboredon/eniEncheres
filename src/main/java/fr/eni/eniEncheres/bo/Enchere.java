@@ -1,36 +1,63 @@
-/**
- * Représente une enchère placée par un utilisateur sur un article.
- * Une enchère est définie par son montant et la date à laquelle elle a été placée.
- * 
- * @author Mariami
- * @version 1.0
- */
 package fr.eni.eniEncheres.bo;
 
 import java.time.LocalDateTime;
 
 public class Enchere {
-    private Utilisateur utilisateur; // L'utilisateur qui a placé l'enchère
-    private ArticleVendu article; // L'article concerné par l'enchère
-    private LocalDateTime dateEnchere; // Date de l'enchère
-    private int montantEnchere; // Montant proposé
-
-    public Enchere() {}
-
-    public Enchere(Utilisateur utilisateur, ArticleVendu article, LocalDateTime dateEnchere, int montantEnchere) {
-        this.utilisateur = utilisateur;
-        this.article = article;
+	private Integer noEnchere;
+    private LocalDateTime dateEnchere;
+    private Integer montantEnchere;
+    
+    private Utilisateur utilisateur;
+    private ArticleVendu article;
+    
+    public Enchere(LocalDateTime dateEnchere, Integer montantEnchere, Utilisateur utilisateur, ArticleVendu article) {
         this.dateEnchere = dateEnchere;
         this.montantEnchere = montantEnchere;
+        this.utilisateur = utilisateur;
+        this.article = article;
     }
 
-    // Getters et Setters
-    public Utilisateur getUtilisateur() { return utilisateur; }
-    public void setUtilisateur(Utilisateur utilisateur) { this.utilisateur = utilisateur; }
-    public ArticleVendu getArticle() { return article; }
-    public void setArticle(ArticleVendu article) { this.article = article; }
-    public LocalDateTime getDateEnchere() { return dateEnchere; }
-    public void setDateEnchere(LocalDateTime dateEnchere) { this.dateEnchere = dateEnchere; }
-    public int getMontantEnchere() { return montantEnchere; }
-    public void setMontantEnchere(int montantEnchere) { this.montantEnchere = montantEnchere; }
+	public Enchere() 	{}
+
+	public Integer getNoEnchere() {
+		return noEnchere;
+	}
+
+	public void setNoEnchere(Integer idEnchere) {
+		this.noEnchere = idEnchere;
+	}
+
+	public LocalDateTime getDateEnchere() {
+		return dateEnchere;
+	}
+
+	public void setDateEnchere(LocalDateTime dateEnchere) {
+		this.dateEnchere = dateEnchere;
+	}
+
+	public Integer getMontantEnchere() {
+		return montantEnchere;
+	}
+
+	public void setMontantEnchere(Integer montantEnchere) {
+		this.montantEnchere = montantEnchere;
+	}
+
+	public Utilisateur getUtilisateur() {
+		return utilisateur;
+	}
+
+	public void setUtilisateur(Utilisateur utilisateur) {
+		this.utilisateur = utilisateur;
+	}
+
+	public ArticleVendu getArticle() {
+		return article;
+	}
+
+	public void setArticle(ArticleVendu article) {
+		this.article = article;
+	}
+
+    
 }

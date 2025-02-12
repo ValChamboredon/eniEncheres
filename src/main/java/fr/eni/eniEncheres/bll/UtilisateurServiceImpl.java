@@ -1,86 +1,102 @@
-/**
- * Implémentation de l'interface UtilisateurService.
- * Cette classe effectue les opérations métier et délègue l'accès aux données au DAO.
- * 
- * Elle est marquée comme un Service Spring (@Service) et gérée par le conteneur IoC.
- * 
- * @author Mariami
- * @version 1.0
- */
 package fr.eni.eniEncheres.bll;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+
 import org.springframework.stereotype.Service;
 
 import fr.eni.eniEncheres.bo.Utilisateur;
 import fr.eni.eniEncheres.dal.UtilisateurDAO;
+import fr.eni.eniEncheres.exception.BusinessException;
 import jakarta.validation.Valid;
+
 
 @Service
 public class UtilisateurServiceImpl implements UtilisateurService {
+	
+	private  UtilisateurDAO utilisateurDAO;
+	
+	public UtilisateurServiceImpl(UtilisateurDAO utilisateurDAO) {
+	    this.utilisateurDAO = utilisateurDAO;
+	}
 
-    private final UtilisateurDAO utilisateurDAO;
+/**
+ * Méthode permettant de d'enregistrer un utilisateur
+ */
+	@Override
+	public void enregistrer(@Valid Utilisateur utilisateur) throws BusinessException {
+		System.out.println("début enregistrer");
+	    List<String> erreurs = new ArrayList<>();
 
-    /**
-     * Injection de dépendance du DAO pour l'accès aux données utilisateurs.
-     * @param utilisateurDAO L'instance du DAO.
-     */
-    @Autowired
-    public UtilisateurServiceImpl(UtilisateurDAO utilisateurDAO) {
-        this.utilisateurDAO = utilisateurDAO;
-    }
+	    // Vérifier si l'email ou le pseudo existent déjà
+	    if (utilisateurDAO.existsByEmail(utilisateur.getEmail())) {
+	        erreurs.add("Cet email est déjà utilisé.");
+	        System.out.println("L'email existe déjà en base !");
+	    }
+	    if (utilisateurDAO.existsByPseudo(utilisateur.getPseudo())) {
+	        erreurs.add("Ce pseudo est déjà pris.");
+	        System.out.println("Le pseudo existe déjà en base !");
+	    }
 
-    @Override
-    public void enregistrer(@Valid Utilisateur utilisateur) {
-        utilisateur.setCredit(0); // Un nouvel utilisateur commence avec 0 crédits.
-        utilisateur.setAdministrateur(false); // Par défaut, il n'est pas administrateur.
-        utilisateurDAO.ajouterUtilisateur(utilisateur);
-    }
+	    // Vérifier si les mots de passe correspondent
+	    System.out.println("mot de passe : " + utilisateur.getMotDePasse());
+	    System.out.println("confirmation : " + utilisateur.getConfirmationMotDePasse());
+	    
 
-    @Override
+	    if (!utilisateur.getMotDePasse().equals(utilisateur.getConfirmationMotDePasse())) {
+	        erreurs.add("Les mots de passe ne correspondent pas.");
+	        System.out.println("Les mots de passe ne correspondent pas !");
+	    }
+
+	    // Si des erreurs existent, on lève une exception
+	    if (!erreurs.isEmpty()) {
+	        System.out.println("Erreurs trouvées : " + erreurs);
+	        throw new BusinessException(erreurs);
+	    }
+
+	    // Hachage du mot de passe
+	    utilisateur.setMotDePasse(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(utilisateur.getMotDePasse()));
+
+	    // Définir les valeurs par défaut
+	    utilisateur.setCredit(0);
+	    utilisateur.setAdministrateur(false);
+
+	    // Sauvegarde en base
+	    utilisateurDAO.save(utilisateur);
+	}
+	@Override
+	public void modifier(@Valid Utilisateur utilisateur) {
+		utilisateurDAO.update(utilisateur);
+	}
+	
+	@Override
     public boolean pseudoExistant(String pseudo) {
-        return utilisateurDAO.getUtilisateurByPseudo(pseudo) != null;
+        return utilisateurDAO.existsByPseudo(pseudo);
     }
 
     @Override
     public boolean emailExistant(String email) {
-        return utilisateurDAO.getUtilisateurByEmail(email) != null;
+        return utilisateurDAO.existsByEmail(email);
     }
 
     @Override
     public Utilisateur getUtilisateurById(int noUtilisateur) {
-        return utilisateurDAO.getUtilisateurById(noUtilisateur);
+        return utilisateurDAO.read(noUtilisateur);
     }
 
     @Override
     public Utilisateur getUtilisateurByEmail(String email) {
-        return utilisateurDAO.getUtilisateurByEmail(email);
+        return utilisateurDAO.getUtilisateur(email);
     }
 
-    @Override
-    public Utilisateur getUtilisateurByPseudo(String pseudo) {
-        return utilisateurDAO.getUtilisateurByPseudo(pseudo);
-    }
 
-    @Override
-    public List<Utilisateur> getAllUtilisateurs() {
-        return utilisateurDAO.getAllUtilisateurs();
-    }
 
-    @Override
-    public void supprimerUtilisateur(int noUtilisateur) {
-        utilisateurDAO.supprimerUtilisateur(noUtilisateur);
-    }
+	@Override
+	public void supprimerByEmail(String email) {
+		utilisateurDAO.supprimerByEmail(email);
+	}
 
-    @Override
-    public void supprimerByEmail(String email) {
-        utilisateurDAO.supprimerByEmail(email);
-    }
 
-    @Override
-    public void mettreAJourUtilisateur(Utilisateur utilisateur) {
-        utilisateurDAO.mettreAJourUtilisateur(utilisateur);
-    }
 }
