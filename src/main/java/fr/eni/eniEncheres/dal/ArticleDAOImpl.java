@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import fr.eni.eniEncheres.bo.ArticleVendu;
+import fr.eni.eniEncheres.dal.mapper.ArticleRowMapper;
 
 @Repository
 public class ArticleDAOImpl implements ArticleDAO {

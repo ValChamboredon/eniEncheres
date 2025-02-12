@@ -1,39 +1,39 @@
+/**
+ * Représente une catégorie d'articles.
+ * Chaque catégorie contient une liste d'articles vendus.
+ * 
+ * Exemple : Électronique, Mobilier, Livres...
+ * 
+ * @author Mariami
+ * @version 1.0
+ */
 package fr.eni.eniEncheres.bo;
 
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
-
+import java.util.List;
 
 public class Categorie {
-	
-    private int noCategorie;
-    private String libelle;
-    
-    // Constructeurs
-    public Categorie() {
-	}
-    
-	public Categorie(int noCategorie, String libelle) {
-		this.noCategorie = noCategorie;
-		this.libelle = libelle;
-	}
+    private int noCategorie; // ID de la catégorie
+    private String libelle; // Nom de la catégorie
+    private List<ArticleVendu> articles; // Liste des articles appartenant à cette catégorie
 
-	public int getNoCategorie() {
-		return noCategorie;
-	}
+    public Categorie() {}
 
-	public void setNoCategorie(int noCategorie) {
-		this.noCategorie = noCategorie;
-	}
+    public Categorie(int noCategorie, String libelle) {
+        this.noCategorie = noCategorie;
+        this.libelle = libelle;
+    }
 
-	public String getLibelle() {
-		return libelle;
-	}
+    // Getters et Setters
+    public int getNoCategorie() { return noCategorie; }
+    public void setNoCategorie(int noCategorie) { this.noCategorie = noCategorie; }
+    public String getLibelle() { return libelle; }
+    public void setLibelle(String libelle) { this.libelle = libelle; }
+    public List<ArticleVendu> getArticles() { return articles; }
+    public void setArticles(List<ArticleVendu> articles) { this.articles = articles; }
 
-	public void setLibelle(String libelle) {
-		this.libelle = libelle;
-	}
-    
+    @Override
+    public String toString() {
+        return "Categorie{noCategorie=" + noCategorie + ", libelle='" + libelle + "'}";
+    }
 }
 
