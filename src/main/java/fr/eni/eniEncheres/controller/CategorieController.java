@@ -55,4 +55,9 @@ public class CategorieController {
         categorieService.supprimerCategorie(id);
         return "redirect:/categories";
     }
+    
+    @ModelAttribute("categories")
+    public List<Categorie> getAllCategories() throws BusinessException {
+        return categorieService.getAllCategories();
+    }
 }
