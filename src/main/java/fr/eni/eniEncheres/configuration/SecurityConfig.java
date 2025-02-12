@@ -19,39 +19,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
- 
-<<<<<<< HEAD
-	
- 
-	@Bean
-	SecurityFilterChain getFilterChain(HttpSecurity security) throws Exception {
-	 
-	    security.authorizeHttpRequests(auth -> {
-	        auth.requestMatchers(HttpMethod.GET, "/css/*", "/images/*").permitAll();
-	        auth.requestMatchers("/", "/articles", "/articles/{id}").permitAll();
-	        auth.requestMatchers("/inscription", "/connexion").anonymous();
-	        auth.requestMatchers("/encheres/**", "/profil/**").authenticated();
-	        auth.anyRequest().denyAll(); 
-	    });
-	 
-	    security
-	        .formLogin(formLogin -> {
-	            formLogin
-	                .loginPage("/connexion")
-	                .defaultSuccessUrl("/", true);
-	        })
-	        .logout(logout ->
-	            logout
-	                .invalidateHttpSession(true)
-	                .logoutRequestMatcher(new AntPathRequestMatcher("/deconnexion", "GET"))
-	                .logoutSuccessUrl("/")
-	        );
-	 
-	    return security.build();
-	}
 
-    
-=======
     @Bean
     SecurityFilterChain getFilterChain(HttpSecurity security) throws Exception {
         security.authorizeHttpRequests(auth -> {
@@ -82,7 +50,6 @@ public class SecurityConfig {
         return security.build();
     }
 
->>>>>>> 452c9cf436e23a67e7e0c007a1ec1bd096db9a7c
     @Bean
     UserDetailsManager users(DataSource dataSource) {
         JdbcUserDetailsManager userManager = new JdbcUserDetailsManager(dataSource);
