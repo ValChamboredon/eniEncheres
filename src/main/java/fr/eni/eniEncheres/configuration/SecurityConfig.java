@@ -22,36 +22,32 @@ public class SecurityConfig {
  
 	
  
-    @Bean
+	@Bean
 	SecurityFilterChain getFilterChain(HttpSecurity security) throws Exception {
-
-		security.authorizeHttpRequests(auth -> {
-			auth.requestMatchers(HttpMethod.GET, "/css/*").permitAll();
-			auth.requestMatchers(HttpMethod.GET, "/images/*").permitAll();
-
-			auth.anyRequest().permitAll();
-			auth.requestMatchers("/", "/articles", "/articles/{id}").permitAll();
-		    auth.requestMatchers("/inscription", "/connexion").anonymous();
-		    auth.requestMatchers("/encheres/**", "/profil/**").authenticated();
-		    auth.anyRequest().denyAll();
-		});
-
-		security
-			.formLogin(formLogin -> {
-				formLogin
-						.loginPage("/connexion")
-						.defaultSuccessUrl("/",true);
-		})
-			.logout((logout) ->
-				logout
-					.invalidateHttpSession(true)
-					.logoutRequestMatcher(new AntPathRequestMatcher("/deconnexion", "GET"))
-					.logoutSuccessUrl("/")
-        );
-		
-		return security.build();
+	 
+	    security.authorizeHttpRequests(auth -> {
+	        auth.requestMatchers(HttpMethod.GET, "/css/*", "/images/*").permitAll();
+	        auth.requestMatchers("/", "/articles", "/articles/{id}").permitAll();
+	        auth.requestMatchers("/inscription", "/connexion").anonymous();
+	        auth.requestMatchers("/encheres/**", "/profil/**").authenticated();
+	        auth.anyRequest().denyAll(); 
+	    });
+	 
+	    security
+	        .formLogin(formLogin -> {
+	            formLogin
+	                .loginPage("/connexion")
+	                .defaultSuccessUrl("/", true);
+	        })
+	        .logout(logout ->
+	            logout
+	                .invalidateHttpSession(true)
+	                .logoutRequestMatcher(new AntPathRequestMatcher("/deconnexion", "GET"))
+	                .logoutSuccessUrl("/")
+	        );
+	 
+	    return security.build();
 	}
-
 
     
     @Bean
