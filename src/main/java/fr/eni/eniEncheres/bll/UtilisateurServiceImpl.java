@@ -24,6 +24,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 
 /**
  * Méthode permettant de d'enregistrer un utilisateur
+ *
  */
 	@Override
 	public void enregistrer(@Valid Utilisateur utilisateur) throws BusinessException {
