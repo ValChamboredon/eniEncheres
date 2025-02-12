@@ -3,6 +3,7 @@ package fr.eni.eniEncheres.bll;
 import java.util.List;
 
 import fr.eni.eniEncheres.bo.ArticleVendu;
+import fr.eni.eniEncheres.exception.BusinessException;
 
 public interface ArticleService {
 	
@@ -14,5 +15,6 @@ public interface ArticleService {
 	List<ArticleVendu> getArticlesByCategory(int categoryId);
 	List<ArticleVendu> getArticlesByUser(int userId);
 	List<ArticleVendu> searchArticles(String keyword, int categoryId);
-
+	List<ArticleVendu> getArticlesTermines();
+	void demarrerVente(int noArticle) throws BusinessException;
 }

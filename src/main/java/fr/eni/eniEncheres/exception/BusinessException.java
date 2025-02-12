@@ -11,6 +11,7 @@ public class BusinessException extends Exception {
         this.clesErreurs = new ArrayList<>();
     }
 
+    
 
     public BusinessException(List<String> erreurs) {
         super("Erreur de validation: " + erreurs);  // Ajout d'un message dans l'exception

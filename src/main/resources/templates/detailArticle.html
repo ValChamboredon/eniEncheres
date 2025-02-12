@@ -30,6 +30,26 @@
                 </div>
             </form>
         </div>
+        
+<div th:if="${not #lists.isEmpty(encheres)}">
+    <h3>Historique des enchères</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Montant</th>
+                <th>Enchérisseur</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="enchere : ${encheres}">
+                <td th:text="${#temporals.format(enchere.dateEnchere, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${enchere.montantEnchere}"></td>
+                <td th:text="${enchere.utilisateur.pseudo}"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
         <a href="/articles" class="text-indigo-600 hover:text-indigo-900">Retour à la liste</a>
     </main>
