@@ -13,12 +13,12 @@ public class ArticleVendu {
     private LocalDate dateFinEncheres;
     private float miseAPrix;
     private float prixVente;
-    private String etatVente;
 
     private Utilisateur vendeur;             
     private Categorie categorie;             
     private Retrait lieuRetrait;            
-    private List<Enchere> encheres; 
+    private List<Enchere> encheres;
+    private EtatVente etatVente;
 
     //constructeur
     public ArticleVendu() {
@@ -93,11 +93,11 @@ public class ArticleVendu {
         this.prixVente = prixVente;
     }
 
-    public String getEtatVente() {
+    public Enum<EtatVente> getEtatVente() {
         return etatVente;
     }
 
-    public void setEtatVente(String etatVente) {
+    public void setEtatVente(EtatVente etatVente) {
         this.etatVente = etatVente;
     }
 

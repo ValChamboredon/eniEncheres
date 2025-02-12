@@ -15,5 +15,6 @@ public interface ArticleDAO {
     List<ArticleVendu> getArticlesByUser(int userId);
     List<ArticleVendu> getArticlesEnVente();
     List<ArticleVendu> searchArticles(String keyword, int categoryId);
+    List<ArticleVendu> getArticlesTermines();
     
 }

@@ -127,4 +127,10 @@ public class ArticleDAOImpl implements ArticleDAO {
 	    params.addValue("categoryId", categoryId);
 	    return namedParameterJdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(ArticleVendu.class));
 	}
+	
+	@Override
+	public List<ArticleVendu> getArticlesTermines() {
+	    String sql = "SELECT * FROM ARTICLES_VENDUS WHERE date_fin_encheres < CURRENT_DATE()";
+	    return jdbcTemplate.query(sql, new ArticleRowMapper());
+	}
 }
