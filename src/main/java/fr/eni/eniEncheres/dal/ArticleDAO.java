@@ -7,9 +7,9 @@ import fr.eni.eniEncheres.bo.ArticleVendu;
 public interface ArticleDAO {
 	
 	ArticleVendu getArticleById(int id);
-    List<ArticleVendu> getAllArticles();
-    void addArticle(ArticleVendu article);
-    void updateArticle(ArticleVendu article);
+    List<ArticleVendu> getAllArticles(); // itération 1 
+    void addArticle(ArticleVendu article); // itération 1
+   // void updateArticle(ArticleVendu article);
     void deleteArticle(int id);
     List<ArticleVendu> getArticlesByCategory(int categoryId);
     List<ArticleVendu> getArticlesByUser(int userId);

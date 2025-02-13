@@ -27,6 +27,20 @@ public class BusinessException extends Exception {
     }
 
     
+    
+    //-------------TEST------------
+    private List<String> messagesErreur = new ArrayList<String>();
+	
+
+	public List<String> getMessagesErreur() {
+		return messagesErreur;
+	}
+
+	public void setMessagesErreur(List<String> messagesErreur) {
+		this.messagesErreur = messagesErreur;
+	}
+
+    
 }
 
 

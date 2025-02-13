@@ -8,10 +8,12 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
  
 import fr.eni.eniEncheres.bo.ArticleVendu;
-import fr.eni.eniEncheres.bo.EtatVente;
+
 import fr.eni.eniEncheres.dal.mapper.ArticleRowMapper;
  
 @Repository
@@ -33,53 +35,57 @@ public class ArticleDAOImpl implements ArticleDAO {
  
 	@Override
 	public List<ArticleVendu> getAllArticles() {
-		String sql = "SELECT * FROM ARTICLES_VENDUS";
-		return jdbcTemplate.query(sql, (rs, rowNum) ->
-        new ArticleVendu(
-                rs.getInt("no_article"),
-                rs.getString("nom_article"),
-                rs.getString("description"),
-                rs.getDate("date_debut_encheres").toLocalDate(),
-                rs.getDate("date_fin_encheres").toLocalDate(),
-                rs.getFloat("prix_initial"),
-                rs.getFloat("prix_vente"),
-                EtatVente.valueOf(rs.getString("etat_vente"))        	)
-		);
+		String requeteSQL = "SELECT articles_vendus.*, utilisateurs.*,categories.* FROM articles_vendus INNER JOIN utilisateurs	ON utilisateurs.no_utilisateur = articles_vendus.no_utilisateur INNER JOIN categories ON categories.no_categorie = articles_vendus.no_categorie";
+
+		return jdbcTemplate.query(requeteSQL, new ArticleRowMapper());
+
 	}
  
 	@Override
 	public void addArticle(ArticleVendu article) {
-		String sql = "INSERT INTO ARTICLES_VENDUS (nom_article, description, date_debut_encheres, date_fin_encheres, prix_initial, prix_vente, etat_vente, no_utilisateur, no_categorie) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		jdbcTemplate.update(sql,
-                article.getNomArticle(),
-                article.getDescription(),
-                article.getDateDebutEncheres(),
-                article.getDateFinEncheres(),
-                article.getMiseAPrix(),
-                article.getPrixVente(),
-                article.getEtatVente(),
-                article.getVendeur().getNoUtilisateur(),
-                article.getCategorie().getNoCategorie()
-        );
+		KeyHolder keyholder =new GeneratedKeyHolder();
+		
+		String requete = "INSERT INTO [ARTICLES_VENDUS] ([nom_article], [description], [date_debut_encheres], [date_fin_encheres], [prix_initial], [prix_vente], [no_utilisateur], [no_categorie]) VALUES (:nom_article, :description, :date_debut_encheres, :date_fin_encheres, :prix_initial, :prix_vente, :no_utilisateur, :no_categorie)";
+
+		MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+
+		namedParameters.addValue("nom_article", article.getNomArticle());
+		namedParameters.addValue("description", article.getDescription());
+		namedParameters.addValue("date_debut_encheres", article.getDateDebutEncheres());
+		namedParameters.addValue("date_fin_encheres", article.getDateFinEncheres());
+		namedParameters.addValue("prix_initial", article.getMiseAPrix());
+		namedParameters.addValue("prix_vente", article.getPrixVente());
+
+		namedParameters.addValue("no_utilisateur", article.getVendeur().getNoUtilisateur());
+		namedParameters.addValue("no_categorie", article.getCategorie().getNoCategorie());
+
+		namedParameterJdbcTemplate.update(requete, namedParameters, keyholder);
+		
+		if (keyholder != null && keyholder.getKey().intValue() > 0) {
+			
+			// Si le no_article a été crée, on l'ajoute à article
+			article.setNoArticle(keyholder.getKey().intValue());
+		}
+
 	}
  
-	@Override
-	public void updateArticle(ArticleVendu article) {
-		String sql = "UPDATE ARTICLES_VENDUS SET nom_article = ?, description = ?, date_debut_encheres = ?, date_fin_encheres = ?, prix_initial = ?, prix_vente = ?, etat_vente = ?, no_utilisateur = ?, no_categorie = ? WHERE no_article = ?";
-        jdbcTemplate.update(sql,
-                article.getNomArticle(),
-                article.getDescription(),
-                article.getDateDebutEncheres(),
-                article.getDateFinEncheres(),
-                article.getMiseAPrix(),
-                article.getPrixVente(),
-                article.getEtatVente(),
-                article.getVendeur().getNoUtilisateur(),
-                article.getCategorie().getNoCategorie(),
-                article.getNoArticle()
-        );
-		
-	}
+//	@Override
+//	public void updateArticle(ArticleVendu article) {
+//		String sql = "UPDATE ARTICLES_VENDUS SET nom_article = ?, description = ?, date_debut_encheres = ?, date_fin_encheres = ?, prix_initial = ?, prix_vente = ?, etat_vente = ?, no_utilisateur = ?, no_categorie = ? WHERE no_article = ?";
+//        jdbcTemplate.update(sql,
+//                article.getNomArticle(),
+//                article.getDescription(),
+//                article.getDateDebutEncheres(),
+//                article.getDateFinEncheres(),
+//                article.getMiseAPrix(),
+//                article.getPrixVente(),
+//                article.getEtatVente(),
+//                article.getVendeur().getNoUtilisateur(),
+//                article.getCategorie().getNoCategorie(),
+//                article.getNoArticle()
+//        );
+//		
+//	}
  
 	@Override
 	public void deleteArticle(int id) {

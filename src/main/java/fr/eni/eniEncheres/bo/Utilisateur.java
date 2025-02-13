@@ -57,6 +57,7 @@ public class Utilisateur {
 	private boolean administrateur;
 	
 	//Relations
+	private List<ArticleVendu> articlesEnVente = new ArrayList<ArticleVendu>();
 	private List<ArticleVendu> article = new ArrayList<ArticleVendu>();
 	private List<Enchere> encheres = new ArrayList<Enchere>();
 	
@@ -207,6 +208,14 @@ public class Utilisateur {
 
 	public void setConfirmationMotDePasse(String confirmationMotDePasse) {
 		this.confirmationMotDePasse = confirmationMotDePasse;
+	}
+
+	public List<ArticleVendu> getArticlesEnVente() {
+		return articlesEnVente;
+	}
+
+	public void setArticlesEnVente(List<ArticleVendu> articlesEnVente) {
+		this.articlesEnVente = articlesEnVente;
 	}
 	
 	
