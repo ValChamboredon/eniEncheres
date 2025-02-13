@@ -9,74 +9,101 @@
     <div th:replace="~{/fragments/fragment-entete :: entete}"></div>
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl mx-auto">
         <h2 class="text-xl font-bold mb-4">Profil</h2>
-        <form th:action="@{/profil/detail}" method="POST" class="space-y-4">
+        <form th:action="@{/profil/detail}" method="POST" th:object="${utilisateur}" class="space-y-4">
+        
+	        <th:block th:if="${erreurs != null and #lists.size(erreurs) > 0}">
+	        	<div th:if="${#lists.size(erreurs) > 0}" class="mb-4">
+				    <ul class="text-red-500">
+				        <li th:each="erreur : ${erreurs}" th:text="${erreur}"></li>
+				    </ul>
+				</div>
+			</th:block>
             
             <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block font-medium">Pseudo</label>
-                    <input type="text" name="pseudo" class="w-full p-2 border rounded-lg" th:value="${utilisateur.pseudo}" required>
-                </div>
+			    <div>
+			        <label class="block font-medium" for="pseudo">Pseudo</label>
+			        <input type="text" id="pseudo" th:field="*{pseudo}" class="w-full p-2 border rounded-lg">
+			        <div class="text-red-500" th:if="${#fields.hasErrors('pseudo')}">
+			            <p th:errors="*{pseudo}">Erreur</p>
+			        </div>
+			    </div>
                 <div>
                     <label class="block font-medium">Nom</label>
-                    <input type="text" name="nom" class="w-full p-2 border rounded-lg" th:value="${utilisateur.nom}" required>
+                    <input type="text" class="w-full p-2 border rounded-lg" th:field="*{nom}">
+                    <div class="text-red-500" th:if="${#fields.hasErrors('nom')}">
+			            <p th:errors="*{nom}">Erreur</p>
+			        </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block font-medium">Prénom</label>
-                    <input type="text" name="prenom" class="w-full p-2 border rounded-lg" th:value="${utilisateur.prenom}" required>
+                    <input type="text" class="w-full p-2 border rounded-lg" th:field="*{prenom}">
+                    <div class="text-red-500" th:if="${#fields.hasErrors('prenom')}">
+			            <p th:errors="*{prenom}">Erreur</p>
+			        </div>
                 </div>
                 <div>
                     <label class="block font-medium">Email</label>
-                    <input type="email" name="email" class="w-full p-2 border rounded-lg" th:value="${utilisateur.email}" required>
+                    <input type="email" class="w-full p-2 border rounded-lg" th:field="*{email}">
+                    <div class="text-red-500" th:if="${#fields.hasErrors('email')}">
+			            <p th:errors="*{email}">Erreur</p>
+			        </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block font-medium">Téléphone</label>
-                    <input type="tel" name="telephone" class="w-full p-2 border rounded-lg" th:value="${utilisateur.telephone}" required>
+                    <input type="tel" class="w-full p-2 border rounded-lg" th:field="*{telephone}">
+                    <div class="text-red-500" th:if="${#fields.hasErrors('telephone')}">
+			            <p th:errors="*{telephone}">Erreur</p>
+			        </div>
                 </div>
                 <div>
                     <label class="block font-medium">Rue</label>
-                    <input type="text" name="rue" class="w-full p-2 border rounded-lg" th:value="${utilisateur.rue}" required>
+                    <input type="text" class="w-full p-2 border rounded-lg" th:field="*{rue}">
+                    <div class="text-red-500" th:if="${#fields.hasErrors('rue')}">
+			            <p th:errors="*{rue}">Erreur</p>
+			        </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block font-medium">Code Postal</label>
-                    <input type="text" name="code_postal" class="w-full p-2 border rounded-lg" th:value="${utilisateur.codePostal}" required>
+                    <input type="text" class="w-full p-2 border rounded-lg" th:field="*{codePostal}">
+                    <div class="text-red-500" th:if="${#fields.hasErrors('codePostal')}">
+			            <p th:errors="*{codePostal}">Erreur</p>
+			        </div>
                 </div>
                 <div>
                     <label class="block font-medium">Ville</label>
-                    <input type="text" name="ville" class="w-full p-2 border rounded-lg" th:value="${utilisateur.ville}" required>
+                    <input type="text" class="w-full p-2 border rounded-lg" th:field="*{ville}">
+                    <div class="text-red-500" th:if="${#fields.hasErrors('ville')}">
+			            <p th:errors="*{ville}">Erreur</p>
+			        </div>
                 </div>
             </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block font-medium">Mot de passe actuel</label>
-                    <input type="password" name="mot_de_passe" class="w-full p-2 border rounded-lg" required>
-                </div>
-            </div>
-
+	
+			
+			<input type="hidden" name="motDePasseActuel" th:field="*{motDePasse}" />
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block font-medium">Nouveau mot de passe</label>
-                    <input type="password" name="nouveau_mot_de_passe" class="w-full p-2 border rounded-lg">
+                    <input type="password" name="motDePasseNouveau" class="w-full p-2 border rounded-lg">
                 </div>
                 <div>
                     <label class="block font-medium">Confirmer nouveau mot de passe</label>
-                    <input type="password" name="confirmer_mot_de_passe" class="w-full p-2 border rounded-lg">
+                    <input type="password" name="motDePasseConfirme" class="w-full p-2 border rounded-lg">
                 </div>
             </div>
             
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block font-medium">Crédit</label>
-                    <input type="number" name="credit" class="w-full p-2 border rounded-lg" th:value="${utilisateur.credit}" required readonly>
+                    <input type="number" class="w-full p-2 border rounded-lg" th:field="*{credit}" required readonly>
                 </div>
             </div>
 
@@ -84,7 +111,7 @@
         </form>
         
         <form th:action="@{/profil/detail/supprimer}" method="post">
-            <input type="hidden" name="email" th:value="${utilisateur.email}" />
+            <input type="hidden" name="email" th:field="*{email}" />
             <button type="submit" class="w-full bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50 mt-4">Supprimer le compte</button>
         </form>
     </div>

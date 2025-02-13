@@ -12,13 +12,13 @@
 
             <div class="flex items-center space-x-4">
                 <!-- Options pour utilisateur non connecté -->
-                <div th:if="${!#authentication.authenticated}">
+                <div sec:authorize="!isAuthenticated()">
                     <a th:href="@{/inscription}" class="text-white hover:underline mr-4">S'inscrire</a>
                     <a th:href="@{/connexion}" class="text-white hover:underline">Se connecter</a>
                 </div>
 
                 <!-- Options pour utilisateur connecté -->
-                <div th:if="${#authentication.authenticated}" class="flex items-center space-x-4">
+                <div sec:authorize="isAuthenticated()" class="flex items-center space-x-4">
                     <a th:href="@{/articles}" class="text-white hover:underline">Enchères</a>
                     <a th:href="@{/articles/new}" class="text-white hover:underline">Vendre un article</a>
                     <a th:href="@{/profil}" class="text-white hover:underline">Mon profil</a>

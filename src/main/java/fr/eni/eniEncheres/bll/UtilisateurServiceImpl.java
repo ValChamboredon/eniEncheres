@@ -3,9 +3,11 @@ package fr.eni.eniEncheres.bll;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import fr.eni.eniEncheres.bo.Utilisateur;
 import fr.eni.eniEncheres.dal.UtilisateurDAO;
@@ -67,9 +69,19 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 	    // Sauvegarde en base
 	    utilisateurDAO.save(utilisateur);
 	}
+	
 	@Override
-	public void modifier(@Valid Utilisateur utilisateur) {
-		utilisateurDAO.update(utilisateur);
+	@Transactional(rollbackFor = BusinessException.class)
+	public void modifier(@Valid Utilisateur utilisateur)throws BusinessException {
+//		BusinessException be = new BusinessException();
+//		
+//		boolean valider = true;
+//				
+//		if(valider) {
+//			utilisateurDAO.update(utilisateur);
+//		}else {
+//			throw be;
+//		}
 	}
 	
 	@Override
