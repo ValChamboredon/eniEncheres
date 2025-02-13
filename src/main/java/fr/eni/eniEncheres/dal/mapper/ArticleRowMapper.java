@@ -40,7 +40,7 @@ public class ArticleRowMapper implements RowMapper<ArticleVendu> {
         
         Utilisateur vendeur = new Utilisateur();
         vendeur.setNoUtilisateur(rs.getInt("no_utilisateur"));
-        vendeur.setPseudo(rs.getString("pseudo"));
+        vendeur.setPseudo(rs.getString("vendeur_pseudo"));
         vendeur.setNom(rs.getString("nom"));
         vendeur.setPrenom(rs.getString("prenom"));
         vendeur.setEmail(rs.getString("email"));
@@ -56,14 +56,14 @@ public class ArticleRowMapper implements RowMapper<ArticleVendu> {
         
         Categorie categorie = new Categorie();
         categorie.setNoCategorie(rs.getInt("no_categorie"));
-        categorie.setLibelle(rs.getString("libelle"));
+        categorie.setLibelle(rs.getString("categorie_libelle"));
         article.setCategorie(categorie);
         
         Retrait lieuDeRetrait = new Retrait();
         lieuDeRetrait.setRue(rs.getString("rue"));
         lieuDeRetrait.setCodePostal(rs.getString("code_postal"));
         lieuDeRetrait.setVille(rs.getString("ville"));
-        article.setLieuRetrait(lieuDeRetrait);
+       article.setLieuRetrait(lieuDeRetrait);
         
         List<Enchere> encheres = new ArrayList<>();
         article.setEncheres(encheres);

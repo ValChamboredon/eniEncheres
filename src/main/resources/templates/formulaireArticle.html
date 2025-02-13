@@ -1,68 +1,86 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${article.noArticle == null ? 'Nouvelle Vente' : 'Modifier la Vente'}"></title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title
+	th:text="${article.noArticle == null ? 'Nouvelle Vente' : 'Modifier la Vente'}"></title>
+<link
+	href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+	rel="stylesheet">
 </head>
 <body class="bg-gray-100 p-8">
-    <main class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
-        <h1 class="text-2xl font-bold mb-6 text-center" th:text="${article.noArticle == null ? 'Nouvelle Vente' : 'Modifier la Vente'}"></h1>
-        
-        <form th:action="@{${article.noArticle == null ? '/articles' : '/articles/edit/' + article.noArticle}}" 
-              th:object="${article}" method="post">
-            <div class="mb-4">
-                <label for="nomArticle" class="block text-gray-700">Article:</label>
-                <input type="text" id="nomArticle" th:field="*{nomArticle}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-            <div class="mb-4">
-                <label for="description" class="block text-gray-700">Description:</label>
-                <textarea id="description" th:field="*{description}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
-            </div>
-            <div class="mb-4">
-                <label for="categorie" class="block text-gray-700">Catégorie:</label>
-                <select id="categorie" th:field="*{categorie.noCategorie}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <select id="categorie" th:field="*{categorie.noCategorie}" required class="...">
-   						 <option th:each="categorie : ${categories}" 
-     						       th:value="${categorie.noCategorie}" 
-   						         th:text="${categorie.libelle}">
- 					   </option>
-					</select>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label for="miseAPrix" class="block text-gray-700">Mise à prix:</label>
-                <input type="number" id="miseAPrix" th:field="*{miseAPrix}" required min="0" step="1" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-            <div class="mb-4">
-                <label for="dateDebutEncheres" class="block text-gray-700">Début de l'enchère:</label>
-                <input type="date" id="dateDebutEncheres" th:field="*{dateDebutEncheres}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-            <div class="mb-4">
-                <label for="dateFinEncheres" class="block text-gray-700">Fin de l'enchère:</label>
-                <input type="date" id="dateFinEncheres" th:field="*{dateFinEncheres}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-            <div class="mb-6">
-                <h3 class="text-lg font-semibold mb-2">Retrait</h3>
-                <div class="mb-2">
-                    <label for="rue" class="block text-gray-700">Rue:</label>
-                    <input type="text" id="rue" th:field="*{lieuRetrait.rue}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                </div>
-                <div class="mb-2">
-                    <label for="codePostal" class="block text-gray-700">Code postal:</label>
-                    <input type="text" id="codePostal" th:field="*{lieuRetrait.codePostal}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                </div>
-                <div class="mb-2">
-                    <label for="ville" class="block text-gray-700">Ville:</label>
-                    <input type="text" id="ville" th:field="*{lieuRetrait.ville}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                </div>
-            </div>
-            <div class="flex justify-between">
-                <button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Enregistrer</button>
-                <a href="/articles" class="bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">Annuler</a>
-            </div>
-        </form>
-    </main>
+	<main class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
+		<h1 class="text-2xl font-bold mb-6 text-center"
+			th:text="${article.noArticle == null ? 'Nouvelle Vente' : 'Modifier la Vente'}"></h1>
+
+		<form th:action="@{/articles}" th:object="${article}" method="post">
+
+			<div class="mb-4">
+				<label for="nomArticle" class="block text-gray-700">Article:</label>
+				<input type="text" id="nomArticle" th:field="*{nomArticle}" required
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+			</div>
+			<div class="mb-4">
+				<label for="description" class="block text-gray-700">Description:</label>
+				<textarea id="description" th:field="*{description}" required
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+			</div>
+			<div class="mb-4">
+				<label for="categorie" class="block text-gray-700">Catégorie:</label>
+				<select id="categorie" th:field="*{categorie.noCategorie}" required
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+					<option th:value="0">Sélectionnez une catégorie</option>
+					<option th:each="categorie : ${categories}"
+						th:value="${categorie.noCategorie}" th:text="${categorie.libelle}">
+					</option>
+				</select>
+
+			</div>
+			<div class="mb-4">
+				<label for="miseAPrix" class="block text-gray-700">Mise à
+					prix:</label> <input type="number" id="miseAPrix" th:field="*{miseAPrix}"
+					required min="0" step="1"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+			</div>
+			<div class="mb-4">
+				<label for="dateDebutEncheres" class="block text-gray-700">Début
+					de l'enchère:</label> <input type="date" id="dateDebutEncheres"
+					th:field="*{dateDebutEncheres}" required
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+			</div>
+			<div class="mb-4">
+				<label for="dateFinEncheres" class="block text-gray-700">Fin
+					de l'enchère:</label> <input type="date" id="dateFinEncheres"
+					th:field="*{dateFinEncheres}" required
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+			</div>
+			<div class="mb-6">
+				<h3 class="text-lg font-semibold mb-2">Retrait</h3>
+				<div class="mb-2">
+					<label for="rue" class="block text-gray-700">Rue:</label> <input
+						type="text" id="rue" th:field="*{lieuRetrait.rue}" required
+						class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+				</div>
+				<div class="mb-2">
+					<label for="codePostal" class="block text-gray-700">Code
+						postal:</label> <input type="text" id="codePostal"
+						th:field="*{lieuRetrait.codePostal}" required
+						class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+				</div>
+				<div class="mb-2">
+					<label for="ville" class="block text-gray-700">Ville:</label> <input
+						type="text" id="ville" th:field="*{lieuRetrait.ville}" required
+						class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+				</div>
+			</div>
+			<div class="flex justify-between">
+				<button type="submit"
+					class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Enregistrer</button>
+				<a href="/articles"
+					class="bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">Annuler</a>
+			</div>
+		</form>
+	</main>
 </body>
 </html>

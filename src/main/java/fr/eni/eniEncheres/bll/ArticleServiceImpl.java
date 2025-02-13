@@ -31,6 +31,7 @@ public class ArticleServiceImpl implements ArticleService {
 
 	@Override
 	public void addArticle(ArticleVendu article) {
+		System.out.println("Article reçu : " + article);
 		articleDAO.addArticle(article);
 		
 	}
