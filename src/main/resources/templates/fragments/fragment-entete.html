@@ -5,14 +5,14 @@
 		<nav>
 <!-- 			Cette div s'affiche s'il n'y a pas d'utilisateur·ice connecté·e -->
 			<div sec:authorize="isAnonymous()" class="header-btn">
-				<a data-th-href="@{inscription}">S'inscrire</a>
-				<a data-th-href="@{connexion}">Se connecter</a>
+				<a data-th-href="@{/encheres/inscription}">S'inscrire</a>
+				<a data-th-href="@{/encheres/connexion}">Se connecter</a>
 			</div>
 		
 <!-- 			Cette div s'affiche si l'utilisateur·ice est connecté -->
 			<div sec:authorize="isAuthenticated()" class="header-btn">
 				<a data-th-href="@{/encheres/vendre}">Vendre un article</a>
-				<a data-th-href="@{/profil}">Mon profil</a>
+				<a data-th-href="@{/encheres/profil}">Mon profil</a>
 				<a data-th-href="@{/deconnexion}">Déconnexion</a>
 			</div>
 		</nav>

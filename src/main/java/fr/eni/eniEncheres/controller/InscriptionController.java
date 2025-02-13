@@ -8,6 +8,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import fr.eni.eniEncheres.bll.UtilisateurService;
 import fr.eni.eniEncheres.bo.Utilisateur;
@@ -16,6 +17,7 @@ import jakarta.validation.Valid;
 
 
 @Controller
+
 public class InscriptionController {
 	
 	@Autowired

@@ -37,7 +37,7 @@ public class SecurityConfig {
             .formLogin(formLogin -> {
                 formLogin
                     .loginPage("/connexion")
-                    .defaultSuccessUrl("/", true);
+                    .defaultSuccessUrl("/encheres", true);
             })
             .logout(logout ->
                 logout
