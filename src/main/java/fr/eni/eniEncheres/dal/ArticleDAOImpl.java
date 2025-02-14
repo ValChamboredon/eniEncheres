@@ -13,7 +13,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
  
 import fr.eni.eniEncheres.bo.ArticleVendu;
-
+import fr.eni.eniEncheres.bo.EtatVente;
 import fr.eni.eniEncheres.dal.mapper.ArticleRowMapper;
  
 @Repository
@@ -69,7 +69,7 @@ public class ArticleDAOImpl implements ArticleDAO {
 	public void addArticle(ArticleVendu article) {
 		KeyHolder keyholder =new GeneratedKeyHolder();
 		
-		String requete = "INSERT INTO [ARTICLES_VENDUS] ([nom_article], [description], [date_debut_encheres], [date_fin_encheres], [prix_initial], [prix_vente], [no_utilisateur], [no_categorie]) VALUES (:nom_article, :description, :date_debut_encheres, :date_fin_encheres, :prix_initial, :prix_vente, :no_utilisateur, :no_categorie)";
+		String requete = "INSERT INTO [ARTICLES_VENDUS] ([nom_article], [description], [date_debut_encheres], [date_fin_encheres], [prix_initial], [prix_vente], [etat_vente], [no_utilisateur], [no_categorie]) VALUES (:nom_article, :description, :date_debut_encheres, :date_fin_encheres, :prix_initial, :prix_vente, :etat_vente, :no_utilisateur, :no_categorie)";
 
 		MapSqlParameterSource namedParameters = new MapSqlParameterSource();
 
@@ -82,6 +82,8 @@ public class ArticleDAOImpl implements ArticleDAO {
 
 		namedParameters.addValue("no_utilisateur", article.getVendeur().getNoUtilisateur());
 		namedParameters.addValue("no_categorie", article.getCategorie().getNoCategorie());
+		namedParameters.addValue("etat_vente", article.getEtatVente().name());  // Convertit l'Enum en String
+
 
 		namedParameterJdbcTemplate.update(requete, namedParameters, keyholder);
 		
@@ -93,29 +95,7 @@ public class ArticleDAOImpl implements ArticleDAO {
 
 	}
  
-//	@Override
-//	public void updateArticle(ArticleVendu article) {
-//		String sql = "UPDATE ARTICLES_VENDUS SET nom_article = ?, description = ?, date_debut_encheres = ?, date_fin_encheres = ?, prix_initial = ?, prix_vente = ?, etat_vente = ?, no_utilisateur = ?, no_categorie = ? WHERE no_article = ?";
-//        jdbcTemplate.update(sql,
-//                article.getNomArticle(),
-//                article.getDescription(),
-//                article.getDateDebutEncheres(),
-//                article.getDateFinEncheres(),
-//                article.getMiseAPrix(),
-//                article.getPrixVente(),
-//                article.getEtatVente(),
-//                article.getVendeur().getNoUtilisateur(),
-//                article.getCategorie().getNoCategorie(),
-//                article.getNoArticle()
-//        );
-//		
-//	}
- 
-	@Override
-	public void deleteArticle(int id) {
-		String sql = "DELETE FROM ARTICLES_VENDUS WHERE no_article = ?";
-        jdbcTemplate.update(sql, id);
-	}
+
  
  
 	@Override
@@ -167,4 +147,23 @@ public class ArticleDAOImpl implements ArticleDAO {
 		String sql = "SELECT * FROM ARTICLES_VENDUS WHERE date_fin_encheres < GETDATE()";
 	    return jdbcTemplate.query(sql, new ArticleRowMapper());
 	}
+
+	@Override
+	public void updateEtatVente(int noArticle, EtatVente nouvelEtat) {
+	    String sql = "UPDATE ARTICLES_VENDUS SET etat_vente = :etat_vente WHERE no_article = :no_article";
+	    
+	    MapSqlParameterSource params = new MapSqlParameterSource();
+	    params.addValue("etat_vente", nouvelEtat.name());  // Convertit l'Enum en String
+	    params.addValue("no_article", noArticle);
+
+	    namedParameterJdbcTemplate.update(sql, params);
+	}
+
+	@Override
+	public void deleteArticle(int articleId) {
+	    String sql = "DELETE FROM ARTICLES_VENDUS WHERE no_article = ?";
+	    jdbcTemplate.update(sql, articleId);
+	}
+
+
 }

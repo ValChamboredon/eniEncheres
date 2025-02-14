@@ -10,7 +10,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import fr.eni.eniEncheres.bo.ArticleVendu;
-
+import fr.eni.eniEncheres.bo.EtatVente;
 import fr.eni.eniEncheres.dal.ArticleDAO;
 import fr.eni.eniEncheres.exception.BusinessException;
 
@@ -85,9 +85,46 @@ public class ArticleServiceImpl implements ArticleService {
 
 	@Override
 	public ArticleVendu getArticleById(int noArticle) {
-	        return articleDAO.getArticleById(noArticle); 
+	    ArticleVendu article = articleDAO.getArticleById(noArticle);
 	    
+	    System.out.println("Vérification état vente pour l'article: " + article.getNoArticle());
+	    System.out.println("Date de début: " + article.getDateDebutEncheres());
+	    System.out.println("Date de fin: " + article.getDateFinEncheres());
+	    System.out.println("Date actuelle: " + LocalDate.now());
+	    System.out.println("État actuel: " + article.getEtatVente());
+
+	    // Vérifier si l'enchère doit passer à "EN_COURS"
+	    if (article.getEtatVente() == EtatVente.CREEE &&
+	       (LocalDate.now().isEqual(article.getDateDebutEncheres()) || LocalDate.now().isAfter(article.getDateDebutEncheres()))) {
+	        
+	        article.setEtatVente(EtatVente.EN_COURS);
+	        System.out.println("Mise à jour en EN_COURS pour l'article: " + article.getNoArticle());
+	        articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.EN_COURS);
+	    }
+
+	    // Vérifier si l'enchère doit passer à "ENCHERES_TERMINEES"
+	    if (article.getEtatVente() == EtatVente.EN_COURS && LocalDate.now().isAfter(article.getDateFinEncheres())) {
+	        article.setEtatVente(EtatVente.ENCHERES_TERMINEES);
+	        System.out.println("Mise à jour en ENCHERES_TERMINEES pour l'article: " + article.getNoArticle());
+	        articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.ENCHERES_TERMINEES);
+	    }
+
+	    return article;
 	}
+
+	@Override
+	public void supprimerArticle(int articleId) {
+	    try {
+	        articleDAO.deleteArticle(articleId);
+	        System.out.println("Article supprimé avec succès : " + articleId);
+	    } catch (Exception e) {
+	        System.err.println("Erreur lors de la suppression de l'article : " + e.getMessage());
+	    }
+	}
+
+
+
+
 
 
 }
