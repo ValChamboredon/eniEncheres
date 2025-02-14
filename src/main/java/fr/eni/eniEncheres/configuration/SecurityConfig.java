@@ -24,7 +24,7 @@ public class SecurityConfig {
             auth.requestMatchers("/", "/articles", "/inscription", "/connexion").permitAll();
             
             // Protégez les routes qui nécessitent une authentification
-            auth.requestMatchers("/profil/**", "/encheres/**", "/articles/new", "/articles/edit/**").authenticated();
+            // auth.requestMatchers("/profil/**", "/encheres/**", "/articles/new", "/articles/edit/**").authenticated();
             
          // Exiger l'authentification pour /encheres
             auth.requestMatchers("/encheres").authenticated();
@@ -37,13 +37,13 @@ public class SecurityConfig {
             .formLogin(formLogin -> {
                 formLogin
                     .loginPage("/connexion")
-                    .defaultSuccessUrl("/", true);
+                    .defaultSuccessUrl("/encheres", true);
             })
             .logout(logout ->
                 logout
                     .invalidateHttpSession(true)
                     .logoutRequestMatcher(new AntPathRequestMatcher("/deconnexion", "GET"))
-                    .logoutSuccessUrl("/")
+                    .logoutSuccessUrl("/encheres")
             );
         
         return security.build();

@@ -6,116 +6,81 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import fr.eni.eniEncheres.bo.ArticleVendu;
-import fr.eni.eniEncheres.bo.EtatVente;
+
 import fr.eni.eniEncheres.dal.ArticleDAO;
 import fr.eni.eniEncheres.exception.BusinessException;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
-	@Autowired
+	// Dépendance
 	private ArticleDAO articleDAO;
 
-	@Override
-	public ArticleVendu getArticleById(int id) {
-		return articleDAO.getArticleById(id);
+	/**
+	 * Constructeur
+	 * 
+	 * @param articleDAO
+	 */
+	// Injection de dépendance
+	public ArticleServiceImpl(ArticleDAO articleDAO) {
+		this.articleDAO = articleDAO;
 	}
 
+	/**
+	 * Méthode qui fait des vérification sur l'Article, si tout est OK elle envoie
+	 * l'Article vers la DAL.<br>
+	 * Sinon elle lève de·s BusinessException·s et les propage vers le Controller
+	 * 
+	 * @throws BusinessException
+	 */
 	@Override
-	public List<ArticleVendu> getAllArticles() {
+	public void creerArticle(ArticleVendu article) throws BusinessException {
+
+		BusinessException be = new BusinessException();
+
+		// Test de la date de début d'enchère (erreur si elle est déjà passée)
+		if (article.getDateDebutEncheres().isBefore(LocalDate.now())) {
+			be.getMessagesErreur().add("La date de début d'enchère est inférieure à la date du jour");
+		}
+
+		// Test de la date de fin d'enchère (erreur si avant ou égale à la date de
+		// début)
+		if (!(article.getDateFinEncheres().isAfter(article.getDateDebutEncheres()))) {
+			be.getMessagesErreur().add("La date de fin d'enchère n'est pas après la date de fin de début d'enchère");
+		}
+
+		// S'il n'y a pas eu d'erreur on envoi l'Article vers la DAL
+		if (be.getMessagesErreur().size() == 0) {
+
+			// On initialise le prix de vente avec la valeur de la mise à prix
+			article.setPrixVente(article.getMiseAPrix());
+
+			try {
+				articleDAO.addArticle(article);
+
+				// On ajoute article à la liste des articles en vente du vendeur
+				article.getVendeur().getArticlesEnVente().add(article);
+
+			} catch (DataAccessException dae) {
+				System.err.println(dae.getStackTrace());
+			}
+
+		} else {
+			throw be;
+		}
+
+	}
+
+	/**
+	 * Méthode qui appelle la DAL pour récupérer tout les Articles en vente
+	 */
+	public List<ArticleVendu> consulterTout() {
+
 		return articleDAO.getAllArticles();
 	}
 
-	@Override
-	public void addArticle(ArticleVendu article) {
-		articleDAO.addArticle(article);
-		
-	}
-
-	@Override
-	public void updateArticle(ArticleVendu article) {
-		articleDAO.updateArticle(article);
-		
-	}
-
-	@Override
-	public void deleteArticle(int id) {
-		articleDAO.deleteArticle(id);
-		
-	}
-
-	@Override
-	public List<ArticleVendu> getArticlesByCategory(int categoryId) {
-		return articleDAO.getArticlesByCategory(categoryId);
-	}
-
-	@Override
-	public List<ArticleVendu> getArticlesByUser(int userId) {
-		return articleDAO.getArticlesByUser(userId);
-	}
-
-	@Override
-	public List<ArticleVendu> searchArticles(String keyword, int categoryId) {
-		return articleDAO.searchArticles(keyword, categoryId);
-	}
-	
-	@Override
-	public List<ArticleVendu> getArticlesTermines() {
-	    return articleDAO.getArticlesTermines();
-	}
-
-	@Override
-	public void demarrerVente(int noArticle) throws BusinessException {
-		ArticleVendu article = articleDAO.getArticleById(noArticle);
-		
-		BusinessException be = new BusinessException();
-		
-		if(article.getEtatVente() != EtatVente.CREEE) {
-			be.addCleErreur("ERR_VENTE_DEJA_DEMARREE");
-		}
-	
-		LocalDate now = LocalDate.now();
-		if (now.isBefore(article.getDateDebutEncheres())) {
-			be.addCleErreur("ERR_DATE_DEBUT_FUTURE");
-		}
-		if (!be.getClesErreurs().isEmpty()) {
-	        throw be;
-	    }
-		article.setEtatVente(EtatVente.EN_COURS);
-		articleDAO.updateArticle(article);
-	}
-
-	@Override
-	public List<ArticleVendu> getArticlesEnVente() {
-	    // Récupérer tous les articles dont l'état de vente est EN_COURS
-	    // et dont la date de début d'enchères est passée et la date de fin d'enchères est future
-	    List<ArticleVendu> articlesEnCours = new ArrayList<>();
-	    
-	    try {
-	        // Récupérer tous les articles en vente
-	        articlesEnCours = articleDAO.getArticlesEnVente();
-	        
-	        // Filtrage supplémentaire pour s'assurer que les dates correspondent
-	        LocalDate now = LocalDate.now();
-	        articlesEnCours = articlesEnCours.stream()
-	            .filter(article -> 
-	                article.getEtatVente() == EtatVente.EN_COURS &&
-	                !now.isBefore(article.getDateDebutEncheres()) &&
-	                now.isBefore(article.getDateFinEncheres())
-	            )
-	            .collect(Collectors.toList());
-	    } catch (Exception e) {
-	        // Gérer l'exception (log, etc.)
-	        System.err.println("Erreur lors de la récupération des articles en vente : " + e.getMessage());
-	        return new ArrayList<>();
-	    }
-	    
-	    return articlesEnCours;
-	}
-	
-	
-	
 }

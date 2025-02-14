@@ -1,30 +1,21 @@
 <header th:fragment="entete">
-    <nav class="bg-gradient-to-r from-blue-900 to-blue-700 p-4 shadow-lg">
-        <div class="container mx-auto flex items-center justify-between">
-            <div class="flex items-center">
-                <h1 class="text-white text-2xl font-bold">
-                    <a th:href="${#authentication.authenticated} ? @{/articles} : @{/}" 
-                       class="hover:text-gray-200 transition">
-                        ENI-Enchères
-                    </a>
-                </h1>
-            </div>
+  <a data-th-href="@{/encheres}" class="lienIndex">
+			<h1>ENI - Enchères</h1>
+		</a>
+		<nav>
+<!-- 			Cette div s'affiche s'il n'y a pas d'utilisateur·ice connecté·e -->
+			<div sec:authorize="isAnonymous()" class="header-btn">
+				<a data-th-href="@{/encheres/inscription}">S'inscrire</a>
+				<a data-th-href="@{/encheres/connexion}">Se connecter</a>
+			</div>
+		
+<!-- 			Cette div s'affiche si l'utilisateur·ice est connecté -->
+			<div sec:authorize="isAuthenticated()" class="header-btn">
+				<a data-th-href="@{/encheres/vendre}">Vendre un article</a>
+				<a data-th-href="@{/encheres/profil}">Mon profil</a>
+				<a data-th-href="@{/deconnexion}">Déconnexion</a>
+			</div>
+		</nav>
 
-            <div class="flex items-center space-x-4">
-                <!-- Options pour utilisateur non connecté -->
-                <div th:if="${!#authentication.authenticated}">
-                    <a th:href="@{/inscription}" class="text-white hover:underline mr-4">S'inscrire</a>
-                    <a th:href="@{/connexion}" class="text-white hover:underline">Se connecter</a>
-                </div>
-
-                <!-- Options pour utilisateur connecté -->
-                <div th:if="${#authentication.authenticated}" class="flex items-center space-x-4">
-                    <a th:href="@{/articles}" class="text-white hover:underline">Enchères</a>
-                    <a th:href="@{/articles/new}" class="text-white hover:underline">Vendre un article</a>
-                    <a th:href="@{/profil}" class="text-white hover:underline">Mon profil</a>
-                    <a th:href="@{/deconnexion}" class="text-white hover:underline">Déconnexion</a>
-                </div>
-            </div>
-        </div>
-    </nav>
 </header>
+
