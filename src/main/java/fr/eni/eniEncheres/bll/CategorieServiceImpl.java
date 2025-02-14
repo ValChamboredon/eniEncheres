@@ -12,7 +12,6 @@ import java.util.List;
 	
 	    private final CategorieDAO categorieDAO;
 	
-	    @Autowired
 	    public CategorieServiceImpl(CategorieDAO categorieDAO) {
 	        this.categorieDAO = categorieDAO;
 	    }
