@@ -4,7 +4,6 @@ import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
@@ -27,7 +26,8 @@ public class SecurityConfig {
             // Protégez les routes qui nécessitent une authentification
             // auth.requestMatchers("/profil/**", "/encheres/**", "/articles/new", "/articles/edit/**").authenticated();
             
-            auth.requestMatchers("/", "/encheres", "/articles").permitAll();
+         // Exiger l'authentification pour /encheres
+            auth.requestMatchers("/encheres").authenticated();
             
             // Utilisez anyRequest() en dernier
             auth.anyRequest().authenticated();

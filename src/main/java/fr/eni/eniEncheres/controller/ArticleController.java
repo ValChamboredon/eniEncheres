@@ -1,5 +1,6 @@
 package fr.eni.eniEncheres.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import fr.eni.eniEncheres.bll.ArticleService;
 import fr.eni.eniEncheres.bll.CategorieService;
+import fr.eni.eniEncheres.bll.EnchereService;
 import fr.eni.eniEncheres.bll.UtilisateurService;
 import fr.eni.eniEncheres.bo.ArticleVendu;
 import fr.eni.eniEncheres.bo.Categorie;
@@ -35,6 +37,8 @@ public class ArticleController {
 
 	// Dépendances
 	private ArticleService articleService;
+
+	private EnchereService enchereService;
 	private CategorieService categorieService;
 	private UtilisateurService utilisateurService;
 
@@ -57,6 +61,7 @@ public class ArticleController {
 	 * @param model
 	 * @return "index"
 	 */
+
 	@GetMapping
 	public String afficherLesArticles(Model model) {
 
@@ -150,4 +155,18 @@ public class ArticleController {
 		return "redirect:/encheres/connexion";
 	}
 
+    @GetMapping("/encheres")
+    public String listeEncheres(Model model) {
+        try {
+            List<ArticleVendu> articles = articleService.getArticlesEnVente();
+            model.addAttribute("articles", articles);
+
+			model.addAttribute("categories", categorieService.getAllCategories());
+            return "listeArticles"; 
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("erreurs", Collections.singletonList("Erreur de chargement : " + e.getMessage()));
+            return "erreur";
+        }
+    }
 }

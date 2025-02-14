@@ -19,7 +19,7 @@ public class ArticleRowMapper implements RowMapper<ArticleVendu> {
 
 	@Override
 	public ArticleVendu mapRow(ResultSet rs, int rowNum) throws SQLException {
-		 
+
 				ArticleVendu article = new ArticleVendu();
 				
 				article.setNoArticle(rs.getInt("no_article"));
@@ -74,3 +74,4 @@ public class ArticleRowMapper implements RowMapper<ArticleVendu> {
 
 
 }
+
