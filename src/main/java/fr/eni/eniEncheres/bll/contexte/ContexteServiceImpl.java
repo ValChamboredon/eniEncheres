@@ -1,12 +1,4 @@
-/**
- * Implémentation de ContexteService qui stocke l'utilisateur connecté en session.
- * 
- * - @Service : Composant Spring
- * - @SessionScope : L'instance de l'utilisateur connecté reste active tant que la session n'est pas fermée.
- * 
- * @author Mariami
- * @version 1.0
- */
+
 package fr.eni.eniEncheres.bll.contexte;
 
 import org.springframework.stereotype.Service;

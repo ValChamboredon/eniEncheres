@@ -9,6 +9,9 @@ import fr.eni.eniEncheres.bll.CategorieService;
 import fr.eni.eniEncheres.bo.Categorie;
 import fr.eni.eniEncheres.exception.BusinessException;
 
+/**
+ * ✅ Contrôleur gérant les catégories pour les enchères.
+ */
 @Controller
 @RequestMapping("/categories")
 public class CategorieController {
@@ -19,45 +22,41 @@ public class CategorieController {
         this.categorieService = categorieService;
     }
 
+    /**
+     * ✅ Affiche la liste des catégories.
+     *
+     * @param model Modèle pour afficher les catégories.
+     * @return La vue contenant la liste des catégories.
+     * @throws BusinessException En cas d'erreur de récupération.
+     */
     @GetMapping
     public String getAllCategories(Model model) throws BusinessException {
         model.addAttribute("categories", categorieService.getAllCategories());
         return "categories/liste";
     }
 
+    /**
+     * ✅ Affiche le formulaire d'ajout d'une nouvelle catégorie.
+     *
+     * @param model Modèle contenant l'objet catégorie.
+     * @return La page du formulaire d'ajout.
+     */
     @GetMapping("/ajouter")
     public String afficherFormulaireAjout(Model model) {
         model.addAttribute("categorie", new Categorie());
         return "categories/formulaire";
     }
 
+    /**
+     * ✅ Ajoute une nouvelle catégorie en base de données.
+     *
+     * @param categorie La catégorie à ajouter.
+     * @return Redirection vers la liste des catégories.
+     * @throws BusinessException En cas d'erreur métier.
+     */
     @PostMapping("/ajouter")
     public String ajouterCategorie(@ModelAttribute Categorie categorie) throws BusinessException {
         categorieService.ajouterCategorie(categorie);
         return "redirect:/categories";
-    }
-
-    @GetMapping("/modifier/{id}")
-    public String afficherFormulaireModification(@PathVariable int id, Model model) throws BusinessException {
-        model.addAttribute("categorie", categorieService.getCategorieById(id));
-        return "categories/formulaire";
-    }
-
-    @PostMapping("/modifier/{id}")
-    public String modifierCategorie(@PathVariable int id, @ModelAttribute Categorie categorie) throws BusinessException {
-        categorie.setNoCategorie(id);
-        categorieService.mettreAJourCategorie(categorie);
-        return "redirect:/categories";
-    }
-
-    @GetMapping("/supprimer/{id}")
-    public String supprimerCategorie(@PathVariable int id) throws BusinessException {
-        categorieService.supprimerCategorie(id);
-        return "redirect:/categories";
-    }
-    
-    @ModelAttribute("categories")
-    public List<Categorie> getAllCategories() throws BusinessException {
-        return categorieService.getAllCategories();
     }
 }

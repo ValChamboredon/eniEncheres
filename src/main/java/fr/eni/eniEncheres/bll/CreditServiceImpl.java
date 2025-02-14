@@ -1,5 +1,8 @@
 package fr.eni.eniEncheres.bll;
 
+import java.lang.System.Logger;
+
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +12,7 @@ import fr.eni.eniEncheres.exception.BusinessException;
 
 @Service
 public class CreditServiceImpl implements CreditService {
-
+	
 	@Autowired
 	private UtilisateurDAO utilisateurDAO;
 	

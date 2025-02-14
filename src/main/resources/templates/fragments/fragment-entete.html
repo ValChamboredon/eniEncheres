@@ -1,22 +1,27 @@
-<header th:fragment="entete">
-    <nav class="bg-gradient-to-r from-blue-900 to-blue-700 p-4 shadow-lg">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center">
+<header th:fragment="entete" class="bg-white shadow-md py-4">
+    <div class="container mx-auto flex justify-between items-center px-6">
+        
+        <!-- ✅ Left: ENI-Enchères Logo -->
+        <a th:href="@{/encheres}" class="text-2xl font-bold text-indigo-600 hover:text-indigo-800">
+            ENI - Enchères
+        </a>
+
+        <!-- ✅ Right: Navigation -->
+        <nav class="flex space-x-4">
             
-            <!-- Itération 1 navigation l'utilisateur peut cliquer sur le h1 pour qu'il soit redirigé vers l'accueil QUE si il est connecté -->
-                <h1 class="text-white text-2xl font-bold">
-                    <a th:href="${#authorization.expression('isAuthenticated()')} ? @{/} : null"
-                       th:if="${#authorization.expression('isAuthenticated()')}">ENI-Enchères</a>
-                    <span th:unless="${#authorization.expression('isAuthenticated()')}">ENI-Enchères</span>
-                </h1>
+            <!-- 🔹 If NOT logged in -->
+            <div sec:authorize="isAnonymous()" class="flex space-x-4">
+                <a th:href="@{/encheres/inscription}" class="text-gray-700 hover:text-indigo-600">S'inscrire</a>
+                <a th:href="@{/encheres/connexion}" class="text-gray-700 hover:text-indigo-600">Se connecter</a>
             </div>
 
-            <div class="flex items-center space-x-4">
-                <p sec:authorize="!isAuthenticated" class="text-white"><a th:href="@{/inscription}" class="hover:underline">S'inscrire</a></p>
-                <p sec:authorize="!isAuthenticated" class="text-white"><a th:href="@{/connexion}" class="hover:underline">Se connecter</a></p>
-                <p sec:authorize="isAuthenticated" class="text-white"><a th:href="@{/profil}" class="hover:underline">profil</a></p>  
-                <p sec:authorize="isAuthenticated" class="text-white"><a th:href="@{/deconnexion}" class="hover:underline">Se déconnecter</a></p>           
+            <!-- 🔹 If logged in -->
+            <div sec:authorize="isAuthenticated()" class="flex space-x-4">
+                <a th:href="@{/encheres/vendre}" class="text-gray-700 hover:text-indigo-600">Vendre un article</a>
+                <a th:href="@{/encheres/profil}" class="text-gray-700 hover:text-indigo-600">Mon profil</a>
+                <a th:href="@{/deconnexion}" class="text-red-600 hover:text-red-800">Déconnexion</a>
             </div>
-        </div>
-    </nav>
+
+        </nav>
+    </div>
 </header>

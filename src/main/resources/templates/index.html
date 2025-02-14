@@ -1,14 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Accueil</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Enchères</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-	<div th:replace="~{/fragments/fragment-entete :: entete}"></div>
-	
-	
-	<h1>SALUT A TOUS ICI CEST LA LISTE DES ITEMS A VENDRE !!!!!!</h1>
+<body class="bg-gray-100">
+
+    <!-- ✅ Include Header Fragment -->
+    <div th:replace="~{fragments/fragment-entete :: entete}"></div>
+
+    <main class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-center my-6">Liste des Enchères</h1>
+
+        <!-- ✅ Filters Section -->
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <form th:action="@{/encheres/search}" method="get" class="space-y-4">
+                <div class="flex space-x-4">
+                    <input type="text" name="keyword" placeholder="Le nom de l'article contient" class="flex-grow border rounded px-3 py-2">
+                    
+                    <select name="categoryId" class="border rounded px-3 py-2">
+                        <option value="0">Toutes</option>
+                        <option th:each="categorie : ${categories}" th:value="${categorie.noCategorie}" th:text="${categorie.libelle}"></option>
+                    </select>
+                    
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Rechercher</button>
+                </div>
+
+                <!-- ✅ Filters for Purchases & Sales -->
+                <div class="flex space-x-4">
+                    <label class="flex items-center">
+                        <input type="radio" name="typeRecherche" value="achats" checked class="mr-2">
+                        Achats
+                    </label>
+                    <div class="ml-4 space-x-2">
+                        <label>
+                            <input type="checkbox" name="enchereOuverte" class="mr-1">Enchères ouvertes
+                        </label>
+                        <label>
+                            <input type="checkbox" name="mesEncheresEnCours" class="mr-1">Mes enchères en cours
+                        </label>
+                        <label>
+                            <input type="checkbox" name="mesEncheresRemportees" class="mr-1">Mes enchères remportées
+                        </label>
+                    </div>
+
+                    <label class="flex items-center ml-auto">
+                        <input type="radio" name="typeRecherche" value="mesVentes" class="mr-2">
+                        Mes ventes
+                    </label>
+                    <div class="ml-4 space-x-2">
+                        <label>
+                            <input type="checkbox" name="ventesEnCours" class="mr-1">Ventes en cours
+                        </label>
+                        <label>
+                            <input type="checkbox" name="ventesNonDebutees" class="mr-1">Ventes non débutées
+                        </label>
+                        <label>
+                            <input type="checkbox" name="ventesTerminees" class="mr-1">Ventes terminées
+                        </label>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- ✅ Auctions List -->
+        <section>
+            <div th:if="${articles.isEmpty()}" class="text-center text-gray-500">
+                Aucune enchère en cours actuellement.
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div th:each="article : ${articles}" class="border p-4 rounded flex bg-white shadow-md">
+                    <div class="w-1/3 border mr-4 bg-gray-200">
+                        <!-- Image Placeholder -->
+                    </div>
+                    <div class="w-2/3">
+                        <h3 th:text="${article.nomArticle}" class="font-bold text-lg"></h3>
+                        <p>Prix : <span th:text="${article.prixVente}"></span> points</p>
+                        <p>Fin de l'enchère : <span th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}"></span></p>
+                        <p>Vendeur : <span th:text="${article.vendeur.pseudo}"></span></p>
+                        <a th:href="@{/encheres/article/{id}(id=${article.noArticle})}" class="text-blue-500">Voir plus</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
 </body>
 </html>

@@ -8,6 +8,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import fr.eni.eniEncheres.bll.UtilisateurService;
 import fr.eni.eniEncheres.bo.Utilisateur;
@@ -16,6 +17,7 @@ import jakarta.validation.Valid;
 
 
 @Controller
+
 public class InscriptionController {
 	
 	@Autowired
@@ -35,34 +37,33 @@ public class InscriptionController {
 	public String inscrireUtilisateur(@Valid @ModelAttribute("utilisateur") Utilisateur utilisateur, 
 	                                  BindingResult result, 
 	                                  Model model) {
-	    
+
 	    if (result.hasErrors()) {
-	        System.out.println("BindingResult formulaire est invalide.");
+	        System.out.println("Formulaire invalide.");
 	        result.getAllErrors().forEach(error -> System.out.println(error.getDefaultMessage()));
 	        return "inscription";
 	    }
 
 	    try {
+	        if (utilisateurService.pseudoExistant(utilisateur.getPseudo())) {
+	            model.addAttribute("erreurPseudo", "Ce pseudo est déjà pris.");
+	            return "inscription";
+	        }
+
+	        if (utilisateurService.emailExistant(utilisateur.getEmail())) {
+	            model.addAttribute("erreurEmail", "Cet email est déjà utilisé.");
+	            return "inscription";
+	        }
+
 	        utilisateurService.enregistrer(utilisateur);
 	    } catch (BusinessException e) {
-	        for (String messageErreur : e.getClesErreurs()) {
-	            // erreur de mot de passe, on l'ajoute au modèle
-	            if (messageErreur.equals("Les mots de passe ne correspondent pas.")) {
-	                model.addAttribute("erreurConfirmation", messageErreur);
-	                System.out.println("Ajout de l'erreur confirmation dans le modèle : " + messageErreur);
-
-	            } else {
-	                result.reject("globalError", messageErreur); 
-	            }
-	        }
 	        model.addAttribute("erreurs", e.getClesErreurs());
-	        model.addAttribute("utilisateur", utilisateur); 
+	        model.addAttribute("utilisateur", utilisateur);
 	        return "inscription";
 	    }
 
-	    return "redirect:/connexion";
+	    return "redirect:/connexion"; // Redirect user to login after successful signup
 	}
-
 
 
 

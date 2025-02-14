@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import fr.eni.eniEncheres.bo.Utilisateur;
@@ -28,37 +28,28 @@ public class UtilisateurServiceImpl implements UtilisateurService {
  */
 	@Override
 	public void enregistrer(@Valid Utilisateur utilisateur) throws BusinessException {
-		System.out.println("début enregistrer");
 	    List<String> erreurs = new ArrayList<>();
 
-	    // Vérifier si l'email ou le pseudo existent déjà
+	    // Vérification email & pseudo
 	    if (utilisateurDAO.existsByEmail(utilisateur.getEmail())) {
 	        erreurs.add("Cet email est déjà utilisé.");
-	        System.out.println("L'email existe déjà en base !");
 	    }
 	    if (utilisateurDAO.existsByPseudo(utilisateur.getPseudo())) {
 	        erreurs.add("Ce pseudo est déjà pris.");
-	        System.out.println("Le pseudo existe déjà en base !");
 	    }
 
-	    // Vérifier si les mots de passe correspondent
-	    System.out.println("mot de passe : " + utilisateur.getMotDePasse());
-	    System.out.println("confirmation : " + utilisateur.getConfirmationMotDePasse());
-	    
-
+	    // Vérification mot de passe
 	    if (!utilisateur.getMotDePasse().equals(utilisateur.getConfirmationMotDePasse())) {
 	        erreurs.add("Les mots de passe ne correspondent pas.");
-	        System.out.println("Les mots de passe ne correspondent pas !");
 	    }
 
-	    // Si des erreurs existent, on lève une exception
 	    if (!erreurs.isEmpty()) {
-	        System.out.println("Erreurs trouvées : " + erreurs);
 	        throw new BusinessException(erreurs);
 	    }
 
-	    // Hachage du mot de passe
-	    utilisateur.setMotDePasse(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(utilisateur.getMotDePasse()));
+	    // Hachage du mot de passe seulement si c'est un nouveau mot de passe
+	    PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+	    utilisateur.setMotDePasse(encoder.encode(utilisateur.getMotDePasse()));
 
 	    // Définir les valeurs par défaut
 	    utilisateur.setCredit(0);
