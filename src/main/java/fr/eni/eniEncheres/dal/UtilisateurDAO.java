@@ -27,5 +27,6 @@ public interface UtilisateurDAO {
 	
 	void supprimerByEmail(String email);
 	
+	void supprimerById(int id);
 	
 }

@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -18,7 +19,9 @@ import org.springframework.validation.ObjectError;
 
 import fr.eni.eniEncheres.bll.UtilisateurService;
 import fr.eni.eniEncheres.bo.Utilisateur;
+import fr.eni.eniEncheres.dal.UtilisateurDAO;
 import fr.eni.eniEncheres.exception.BusinessException;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -38,64 +41,76 @@ public class ProfilController {
 	}
 		
 	@GetMapping("/profil")
-	public String afficherProfil(Model model) {
+	public String afficherProfil(Model model, HttpSession session) {
 		//récupérer email de l'utilisateur
 		Authentication authentification = SecurityContextHolder.getContext().getAuthentication();
 		String email = authentification.getName();
+		System.out.println(email);
+		int userId = utilisateurService.getIdByEmail(email);
 		
 		//récupérer l'utilisateur en base de données
-		Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(email);
+		Utilisateur utilisateur = utilisateurService.getUtilisateurById(userId);
 		model.addAttribute("utilisateur", utilisateur);
 		
 		return "profil";
 	}
 	
-	@PostMapping("/profil/detail")
-	public String modifierProfil(
-		@RequestParam(value = "motDePasseNouveau", required = false) String motDePasseNouveau,
-		@RequestParam(value = "motDePasseConfirme", required = false) String motDePasseConfirme,
-		@Valid @ModelAttribute("utilisateur") Utilisateur utilisateur, 
-        BindingResult bindingResult,
-	    Model model) {
+    @PostMapping("/profil/detail")
+    public String modifierProfil(
+            @Valid @ModelAttribute("utilisateur") Utilisateur utilisateur,
+            BindingResult bindingResult,
+            Model model,
+            @RequestParam("motDePasseNouveau") String motDePasseNouveau,
+            @RequestParam("motDePasseConfirme") String motDePasseConfirme) {
+        
+        // Vérification des erreurs de validation
+        if (bindingResult.hasErrors()) {
+        	bindingResult.getAllErrors().forEach(error -> {
+                System.out.println("Erreur : " + error.getObjectName() + " - " + error.getDefaultMessage());
+            });
+            return "profil-detail";
+        }else {
+            try {
+            	//modification en bdd
+                utilisateurService.modifier(utilisateur);
+                
+                //modification du contexte
+                // Récupérer l'authentification actuelle
+                int id = utilisateur.getNoUtilisateur();
 
-	    // Créer une instance de BusinessException pour collecter les erreurs
-	    BusinessException exception = new BusinessException();
-	    
-	    if(bindingResult.hasErrors()) {
-	    	System.out.println("erreur");
-	    	
-	    	bindingResult.getAllErrors().forEach(error -> {
-	            System.out.println("Erreur : " + error.getObjectName() + " - " + error.getDefaultMessage());
-	        });
-	    	
-	    	return "profil-detail";
-	    }
-	    
-	    try {
-	    	utilisateurService.modifier(utilisateur);
-	    }catch (BusinessException e) {
-	    	e.printStackTrace();
-	    	e.getClesErreurs().forEach(cle->{
-	    		ObjectError erreur = new ObjectError("globalError", cle);
-	    		bindingResult.addError(erreur);
-	    	});
-	    	
-	    	
-	    	return "profil-detail";
-	    	}
-	    
-	    // Si un nouveau mot de passe est fourni, vérifier s'il correspond à la confirmation
-	    if (motDePasseNouveau != null && !motDePasseNouveau.isEmpty()) {
-	        if (!motDePasseNouveau.equals(motDePasseConfirme)) {
-	            exception.addCleErreur("Les mots de passe ne correspondent pas.");
-	        } else {
-	            // Encoder et changer le mot de passe
-	            utilisateur.setMotDePasse(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(motDePasseNouveau));
-	        }
-	    }
+                // Récupérer l'utilisateur avec son email après mise à jour
+                Utilisateur utilisateurMisAJour = utilisateurService.getUtilisateurById(id);
 
-	    return "profil";  // Retourner à la page profil après modification
-	}
+                // Créer un nouvel objet Authentication avec les informations mises à jour de l'utilisateur
+                Authentication newAuthentication = new UsernamePasswordAuthenticationToken(
+                    utilisateurMisAJour.getEmail(), 
+                    utilisateurMisAJour.getMotDePasse()
+                );
+
+                // Mettre à jour le SecurityContext avec la nouvelle authentification
+                SecurityContextHolder.getContext().setAuthentication(newAuthentication);
+                
+            } catch (BusinessException e) {
+                e.getClesErreurs().forEach(cle -> {
+                    String messageErreur = messageSource.getMessage(cle, null, Locale.getDefault());
+                    bindingResult.addError(new ObjectError("globalError", messageErreur));
+                });
+                return "profil-detail";
+            }
+        }
+        
+        return "index";
+    }
+    
+    // Vérification de la correspondance des mots de passe
+//  if (motDePasseNouveau != null && !motDePasseNouveau.isEmpty()) {
+//      if (!motDePasseNouveau.equals(motDePasseConfirme)) {
+//          bindingResult.rejectValue("motDePasse", "error.utilisateur", "Les mots de passe ne correspondent pas.");
+//          return "profil-detail";
+//      } else {
+//          utilisateur.setMotDePasse(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(motDePasseNouveau));
+//      }
+//  }
 
 
 	
@@ -104,17 +119,18 @@ public class ProfilController {
 		//récupérer email de l'utilisateur
 		Authentication authentification = SecurityContextHolder.getContext().getAuthentication();
 		String email = authentification.getName();
+		int userId = utilisateurService.getIdByEmail(email);
 		
 		//récupérer l'utilisateur en base de données
-		Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(email);
+		Utilisateur utilisateur = utilisateurService.getUtilisateurById(userId);
 		model.addAttribute("utilisateur", utilisateur);
 		
 		return "profil-detail";
 	}
 	
 	@PostMapping("/profil/detail/supprimer")
-	public String supprimerCompte(@RequestParam("email") String email){
-		utilisateurService.supprimerByEmail(email);
+	public String supprimerCompte(@RequestParam("noUtilisateur") int id){
+		utilisateurService.supprimerById(id);
 		return "redirect:/deconnexion";
 	}
 

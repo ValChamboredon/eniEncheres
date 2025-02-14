@@ -11,16 +11,13 @@
         <h2 class="text-xl font-bold mb-4">Profil</h2>
         <form th:action="@{/profil/detail}" method="POST" th:object="${utilisateur}" class="space-y-4">
         
-	        <th:block th:if="${erreurs != null and #lists.size(erreurs) > 0}">
-	        	<div th:if="${#lists.size(erreurs) > 0}" class="mb-4">
-				    <ul class="text-red-500">
-				        <li th:each="erreur : ${erreurs}" th:text="${erreur}"></li>
-				    </ul>
-				</div>
-			</th:block>
+			<div th:if="${#fields.hasErrors()}">
+			    <p class="text-red-500" th:each="err : ${#fields.errors}" th:text="${err}"></p>
+			</div>
             
             <div class="grid grid-cols-2 gap-4">
 			    <div>
+			    	<input type="hidden" th:field="*{noUtilisateur}" />
 			        <label class="block font-medium" for="pseudo">Pseudo</label>
 			        <input type="text" id="pseudo" th:field="*{pseudo}" class="w-full p-2 border rounded-lg">
 			        <div class="text-red-500" th:if="${#fields.hasErrors('pseudo')}">
@@ -88,7 +85,7 @@
             </div>
 	
 			
-			<input type="hidden" name="motDePasseActuel" th:field="*{motDePasse}" />
+			<input type="hidden" th:field="*{motDePasse}" />
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block font-medium">Nouveau mot de passe</label>
@@ -110,8 +107,8 @@
             <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 mt-4">Enregistrer</button>
         </form>
         
-        <form th:action="@{/profil/detail/supprimer}" method="post">
-            <input type="hidden" name="email" th:field="*{email}" />
+        <form th:action="@{/profil/detail/supprimer}" method="post" th:object="${utilisateur}">
+            <input type="hidden" th:field="*{noUtilisateur}" />
             <button type="submit" class="w-full bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50 mt-4">Supprimer le compte</button>
         </form>
     </div>

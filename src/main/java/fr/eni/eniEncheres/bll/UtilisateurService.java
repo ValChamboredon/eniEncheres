@@ -18,7 +18,10 @@ public interface UtilisateurService {
 	
 	Utilisateur getUtilisateurByEmail(String email);
 	
+	int getIdByEmail(String email);
+	
 	void supprimerByEmail(String email);
 	
+	void supprimerById(int id);
 
 }

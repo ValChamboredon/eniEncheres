@@ -73,16 +73,41 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 	@Override
 	@Transactional(rollbackFor = BusinessException.class)
 	public void modifier(@Valid Utilisateur utilisateur)throws BusinessException {
-//		BusinessException be = new BusinessException();
-//		
-//		boolean valider = true;
-//				
-//		if(valider) {
-//			utilisateurDAO.update(utilisateur);
-//		}else {
-//			throw be;
-//		}
+		BusinessException be = new BusinessException();
+		
+		boolean valider = validerEmail(utilisateur.getEmail(), utilisateur.getNoUtilisateur(), be);
+//		valider &= validerPseudo(utilisateur.getPseudo(), utilisateur.getNoUtilisateur());
+				
+		if(valider) {
+			utilisateurDAO.update(utilisateur);
+		}else {
+			throw be;
+		}
+		
 	}
+	
+	private boolean validerEmail(String email, int noUtilisateur, BusinessException be) {
+		
+		boolean valide = true;
+		
+		try {
+			Utilisateur utilisateurTrouve = utilisateurDAO.getUtilisateur(email);
+			System.out.println(utilisateurDAO.getUtilisateur(email).getEmail());
+			if(utilisateurTrouve != null && utilisateurTrouve.getNoUtilisateur() != noUtilisateur) {
+				valide = false;
+				be.addCleErreur("modification.profil.email.existe");
+			}
+		}catch(EmptyResultDataAccessException e ) {
+			valide = true;
+		}
+		
+		return valide;
+	}
+	
+//	private boolean validerPseudo(String pseudo, int noUtilisateur) {
+//	    Utilisateur utilisateur = utilisateurDAO.getUtilisateur(pseudo));
+//	    return utilisateur != null && !utilisateur.getId().equals(id);
+//	}
 	
 	@Override
     public boolean pseudoExistant(String pseudo) {
@@ -104,11 +129,20 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         return utilisateurDAO.getUtilisateur(email);
     }
 
-
-
 	@Override
 	public void supprimerByEmail(String email) {
 		utilisateurDAO.supprimerByEmail(email);
+	}
+	
+	@Override
+	public void supprimerById(int id) {
+		utilisateurDAO.supprimerById(id);
+	}
+
+	@Override
+	public int getIdByEmail(String email) {
+		Utilisateur utilisateur = utilisateurDAO.getUtilisateur(email);
+		return utilisateur.getNoUtilisateur();
 	}
 
 
