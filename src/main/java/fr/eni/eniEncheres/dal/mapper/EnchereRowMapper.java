@@ -1,3 +1,4 @@
+
 //package fr.eni.eniEncheres.dal.mapper;
 //
 //import java.sql.ResultSet;
@@ -40,3 +41,4 @@
 //        return enchere;
 //    }
 //}
+

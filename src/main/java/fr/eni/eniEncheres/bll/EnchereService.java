@@ -1,4 +1,4 @@
-/**
+
 // * Interface du service métier pour la gestion des enchères.
 // * Définit les opérations métiers possibles sur les enchères
 // */
@@ -42,3 +42,4 @@
 //     */
 //    void mettreAJourEnchere(Enchere enchere) throws BusinessException;
 //}
+

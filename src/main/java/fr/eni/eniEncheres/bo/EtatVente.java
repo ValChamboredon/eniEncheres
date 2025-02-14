@@ -1,3 +1,4 @@
+
 //package fr.eni.eniEncheres.bo;
 //
 //public enum EtatVente {
@@ -16,3 +17,4 @@
 //        return valeur;
 //    }
 //}
+
