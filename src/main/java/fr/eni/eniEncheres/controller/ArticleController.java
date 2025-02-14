@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -149,5 +150,36 @@ public class ArticleController {
 		// Si pas d'utilisateur·ice connecté·e on renvoit sur la page de connexion
 		return "redirect:/encheres/connexion";
 	}
+	
+	
+	/**
+	 * Route qui affiche le détail d'un article
+	 * 
+	 * @param id    ID de l'article
+	 * @param model Modèle Thymeleaf
+	 * @return "detailArticle" (nom du fichier HTML)
+	 */
+	@GetMapping("/article/detail/{noArticle}")
+	public String afficherDetailArticle(@PathVariable("noArticle") int noArticle, Model model) {
+	    ArticleVendu article = articleService.getArticleById(noArticle);
+
+	    if (article == null) {
+	        return "redirect:/encheres"; // Redirige si l'article n'existe pas
+	    }
+
+	    // Vérifier si lieuDeRetrait est null, et le définir avec l'adresse du vendeur
+	    if (article.getLieuDeRetrait() == null) {
+	        Retrait lieuDeRetrait = new Retrait();
+	        lieuDeRetrait.setRue(article.getVendeur().getRue());
+	        lieuDeRetrait.setCodePostal(article.getVendeur().getCodePostal());
+	        lieuDeRetrait.setVille(article.getVendeur().getVille());
+	        article.setLieuDeRetrait(lieuDeRetrait);
+	    }
+
+	    model.addAttribute("article", article);
+	    return "detailArticle";
+	}
+
+
 
 }

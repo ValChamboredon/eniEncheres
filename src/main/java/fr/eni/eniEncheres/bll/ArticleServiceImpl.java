@@ -83,4 +83,11 @@ public class ArticleServiceImpl implements ArticleService {
 		return articleDAO.getAllArticles();
 	}
 
+	@Override
+	public ArticleVendu getArticleById(int noArticle) {
+	        return articleDAO.getArticleById(noArticle); 
+	    
+	}
+
+
 }

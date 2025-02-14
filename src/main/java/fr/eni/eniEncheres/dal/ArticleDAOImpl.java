@@ -27,17 +27,41 @@ public class ArticleDAOImpl implements ArticleDAO {
  
  
 	@Override
-	public ArticleVendu getArticleById(int id) {
-		String sql = "SELECT * FROM ARTICLES_VENDUS WHERE no_article = :id";
-		MapSqlParameterSource params = new MapSqlParameterSource("id", id);
+	public ArticleVendu getArticleById(int noArticle) {
+		String sql = "SELECT av.*, " +
+	             "u.pseudo, u.nom, u.prenom, u.email, u.telephone, u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, " +
+	             "c.libelle, " +
+	             "COALESCE(r.rue, u.rue) AS retrait_rue, " +
+	             "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, " +
+	             "COALESCE(r.ville, u.ville) AS retrait_ville " +
+	             "FROM ARTICLES_VENDUS av " +
+	             "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur " +
+	             "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie " +
+	             "LEFT JOIN RETRAITS r ON av.no_article = r.no_article " +  
+	             "WHERE av.no_article = :noArticle";
+
+
+
+		MapSqlParameterSource params = new MapSqlParameterSource("noArticle", noArticle);
 		return namedParameterJdbcTemplate.queryForObject(sql, params, new ArticleRowMapper());
 	}
  
 	@Override
 	public List<ArticleVendu> getAllArticles() {
-		String requeteSQL = "SELECT articles_vendus.*, utilisateurs.*,categories.* FROM articles_vendus INNER JOIN utilisateurs	ON utilisateurs.no_utilisateur = articles_vendus.no_utilisateur INNER JOIN categories ON categories.no_categorie = articles_vendus.no_categorie";
+		String sql = "SELECT av.*, " +
+	             "u.pseudo, u.nom, u.prenom, u.email, u.telephone, " +
+	             "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, " +
+	             "c.libelle, " +
+	             "COALESCE(r.rue, u.rue) AS retrait_rue, " +
+	             "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, " +
+	             "COALESCE(r.ville, u.ville) AS retrait_ville " +
+	             "FROM ARTICLES_VENDUS av " +
+	             "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur " +
+	             "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie " +
+	             "LEFT JOIN RETRAITS r ON av.no_article = r.no_article";
 
-		return jdbcTemplate.query(requeteSQL, new ArticleRowMapper());
+
+		return jdbcTemplate.query(sql, new ArticleRowMapper());
 
 	}
  

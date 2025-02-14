@@ -11,5 +11,6 @@ public interface ArticleService {
 	
 	public List<ArticleVendu> consulterTout();
 
+	ArticleVendu getArticleById(int noArticle);
 
 }
