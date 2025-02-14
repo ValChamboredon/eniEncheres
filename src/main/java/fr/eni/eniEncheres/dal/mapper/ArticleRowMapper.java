@@ -35,6 +35,7 @@ public class ArticleRowMapper implements RowMapper<ArticleVendu> {
 	    Utilisateur vendeur = new Utilisateur();
 	    vendeur.setNoUtilisateur(rs.getInt("no_utilisateur"));
 	    vendeur.setPseudo(rs.getString("pseudo"));
+	    vendeur.setEmail(rs.getString("email"));  
 	    vendeur.setRue(rs.getString("user_rue"));
 	    vendeur.setCodePostal(rs.getString("user_code_postal"));
 	    vendeur.setVille(rs.getString("user_ville"));
@@ -46,7 +47,7 @@ public class ArticleRowMapper implements RowMapper<ArticleVendu> {
 	    categorie.setLibelle(rs.getString("libelle"));
 	    article.setCategorie(categorie);
 
-	    // Lieu de retrait (déjà géré par la requête SQL avec `COALESCE`)
+	    // Lieu de retrait
 	    Retrait lieuDeRetrait = new Retrait();
 	    lieuDeRetrait.setRue(rs.getString("retrait_rue"));
 	    lieuDeRetrait.setCodePostal(rs.getString("retrait_code_postal"));
@@ -55,6 +56,7 @@ public class ArticleRowMapper implements RowMapper<ArticleVendu> {
 
 	    return article;
 	}
+
 
 }
 

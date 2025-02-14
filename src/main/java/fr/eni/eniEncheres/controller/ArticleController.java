@@ -1,6 +1,9 @@
 package fr.eni.eniEncheres.controller;
 
 import java.util.Collections;
+
+import java.security.Principal;
+
 import java.util.List;
 
 
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 
@@ -184,6 +188,25 @@ public class ArticleController {
 	    model.addAttribute("article", article);
 	    return "detailArticle";
 	}
+
+	
+	@PostMapping("/supprimer")
+	public String supprimerArticle(@RequestParam("articleId") int articleId, Principal principal) {
+	    System.out.println("Requête reçue pour supprimer l'article ID: " + articleId);
+	    System.out.println("Utilisateur connecté: " + principal.getName());
+
+	    // Vérifier si l'utilisateur connecté est bien le vendeur (via email)
+	    ArticleVendu article = articleService.getArticleById(articleId);
+	    if (article != null && article.getVendeur().getEmail().equals(principal.getName())) {
+	        articleService.supprimerArticle(articleId);
+	        System.out.println("Article supprimé avec succès: " + articleId);
+	    } else {
+	        System.out.println("Tentative de suppression non autorisée !");
+	    }
+
+	    return "redirect:/encheres";
+	}
+
 
 
 //
