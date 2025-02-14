@@ -19,6 +19,6 @@ public interface ArticleDAO {
     
     void updateEtatVente(int noArticle, EtatVente nouvelEtat);
     void deleteArticle(int articleId);
-
+    void updateArticle(ArticleVendu article);
     
 }

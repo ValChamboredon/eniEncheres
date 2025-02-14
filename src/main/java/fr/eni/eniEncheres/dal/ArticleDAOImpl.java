@@ -165,5 +165,14 @@ public class ArticleDAOImpl implements ArticleDAO {
 	    jdbcTemplate.update(sql, articleId);
 	}
 
+	@Override
+	public void updateArticle(ArticleVendu article) {
+		String sql = "UPDATE ARTICLES_VENDUS SET nom_article = ?, description = ?, prix_initial = ?, date_debut_encheres = ?, date_fin_encheres = ? WHERE no_article = ?";
+        jdbcTemplate.update(sql, article.getNomArticle(), article.getDescription(), article.getMiseAPrix(),
+                article.getDateDebutEncheres(), article.getDateFinEncheres(), article.getNoArticle());
+    }
+		
+	}
 
-}
+
+

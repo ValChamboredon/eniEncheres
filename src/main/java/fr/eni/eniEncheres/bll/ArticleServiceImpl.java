@@ -122,6 +122,12 @@ public class ArticleServiceImpl implements ArticleService {
 	    }
 	}
 
+	@Override
+	public void modifierArticle(ArticleVendu article) {
+		articleDAO.updateArticle(article);
+		
+	}
+
 
 
 

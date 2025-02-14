@@ -14,6 +14,8 @@ public interface ArticleService {
 	ArticleVendu getArticleById(int noArticle);
 	
 	void supprimerArticle(int articleId);
+	
+	void modifierArticle(ArticleVendu article);
 
 
 }

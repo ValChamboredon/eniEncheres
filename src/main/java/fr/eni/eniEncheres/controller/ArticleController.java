@@ -1,9 +1,10 @@
 package fr.eni.eniEncheres.controller;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 
-
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,23 +12,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
-
+import org.springframework.web.bind.annotation.*;
 
 import fr.eni.eniEncheres.bll.ArticleService;
 import fr.eni.eniEncheres.bll.CategorieService;
 import fr.eni.eniEncheres.bll.UtilisateurService;
-import fr.eni.eniEncheres.bo.ArticleVendu;
-import fr.eni.eniEncheres.bo.Categorie;
-import fr.eni.eniEncheres.bo.Enchere;
-import fr.eni.eniEncheres.bo.Retrait;
-import fr.eni.eniEncheres.bo.Utilisateur;
+import fr.eni.eniEncheres.bo.*;
 import fr.eni.eniEncheres.exception.BusinessException;
 import jakarta.validation.Valid;
 
@@ -36,171 +26,173 @@ import jakarta.validation.Valid;
 @SessionAttributes("CategoriesEnSession")
 public class ArticleController {
 
-	// Dépendances
-	private ArticleService articleService;
-	private CategorieService categorieService;
-	private UtilisateurService utilisateurService;
+    private final ArticleService articleService;
+    private final CategorieService categorieService;
+    private final UtilisateurService utilisateurService;
 
-	/**
-	 * Constructeur
-	 * 
-	 * @param articleService
-	 * @param categorieService
-	 */
-	// Injection des dépendances
-	public ArticleController(ArticleService articleService, CategorieService categorieService, UtilisateurService utilisateurService) {
-		this.articleService = articleService;
-		this.categorieService = categorieService;
-		this.utilisateurService = utilisateurService;
-	}
+    /**
+     * Constructeur avec injection des dépendances.
+     */
+    public ArticleController(ArticleService articleService, CategorieService categorieService, 
+                             UtilisateurService utilisateurService) {
+        this.articleService = articleService;
+        this.categorieService = categorieService;
+        this.utilisateurService = utilisateurService;
+    }
 
-	/**
-	 * Route qui affiche la page prinicpale => liste des articles
-	 * 
-	 * @param model
-	 * @return "index"
-	 */
-	@GetMapping
-	public String afficherLesArticles(Model model) {
+    /**
+     * Affiche la liste des articles sur la page principale.
+     */
+    @GetMapping
+    public String afficherLesArticles(Model model, Principal principal) {
+        List<ArticleVendu> articles = articleService.consulterTout();
+        model.addAttribute("articles", articles);
 
-		List<ArticleVendu> articles = articleService.consulterTout();
+        if (principal != null) {
+            Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+            model.addAttribute("creditsUtilisateur", utilisateur.getCredit());
+        }
 
-		model.addAttribute("articles", articles);
-		return "index";
-	}
+        return "index";
+    }
 
-	/**
-	 * Méthode permettant de mettre les Catégories en 'SessionAttribute'
-	 * @throws BusinessException 
-	 */
-	@ModelAttribute("CategoriesEnSession")
-	public List<Categorie> chargerCategories() throws BusinessException {
-		System.out.println("Chargement en Session des CATEGORIES");
-		return categorieService.getAllCategories();
-	}
+    /**
+     * Charge les catégories en session pour toutes les pages.
+     */
+    @ModelAttribute("CategoriesEnSession")
+    public List<Categorie> chargerCategories() throws BusinessException {
+        return categorieService.getAllCategories();
+    }
 
-	/**
-	 * Route qui affiche le formulaire de mise en vente d'un article
-	 * 
-	 * @param model
-	 * @return "vendreArticle"
-	 */
-	@GetMapping("/vendre")
-	public String afficherFormulaireVendreArticle(Model model) {
+    /**
+     * Affiche le formulaire de mise en vente d'un article.
+     */
+    @GetMapping("/vendre")
+    public String afficherFormulaireVendreArticle(Model model) {
+        model.addAttribute("article", new ArticleVendu());
+        return "formulaireArticle";
+    }
 
-		// On injecte un objet avec le modèle pour que
-		// le formulaire Thymeleaf n'explose pas sur le : "${#fields.hasGlobalErrors()}"
-		model.addAttribute("article", new ArticleVendu());
-		
-		return "formulaireArticle";
-	}
+    /**
+     * Enregistre un article mis en vente.
+     */
+    @PostMapping("/vendre")
+    public String mettreArticleEnVente(@Valid @ModelAttribute("article") ArticleVendu article,
+                                       BindingResult bindingResult, Model model, Principal principal) {
+        if (bindingResult.hasErrors()) {
+            return "formulaireArticle";
+        }
 
-	/**
-	 * Méthode qui crée l'article et l'envoi à la BLL
-	 * 
-	 * @param retrait
-	 * @param article
-	 * @param bindingResult
-	 * @param model
-	 * @return "redirect:/encheres" si la saisie est correcte
-	 */
-	@PostMapping("/vendre")
-	public String mettreArticleEnVente(@Valid @ModelAttribute("retrait") Retrait retrait,
-			@Valid @ModelAttribute("article") ArticleVendu article, BindingResult bindingResult, Model model) {
+        if (principal != null) {
+            Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+            article.setVendeur(utilisateur);
 
-		if (bindingResult.hasErrors()) {
-			System.out.println("Erreurs de BINDING_RESULT !");
-			return "vendreArticle";
-		}
+            try {
+                articleService.creerArticle(article);
+                return "redirect:/encheres";
+            } catch (BusinessException be) {
+                bindingResult.addError(new ObjectError("globalError", be.getMessage()));
+                return "formulaireArticle";
+            }
+        }
 
-		// TODO Duplication de code, faire une méthode !
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		
-		// Si on a un·e utilisateur·ice connecté·e
-		if (!(authentication instanceof AnonymousAuthenticationToken)) {
-			
-			Utilisateur utilisateurCourant = new Utilisateur();
-			String currentEmail = authentication.getName();
-			utilisateurCourant = utilisateurService.getUtilisateurByEmail(currentEmail);
-			
-			// On ajoute l'Utilisateur courant à l'article
-			article.setVendeur(utilisateurCourant);
-			
-			try {
-				// Passage de l'article à la BLL
-				articleService.creerArticle(article);
-				
-				// Si tout marche on revient à "encheres"
-				return "redirect:/encheres";
-				
-			} catch (BusinessException be) {
-				
-				for (String messageErreur : be.getMessagesErreur()) {
-					
-					// On ajoute les Exceptions levées au bindingResult dans le champ "globalError"
-					bindingResult.addError(new ObjectError("globalError", messageErreur));
-					
-					model.addAttribute(bindingResult);
-				}
-				
-				// S'il y a un problème on reste sur "vendreArticle"
-				return "vendreArticle";
-			}
-			
-		}
+        return "redirect:/encheres/connexion";
+    }
 
-		// Si pas d'utilisateur·ice connecté·e on renvoit sur la page de connexion
-		return "redirect:/encheres/connexion";
-	}
-	
-	
-	/**
-	 * Route qui affiche le détail d'un article
-	 * 
-	 * @param id    ID de l'article
-	 * @param model Modèle Thymeleaf
-	 * @return "detailArticle" (nom du fichier HTML)
-	 */
-	@GetMapping("/article/detail/{noArticle}")
-	public String afficherDetailArticle(@PathVariable("noArticle") int noArticle, Model model) {
-	    ArticleVendu article = articleService.getArticleById(noArticle);
+    /**
+     * Affiche le détail d'un article.
+     */
+    @GetMapping("/article/detail/{noArticle}")
+    public String afficherDetailArticle(@PathVariable("noArticle") int noArticle, Model model, Principal principal) {
+        ArticleVendu article = articleService.getArticleById(noArticle);
 
-	    if (article == null) {
-	        return "redirect:/encheres"; // Redirige si l'article n'existe pas
-	    }
+        if (article == null) {
+            return "redirect:/encheres";
+        }
 
-	    // Vérifier si lieuDeRetrait est null, et le définir avec l'adresse du vendeur
-	    if (article.getLieuDeRetrait() == null) {
-	        Retrait lieuDeRetrait = new Retrait();
-	        lieuDeRetrait.setRue(article.getVendeur().getRue());
-	        lieuDeRetrait.setCodePostal(article.getVendeur().getCodePostal());
-	        lieuDeRetrait.setVille(article.getVendeur().getVille());
-	        article.setLieuDeRetrait(lieuDeRetrait);
-	    }
+        if (article.getLieuDeRetrait() == null) {
+            article.setLieuDeRetrait(new Retrait(
+                    article.getVendeur().getRue(),
+                    article.getVendeur().getCodePostal(),
+                    article.getVendeur().getVille()
+            ));
+        }
 
-	    model.addAttribute("article", article);
-	    return "detailArticle";
-	}
+        model.addAttribute("article", article);
+        return "detailArticle";
+    }
 
-	
-	@PostMapping("/supprimer")
-	public String supprimerArticle(@RequestParam("articleId") int articleId, Principal principal) {
-	    System.out.println("Requête reçue pour supprimer l'article ID: " + articleId);
-	    System.out.println("Utilisateur connecté: " + principal.getName());
+    /**
+     * Supprime un article si l'utilisateur connecté est bien le vendeur.
+     */
+    @PostMapping("/supprimer")
+    public String supprimerArticle(@RequestParam("articleId") int articleId, Principal principal) {
+        ArticleVendu article = articleService.getArticleById(articleId);
 
-	    // Vérifier si l'utilisateur connecté est bien le vendeur (via email)
-	    ArticleVendu article = articleService.getArticleById(articleId);
-	    if (article != null && article.getVendeur().getEmail().equals(principal.getName())) {
-	        articleService.supprimerArticle(articleId);
-	        System.out.println("Article supprimé avec succès: " + articleId);
-	    } else {
-	        System.out.println("Tentative de suppression non autorisée !");
-	    }
+        if (article != null && article.getVendeur().getEmail().equals(principal.getName())) {
+            if (article.getEtatVente() == EtatVente.ENCHERES_TERMINEES || article.getEtatVente() == EtatVente.RETRAIT_EFFECTUE) {
+                return "redirect:/encheres?error=suppressionNonAutorisee";
+            }
+            articleService.supprimerArticle(articleId);
+        }
 
-	    return "redirect:/encheres";
-	}
+        return "redirect:/encheres";
+    }
 
+    /**
+     * Affiche le formulaire de modification d’un article si l’enchère n’a pas commencé.
+     */
+    @GetMapping("/modifier")
+    public String afficherFormulaireModification(@RequestParam("articleId") int articleId, Principal principal, Model model) {
+        ArticleVendu article = articleService.getArticleById(articleId);
 
+        if (article != null && article.getEtatVente() == EtatVente.CREEE
+                && article.getVendeur().getEmail().equals(principal.getName())) {
+            model.addAttribute("article", article);
+            return "modifierArticle";
+        }
 
+        return "redirect:/encheres";
+    }
 
+    /**
+     * Modifie un article si l’utilisateur est le vendeur et que l’état est encore `CREEE`.
+     */
+    @PostMapping("/modifier")
+    public String modifierArticle(@RequestParam("articleId") int articleId,
+                                  @RequestParam("nomArticle") String nomArticle,
+                                  @RequestParam("description") String description,
+                                  @RequestParam("miseAPrix") int miseAPrix,
+                                  @RequestParam("dateDebutEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateDebutEncheres,
+                                  @RequestParam("dateFinEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFinEncheres,
+                                  Principal principal) {
+
+        ArticleVendu article = articleService.getArticleById(articleId);
+
+        if (article != null && article.getEtatVente() == EtatVente.CREEE
+                && article.getVendeur().getEmail().equals(principal.getName())) {
+            article.setNomArticle(nomArticle);
+            article.setDescription(description);
+            article.setMiseAPrix(miseAPrix);
+            article.setDateDebutEncheres(dateDebutEncheres);
+            article.setDateFinEncheres(dateFinEncheres);
+
+            articleService.modifierArticle(article);
+        }
+
+        return "redirect:/encheres/article/detail/" + articleId;
+    }
+
+    /**
+     * Charge les crédits de l'utilisateur connecté.
+     */
+    @ModelAttribute("creditsUtilisateur")
+    public Integer chargerCreditsUtilisateur(Principal principal) {
+        if (principal != null) {
+            Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+            return utilisateur.getCredit();
+        }
+        return 0;
+    }
 }
+
