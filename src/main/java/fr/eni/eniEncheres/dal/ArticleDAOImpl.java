@@ -113,7 +113,7 @@ public class ArticleDAOImpl implements ArticleDAO {
 	                     "WHERE av.etat_vente = 'EN_COURS'";
 	        return jdbcTemplate.query(sql, new ArticleRowMapper());
 	    } catch (Exception e) {
-	    	System.err.println("Erreur SQL : " + e.getMessage());
+	        System.err.println("Erreur SQL : " + e.getMessage());
 	        e.printStackTrace();
 	        return new ArrayList<>();
 	    }
@@ -134,7 +134,7 @@ public class ArticleDAOImpl implements ArticleDAO {
 	
 	@Override
 	public List<ArticleVendu> getArticlesTermines() {
-		String sql = "SELECT * FROM ARTICLES_VENDUS WHERE date_fin_encheres < GETDATE()";
+	    String sql = "SELECT * FROM ARTICLES_VENDUS WHERE date_fin_encheres <= CURRENT_DATE AND etat_vente = 'EN_COURS'";
 	    return jdbcTemplate.query(sql, new ArticleRowMapper());
 	}
 }

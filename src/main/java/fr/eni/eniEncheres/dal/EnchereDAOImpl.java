@@ -55,12 +55,12 @@ public class EnchereDAOImpl implements EnchereDAO {
     @Override
     public Enchere getEnchereMaxParArticle(int noArticle) throws BusinessException {
         try {
-            String sql = "SELECT e.*, u.pseudo, u.nom, u.prenom, a.nom_article " +
-                        "FROM ENCHERES e " +
-                        "JOIN UTILISATEURS u ON e.no_utilisateur = u.no_utilisateur " +
-                        "JOIN ARTICLES_VENDUS a ON e.no_article = a.no_article " +
-                        "WHERE e.no_article = ? " +
-                        "ORDER BY e.montant_enchere DESC LIMIT 1";
+            String sql = "SELECT TOP 1 e.*, u.pseudo, u.nom, u.prenom, a.nom_article " +
+                         "FROM ENCHERES e " +
+                         "JOIN UTILISATEURS u ON e.no_utilisateur = u.no_utilisateur " +
+                         "JOIN ARTICLES_VENDUS a ON e.no_article = a.no_article " +
+                         "WHERE e.no_article = ? " +
+                         "ORDER BY e.montant_enchere DESC";
             return jdbcTemplate.queryForObject(sql, new Object[]{noArticle}, new EnchereRowMapper());
         } catch (EmptyResultDataAccessException e) {
             return null;
@@ -98,6 +98,19 @@ public class EnchereDAOImpl implements EnchereDAO {
             BusinessException be = new BusinessException();
             be.addCleErreur("ERR_MISE_A_JOUR_ENCHERE");
             throw be;
+        }
+    }
+
+    @Override
+    public List<Enchere> getEncheresByUtilisateur(int noUtilisateur) {
+        try {
+            String sql = "SELECT e.*, a.nom_article, a.prix_vente, a.date_fin_encheres, a.no_utilisateur as no_vendeur " +
+                         "FROM ENCHERES e " +
+                         "JOIN ARTICLES_VENDUS a ON e.no_article = a.no_article " +
+                         "WHERE e.no_utilisateur = ?";
+            return jdbcTemplate.query(sql, new EnchereRowMapper(), noUtilisateur);
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la récupération des enchères de l'utilisateur " + noUtilisateur, e);
         }
     }
 }

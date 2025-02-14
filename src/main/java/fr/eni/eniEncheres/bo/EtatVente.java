@@ -4,7 +4,9 @@ public enum EtatVente {
     CREEE("CREEE"),
     EN_COURS("EN_COURS"),
     ENCHERES_TERMINEES("ENCHERES_TERMINEES"),
-    RETRAIT_EFFECTUE("RETRAIT_EFFECTUE");
+    RETRAIT_EFFECTUE("RETRAIT_EFFECTUE"), 
+    VENDU("VENDU"), 
+    NON_VENDU("NON_VENDU");
 
     private final String valeur;
 

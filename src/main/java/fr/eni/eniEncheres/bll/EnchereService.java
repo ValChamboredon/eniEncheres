@@ -41,4 +41,10 @@ public interface EnchereService {
      * @param enchere L'enchère mise à jour.
      */
     void mettreAJourEnchere(Enchere enchere) throws BusinessException;
+    
+    void placerEnchere(int articleId, String email, int montantEnchere) throws BusinessException;
+
+	void finaliserEncheresTerminees();
+
+	List<Enchere> getEncheresByUtilisateur(int noUtilisateur) throws BusinessException;
 }
