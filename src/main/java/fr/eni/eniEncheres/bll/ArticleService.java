@@ -18,7 +18,6 @@ public interface ArticleService {
 	public void modifierArticle(ArticleVendu article);
 	    
 	void mettreAJourEtatVente(ArticleVendu article);
-	
 
 
 

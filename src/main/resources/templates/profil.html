@@ -6,6 +6,8 @@
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
+<p><strong>Debug :</strong> Crédits utilisateur = <span th:text="${creditsUtilisateur}"></span></p>
+
 	<div th:replace="~{/fragments/fragment-entete :: entete}"></div>
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h2 class="text-xl font-bold mb-4">Profil</h2>

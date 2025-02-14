@@ -1,144 +1,53 @@
-<!DOCTYPE html>
-
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Page d'accueil</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page d'accueil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<main>
-	<div th:replace="~{fragments/fragment-entete :: entete}"></div>
-	<div class="container">
-		<div class="Lumière">
+<div th:replace="~{fragments/fragment-entete :: entete}"></div>
+<main class="bg-gray-100 min-h-screen p-6">
 
-			<div sec:authorize="isAuthenticated()" class="statutConnection">
-				<p>
-					<span sec:authentication="name"></span> est connecté.e
-				</p>
-			</div>
+    <div class="container mx-auto">
+    
+        <div class="bg-white p-6 shadow-md rounded-lg mb-6">
+            <div sec:authorize="isAuthenticated()" class="statutConnection">
+                <p class="text-gray-700 font-semibold">
+                    <span sec:authentication="name" class="text-blue-600"></span> est connecté.e
+                </p>
+            </div>
 
-			<p>
-				<strong> Filtres :</strong>
-			</p>
-			<input type="search" id="recherche" name="recherche"
-				placeholder="Le nom de l'article contient" />
-
-
-			<button>Rechercher</button>
-
-			<!-- 		<p><strong>Catégorie :</strong></p> <label for="Catégorie-select"></label> -->
-
-			<!--     	<select name="Categorie" id="Categorie-select"> -->
-
-			<!--       	<option value="">--Choisir sa Catégorie--</option> -->
-
-			<!--       	<option value="tout">Tout</option> -->
-
-			<!--       	<option data-th-each="categorie : ${categorie}" -->
-			<!--     			data-th-value="${categorie.no_categorie}" -->
-			<!--     			data-th-text="${categorie.name}"> -->
-			<!-- 		</option> -->
-			<!-- 	    </select> -->
-
-			<div>
-				<label for="categorie">Catégorie</label> <select id="categorie"
-					data-th-name="categorie" required>
-					<option value="">Veuillez sélectionner une catégorie</option>
-					<option data-th-each="cat : ${CategoriesEnSession}"
-						data-th-text="${cat.libelle}" data-th-value="${cat.noCategorie}"></option>
-				</select>
-			</div>
+            <p class="font-bold mt-4">Filtres :</p>
+            <div class="flex space-x-2">
+                <input type="search" id="recherche" name="recherche"
+                    placeholder="Le nom de l'article contient"
+                    class="border border-gray-300 p-2 rounded w-full">
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Rechercher
+                </button>
+            </div>
+        </div>
 
 
-			<div class="multiTache">
+        <!-- Liste des articles -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-white shadow-lg rounded-lg p-4 border hover:shadow-xl transition duration-300" data-th-each="article : ${articles}">
+                <div class="card-product-infos">
+                    <h2 class="text-lg font-bold text-blue-600 hover:underline">
+                        <a data-th-href="@{/encheres/article/detail/{id}(id=${article.noArticle})}"
+                            data-th-text="${article.nomArticle}"></a>
+                    </h2>
+                    <p class="text-gray-700">
+                        Prix : <span class="font-semibold" data-th-text="${article.prixVente}"></span> points
+                    </p>
+                    <p class="text-gray-600">
+                        Fin de l'enchère : <span class="italic" data-th-text="${article.dateFinEncheres}"></span>
+                    </p>
+                    <p class="text-gray-800">
+                        Vendeur : <span class="font-medium" data-th-text="${article.vendeur.pseudo}"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-				<div class="achats">
-
-					<div sec:authorize="isAuthenticated()">
-
-						<label for="achats"><input type="radio" id="achats"
-							name="achats" value="achats" checked />Achats : </label>
-
-						<div>
-							<label for="encheres ouvertes"><input type="checkbox"
-								id="encheres ouvertes" name="encheres ouvertes" /> enchères
-								ouvertes</label>
-						</div>
-
-						<div>
-							<label for="mes encheres en cours"><input type="checkbox"
-								id="mes encheres en cours" name="mes encheres en cours" /> mes
-								enchères en cours</label>
-						</div>
-
-						<div>
-							<label for="mes encheres remportees"><input
-								type="checkbox" id="mes encheres remportees"
-								name="mes encheres remportees" /> mes enchères remportées</label>
-						</div>
-					</div>
-				</div>
-
-				<div class="ventes">
-
-					<div sec:authorize="isAuthenticated()">
-
-						<label for="Mes Ventes"><input type="radio"
-							id="Mes Ventes" name="achats" value="Mes Ventes" checked />Mes
-							Ventes : </label>
-
-						<div>
-							<label for="mes ventes en cours"><input type="checkbox"
-								id="mes ventes en cours" name="mes ventes en cours" /> mes
-								ventes en cours</label>
-						</div>
-
-						<div>
-							<label for="ventes non debutees"><input type="checkbox"
-								id="ventes non debutees" name="ventes non debutees" /> ventes
-								non débutées</label>
-						</div>
-
-						<div>
-							<label for="ventes terminees"><input type="checkbox"
-								id="ventes terminees" name="ventes terminees" /> ventes
-								terminées</label>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="divArticles">
-		<div class="carte-produit" data-th-each="article : ${articles}">
-			<div class="card-product-infos">
-				<!-- Lien vers la page de détail -->
-				<h2>
-					<a
-						data-th-href="@{/encheres/article/detail/{id}(id=${article.noArticle})}"
-						data-th-text="${article.nomArticle}"></a>
-				</h2>
-				<p>
-					Prix : <span data-th-text="${article.prixVente}"></span>
-				</p>
-				<p>
-					Début de l'enchère : <span
-						th:text="${#temporals.format(article.dateDebutEncheres, 'dd/MM/yyyy')}"></span>
-				</p>
-				<p>
-					Fin de l'enchère : <span
-						th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}"></span>
-				</p>
-				<p>
-					Vendeur : <span data-th-text="${article.vendeur.pseudo}"></span>
-				</p>
-				<p>
-					<strong>Debug : État de l'article :</strong> <span
-						th:text="${article.etatVente.name()}"></span>
-				</p>
-			</div>
-		</div>
-
-	</div>
 </main>
-</html>

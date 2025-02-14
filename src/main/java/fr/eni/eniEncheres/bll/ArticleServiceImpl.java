@@ -128,6 +128,7 @@ public class ArticleServiceImpl implements ArticleService {
 	    }
 	}
 
+
 	public void modifierArticle(ArticleVendu article) {
 	    articleDAO.modifierArticle(article);
 	}
@@ -154,6 +155,7 @@ public class ArticleServiceImpl implements ArticleService {
 	        articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.ENCHERES_TERMINEES);
 	    }
 	}
+
 
 
 

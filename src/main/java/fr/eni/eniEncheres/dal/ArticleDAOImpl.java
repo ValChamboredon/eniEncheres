@@ -166,6 +166,7 @@ public class ArticleDAOImpl implements ArticleDAO {
 	}
 
 	@Override
+
 	public void modifierArticle(ArticleVendu article) {
 	    String requete = "UPDATE ARTICLES_VENDUS SET nom_article = ?, description = ?, " +
 	                     "date_debut_encheres = ?, date_fin_encheres = ?, prix_initial = ? " +
@@ -179,8 +180,8 @@ public class ArticleDAOImpl implements ArticleDAO {
 	            article.getMiseAPrix(),
 	            article.getNoArticle()
 	    );
-	}
+
+	}}
 
 
 
-}
