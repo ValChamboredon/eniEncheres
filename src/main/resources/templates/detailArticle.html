@@ -42,9 +42,14 @@
 								th:text="${article.miseAPrix}"></span> points
 						</p>
 						<p>
+							<strong>Début de l'enchère :</strong> <span
+								th:text="${#temporals.format(article.dateDebutEncheres, 'dd/MM/yyyy')}"></span>
+						</p>
+						<p>
 							<strong>Fin de l'enchère :</strong> <span
 								th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}"></span>
 						</p>
+
 						<p>
 							<strong>Retrait :</strong> <span
 								th:if="${article.lieuDeRetrait != null}"
@@ -73,16 +78,11 @@
 					</div>
 
 
-					<p>
-						Utilisateur connecté : <span
-							th:text="${#authentication.principal.username}"></span>
-					</p>
-					<p>
-						Email du vendeur : <span th:text="${article.vendeur.email}"></span>
-					</p>
 
+
+					<!-- Bouton Supprimer : Affiché uniquement si l'utilisateur est le vendeur ET que l'enchère n'est pas terminée -->
 					<div
-						th:if="${#authentication.principal.username == article.vendeur.email}">
+						th:if="${#authentication.principal.username == article.vendeur.email and article.etatVente.name() != 'ENCHERES_TERMINEES' and article.etatVente.name() != 'RETRAIT_EFFECTUE'}">
 						<form th:action="@{/encheres/supprimer}" method="post">
 							<input type="hidden" name="articleId"
 								th:value="${article.noArticle}" />
@@ -91,6 +91,33 @@
 								Supprimer l'article</button>
 						</form>
 					</div>
+
+					<p>
+						<strong>Debug : État de l'article :</strong> <span
+							th:text="${article.etatVente.name()}"></span>
+					</p>
+					<p>
+						<strong>Utilisateur connecté :</strong> <span
+							th:text="${#authentication.name}"></span>
+					</p>
+					<p>
+						<strong>Email du vendeur :</strong> <span
+							th:text="${article.vendeur.email}"></span>
+					</p>
+
+					<!-- Bouton Modifier (Visible seulement si l'état est CREEE et si l'utilisateur est le vendeur) -->
+					<div
+						th:if="${article.etatVente.name() == 'CREEE' and #authentication.name == article.vendeur.email}">
+						<form th:action="@{/encheres/modifier}" method="get">
+							<input type="hidden" name="articleId"
+								th:value="${article.noArticle}" />
+							<button type="submit"
+								class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+								Modifier l'article</button>
+						</form>
+					</div>
+
+
 
 				</div>
 			</div>

@@ -122,10 +122,19 @@
 					Prix : <span data-th-text="${article.prixVente}"></span>
 				</p>
 				<p>
-					Fin de l'enchère : <span data-th-text="${article.dateFinEncheres}"></span>
+					Début de l'enchère : <span
+						th:text="${#temporals.format(article.dateDebutEncheres, 'dd/MM/yyyy')}"></span>
+				</p>
+				<p>
+					Fin de l'enchère : <span
+						th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}"></span>
 				</p>
 				<p>
 					Vendeur : <span data-th-text="${article.vendeur.pseudo}"></span>
+				</p>
+				<p>
+					<strong>Debug : État de l'article :</strong> <span
+						th:text="${article.etatVente.name()}"></span>
 				</p>
 			</div>
 		</div>

@@ -78,9 +78,15 @@ public class ArticleServiceImpl implements ArticleService {
 	/**
 	 * Méthode qui appelle la DAL pour récupérer tout les Articles en vente
 	 */
+	@Override
 	public List<ArticleVendu> consulterTout() {
+	    List<ArticleVendu> articles = articleDAO.getAllArticles();
 
-		return articleDAO.getAllArticles();
+	    for (ArticleVendu article : articles) {
+	        mettreAJourEtatVente(article);
+	    }
+
+	    return articles;
 	}
 
 	@Override
@@ -122,6 +128,32 @@ public class ArticleServiceImpl implements ArticleService {
 	    }
 	}
 
+	public void modifierArticle(ArticleVendu article) {
+	    articleDAO.modifierArticle(article);
+	}
+
+	/**
+	 * Met à jour l'état de vente d'un article en fonction de la date actuelle. Pour l'index 
+	 */
+	public void mettreAJourEtatVente(ArticleVendu article) {
+	    LocalDate today = LocalDate.now();
+
+	    
+
+	    if (article.getEtatVente() == EtatVente.CREEE && 
+	        (today.isEqual(article.getDateDebutEncheres()) || today.isAfter(article.getDateDebutEncheres()))) {
+
+	        article.setEtatVente(EtatVente.EN_COURS);
+	        System.out.println("Mise à jour en EN_COURS pour l'article: " + article.getNoArticle());
+	        articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.EN_COURS);
+	    }
+
+	    if (article.getEtatVente() == EtatVente.EN_COURS && today.isAfter(article.getDateFinEncheres())) {
+	        article.setEtatVente(EtatVente.ENCHERES_TERMINEES);
+	        System.out.println("Mise à jour en ENCHERES_TERMINEES pour l'article: " + article.getNoArticle());
+	        articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.ENCHERES_TERMINEES);
+	    }
+	}
 
 
 
