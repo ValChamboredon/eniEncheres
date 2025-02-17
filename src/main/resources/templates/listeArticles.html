@@ -89,8 +89,8 @@
                     <h3 th:text="${article.nomArticle}" class="font-bold text-lg mb-2"></h3>
                     <p class="mb-1">Prix : <span th:text="${article.prixVente}"></span> points</p>
                     <p class="mb-1">Fin de l'enchère : <span th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}"></span></p>
-                    <p>Vendeur : <span th:text="${article.vendeur.pseudo}"></span></p>
-                    <a th:href="@{'/articles/' + ${article.noArticle}}" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Voir détails</a>
+                   	<a th:href="@{encheres/articles/profil(pseudo=${article.vendeur.pseudo})}" class="text-blue-500 hover:text-blue-700 font-medium underline">Vendeur : <span th:text="${article.vendeur.pseudo}"></span></a>
+                    <a th:href="@{'encheres/articles/profil' + ${article.noArticle}}" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Voir détails</a>
                 </div>
             </div>
         </div>

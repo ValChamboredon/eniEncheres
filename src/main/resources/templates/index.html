@@ -43,7 +43,7 @@
                         Fin de l'enchère : <span class="italic" data-th-text="${article.dateFinEncheres}"></span>
                     </p>
                     <p class="text-gray-800">
-                        Vendeur : <span class="font-medium" data-th-text="${article.vendeur.pseudo}"></span>
+                        <a th:href="@{encheres/vendeur(pseudo=${article.vendeur.pseudo})}" class="text-blue-500 hover:text-blue-700 font-medium">Vendeur : <span th:text="${article.vendeur.pseudo}"></span></a>
                     </p>
                 </div>
             </div>

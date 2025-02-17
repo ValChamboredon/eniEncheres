@@ -78,6 +78,14 @@ public class ArticleController {
 
         return "index";
     }
+    
+	@GetMapping("/vendeur")
+	public String afficherProfilVendeur(@RequestParam("pseudo") String pseudo, Model model) {
+		Utilisateur vendeur = utilisateurService.getUtilisateurByPseudo(pseudo);
+		model.addAttribute("vendeur", vendeur);
+		
+		return "vendeur-profil";
+	}
 
 
     /**
