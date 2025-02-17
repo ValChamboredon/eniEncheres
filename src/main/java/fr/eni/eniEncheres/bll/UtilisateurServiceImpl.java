@@ -3,9 +3,11 @@ package fr.eni.eniEncheres.bll;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import fr.eni.eniEncheres.bo.Utilisateur;
 import fr.eni.eniEncheres.dal.UtilisateurDAO;
@@ -67,9 +69,54 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 	    // Sauvegarde en base
 	    utilisateurDAO.save(utilisateur);
 	}
+	
 	@Override
-	public void modifier(@Valid Utilisateur utilisateur) {
-		utilisateurDAO.update(utilisateur);
+	@Transactional(rollbackFor = BusinessException.class)
+	public void modifier(@Valid Utilisateur utilisateur)throws BusinessException {
+		BusinessException be = new BusinessException();
+		
+		boolean valider = validerEmail(utilisateur.getEmail(), utilisateur.getNoUtilisateur(), be);
+		valider &= validerPseudo(utilisateur.getPseudo(), utilisateur.getNoUtilisateur(), be);
+				
+		if(valider) {
+			utilisateurDAO.update(utilisateur);
+		}else {
+			throw be;
+		}
+		
+	}
+	
+	private boolean validerEmail(String email, int noUtilisateur, BusinessException be) {
+		boolean valide = true;
+		
+		try {
+			Utilisateur utilisateurTrouve = utilisateurDAO.getUtilisateur(email);
+			if(utilisateurTrouve != null && utilisateurTrouve.getNoUtilisateur() != noUtilisateur) {
+				valide = false;
+				be.addCleErreur("modification.profil.email.existe");
+			}
+		}catch(EmptyResultDataAccessException e ) {
+			valide = true;
+		}
+		
+		return valide;
+	}
+	
+	private boolean validerPseudo(String pseudo, int noUtilisateur, BusinessException be) {
+		boolean valide = true;
+		
+		try {
+			Utilisateur utilisateurTrouve = utilisateurDAO.getUtilisateurByPseudo(pseudo);
+			if(utilisateurTrouve != null && utilisateurTrouve.getNoUtilisateur() != noUtilisateur) {
+				valide = false;
+				be.addCleErreur("modification.profil.pseudo.existe");
+			}
+		}catch(EmptyResultDataAccessException e) {
+			valide = true;
+		}
+		
+		return valide;
+		
 	}
 	
 	@Override
@@ -92,12 +139,20 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         return utilisateurDAO.getUtilisateur(email);
     }
 
-
-
 	@Override
 	public void supprimerByEmail(String email) {
 		utilisateurDAO.supprimerByEmail(email);
 	}
+	
+	@Override
+	public void supprimerById(int id) {
+		utilisateurDAO.supprimerById(id);
+	}
 
+	@Override
+	public int getIdByEmail(String email) {
+		Utilisateur utilisateur = utilisateurDAO.getUtilisateur(email);
+		return utilisateur.getNoUtilisateur();
+	}
 
 }

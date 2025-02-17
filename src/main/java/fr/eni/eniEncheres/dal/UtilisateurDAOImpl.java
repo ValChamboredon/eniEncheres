@@ -28,18 +28,21 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 	private static final String INSERT = "INSERT INTO UTILISATEURS (pseudo, nom, prenom, email, telephone, rue, code_postal, ville, mot_de_passe, credit, administrateur) " +
 	        "VALUES (:pseudo, :nom, :prenom, :email, :telephone, :rue, :codePostal, :ville, :motDePasse, :credit, :administrateur)";
 	
-	private static final String UPDATE = "UPDATE UTILISATEURS SET pseudo = :pseudo, nom = :nom, prenom = :prenom, email = :email, telephone = :telephone, rue = :rue, code_postal = :codePostal, ville = :ville, mot_de_passe = :motDePasse, credit = :credit, administrateur = :administrateur WHERE email = :email";
+	private static final String UPDATE = "UPDATE UTILISATEURS SET pseudo = :pseudo, nom = :nom, prenom = :prenom, email = :email, telephone = :telephone, rue = :rue, code_postal = :codePostal, ville = :ville, mot_de_passe = :motDePasse, credit = :credit, administrateur = :administrateur WHERE no_utilisateur = :noUtilisateur";
 	private final String FIND_BY_ID = "SELECT * FROM UTILISATEURS WHERE no_utilisateur =:id";
 	private final String FIND_BY_EMAIL = "SELECT * FROM UTILISATEURS WHERE email = :email";
-	private static final String DELETE = "DELETE FROM UTILISATEURS WHERE email = :email";
+	private static final String DELETE_BY_EMAIL = "DELETE FROM UTILISATEURS WHERE email = :email";
+	private static final String DELETE_BY_ID = "DELETE FROM UTILISATEURS WHERE no_utilisateur = :id";
 	private final String COUNT_IDENTICAL_EMAILS = "SELECT COUNT (EMAIL) FROM UTILISATEURS WHERE  EMAIL = :email";
 	private final String COUNT_IDENTICAL_PSEUDOS = "SELECT COUNT (PSEUDO) FROM UTILISATEURS WHERE PSEUDO = :pseudo";
+	private static final String SELECT_BY_PSEUDO = "select * from utilisateurs where pseudo = :pseudo";
 	
 	
 	@Override
 	public void update(Utilisateur utilisateur) {
 		
 		MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+		namedParameters.addValue("noUtilisateur", utilisateur.getNoUtilisateur());
 		namedParameters.addValue("pseudo", utilisateur.getPseudo());
 		namedParameters.addValue("nom", utilisateur.getNom());
 		namedParameters.addValue("prenom", utilisateur.getPrenom());
@@ -48,7 +51,7 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 		namedParameters.addValue("rue", utilisateur.getRue());
 		namedParameters.addValue("codePostal", utilisateur.getCodePostal());
 		namedParameters.addValue("ville", utilisateur.getVille());
-		namedParameters.addValue("motDePasse", utilisateur.getMotDePasse()); // à haché
+		namedParameters.addValue("motDePasse", utilisateur.getMotDePasse());
 		namedParameters.addValue("credit", utilisateur.getCredit());
 		namedParameters.addValue("administrateur", utilisateur.isAdministrateur());
  
@@ -106,9 +109,6 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 	    return nbOccurrencesPseudo > 0;
 	}
 
-	
-
-
 	@Override
 	public Utilisateur read(int noUtilisateur) {
 		MapSqlParameterSource namedParameterSource = new MapSqlParameterSource();
@@ -127,7 +127,7 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 	public void supprimerByEmail(String email) {
 		MapSqlParameterSource namedParameterSource = new MapSqlParameterSource();
 		namedParameterSource.addValue("email", email);
-		namedParameterJdbcTemplate.update(DELETE, namedParameterSource);
+		namedParameterJdbcTemplate.update(DELETE_BY_EMAIL, namedParameterSource);
 	}
 
 	class UtilisateurRowMapper implements RowMapper<Utilisateur> {
@@ -148,6 +148,20 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 			utilisateur.setAdministrateur(rs.getBoolean("administrateur"));
 			return utilisateur;
 		}
+	}
+
+	@Override
+	public void supprimerById(int id) {
+		MapSqlParameterSource namedParameterSource = new MapSqlParameterSource();
+		namedParameterSource.addValue("id", id);
+		namedParameterJdbcTemplate.update(DELETE_BY_ID, namedParameterSource);
+	}
+
+	@Override
+	public Utilisateur getUtilisateurByPseudo(String pseudo) {
+		MapSqlParameterSource namedParameterSource = new MapSqlParameterSource();
+		namedParameterSource.addValue("pseudo", pseudo);
+		return namedParameterJdbcTemplate.queryForObject(SELECT_BY_PSEUDO, namedParameterSource, new UtilisateurRowMapper()) ;
 	}
 
 }

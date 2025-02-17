@@ -8,7 +8,7 @@ public interface UtilisateurService {
 
 	void enregistrer(@Valid Utilisateur utilisateur)throws BusinessException;
 	
-	void modifier(@Valid Utilisateur utilisateur);
+	void modifier(@Valid Utilisateur utilisateur)throws BusinessException;
 
 	boolean pseudoExistant(String pseudo);
 
@@ -18,7 +18,10 @@ public interface UtilisateurService {
 	
 	Utilisateur getUtilisateurByEmail(String email);
 	
+	int getIdByEmail(String email);
+	
 	void supprimerByEmail(String email);
 	
+	void supprimerById(int id);
 
 }

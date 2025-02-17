@@ -25,7 +25,10 @@ public interface UtilisateurDAO {
 	
 	Utilisateur getUtilisateur(String email);
 	
+	Utilisateur getUtilisateurByPseudo(String pseudo);
+	
 	void supprimerByEmail(String email);
 	
+	void supprimerById(int id);
 	
 }
