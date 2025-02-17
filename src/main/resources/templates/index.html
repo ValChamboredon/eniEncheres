@@ -21,18 +21,54 @@
 
 				<!-- Sélecteur de catégorie -->
 				<select name="categorie" id="categorie"
-					class="border border-gray-300 p-2 rounded" >
+					class="border border-gray-300 p-2 rounded">
 					<option value="">Toutes les catégories</option>
 					<option th:each="cat : ${CategoriesEnSession}"
 						th:value="${cat.noCategorie}" th:text="${cat.libelle}"
 						th:selected="${categorie != null and categorie == cat.noCategorie}">
 					</option>
 				</select>
-
+				<div sec:authorize="isAuthenticated()" class="flex flex-wrap gap-6">
+					<div>
+						<label class="font-semibold block"> <input type="radio"
+							name="typeRecherche" value="achats"  class="mr-2">
+							Achats
+						</label>
+						<div class="ml-4 space-y-2">
+							<label class="flex items-center"> <input type="checkbox"
+								name="enchereOuverte" class="mr-2"> Enchères ouvertes
+							</label> <label class="flex items-center"> <input type="checkbox"
+								name="mesEncheresEnCours" class="mr-2"> Mes enchères en
+								cours
+							</label> <label class="flex items-center"> <input type="checkbox"
+								name="mesEncheresRemportees" class="mr-2"> Mes enchères
+								remportées
+							</label>
+						</div>
+					</div>
+					<div>
+						<label class="font-semibold block"> <input type="radio"
+							name="typeRecherche" value="mesVentes" class="mr-2"> Mes
+							ventes
+						</label>
+						<div class="ml-4 space-y-2">
+							<label class="flex items-center"> <input type="checkbox"
+								name="ventesEnCours" class="mr-2"> Ventes en cours
+							</label> <label class="flex items-center"> <input type="checkbox"
+								name="ventesNonDebutees" class="mr-2"> Ventes non
+								débutées
+							</label> <label class="flex items-center"> <input type="checkbox"
+								name="ventesTerminees" class="mr-2"> Ventes terminées
+							</label>
+						</div>
+					</div>
+				</div>
 				<!-- Bouton de recherche -->
 				<button type="submit"
 					class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
 					Rechercher</button>
+
+
 			</form>
 		</div>
 

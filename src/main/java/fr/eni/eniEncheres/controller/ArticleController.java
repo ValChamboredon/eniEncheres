@@ -68,26 +68,38 @@ public class ArticleController {
 	public String afficherLesArticles(
 	        @RequestParam(value = "recherche", required = false) String recherche,
 	        @RequestParam(value = "categorie", required = false, defaultValue = "0") Integer noCategorie,
+	        @RequestParam(value = "typeRecherche", required = false) String typeRecherche,
+	        @RequestParam(value = "ventesEnCours", required = false) Boolean ventesEnCours,
+	        @RequestParam(value = "ventesNonDebutees", required = false) Boolean ventesNonDebutees,
+	        @RequestParam(value = "ventesTerminees", required = false) Boolean ventesTerminees,
 	        Model model, Principal principal) {
 
-	    // Vérification et correction si `noCategorie` est null
-	    if (noCategorie == null) {
-	        noCategorie = 0; // Par défaut : "Toutes les catégories"
-	    }
+	    // Vérification des valeurs nulles
+	    if (noCategorie == null) noCategorie = 0;
 
-	    // Récupération des articles filtrés
-	    List<ArticleVendu> articlesFiltres = articleService.rechercherArticles(recherche, noCategorie);
+	    List<ArticleVendu> articlesFiltres;
+
+	    // Cas où l'utilisateur filtre sur "Mes ventes"
+	    if (principal != null && "mesVentes".equals(typeRecherche)) {
+	        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+	        articlesFiltres = articleService.filtrerVentes(
+	                utilisateur.getNoUtilisateur(), ventesEnCours, ventesNonDebutees, ventesTerminees
+	        );
+
+	        model.addAttribute("creditsUtilisateur", utilisateur.getCredit());
+	    } else {
+	        // Recherche standard (par mot-clé et catégorie)
+	        articlesFiltres = articleService.rechercherArticles(recherche, noCategorie);
+	    }
 
 	    // Ajouter les articles et les filtres au modèle
 	    model.addAttribute("articles", articlesFiltres);
 	    model.addAttribute("recherche", recherche);
 	    model.addAttribute("categorie", noCategorie);
-
-	    // Ajouter les crédits si l'utilisateur est connecté
-	    if (principal != null) {
-	        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
-	        model.addAttribute("creditsUtilisateur", utilisateur.getCredit());
-	    }
+	    model.addAttribute("typeRecherche", typeRecherche);
+	    model.addAttribute("ventesEnCours", ventesEnCours);
+	    model.addAttribute("ventesNonDebutees", ventesNonDebutees);
+	    model.addAttribute("ventesTerminees", ventesTerminees);
 
 	    return "index"; // Retourne la vue index.html
     }
