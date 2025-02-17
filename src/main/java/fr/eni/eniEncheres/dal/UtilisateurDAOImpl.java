@@ -36,6 +36,7 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 	private static final String DELETE_BY_ID = "DELETE FROM UTILISATEURS WHERE no_utilisateur = :id";
 	private final String COUNT_IDENTICAL_EMAILS = "SELECT COUNT (EMAIL) FROM UTILISATEURS WHERE  EMAIL = :email";
 	private final String COUNT_IDENTICAL_PSEUDOS = "SELECT COUNT (PSEUDO) FROM UTILISATEURS WHERE PSEUDO = :pseudo";
+	private static final String SELECT_BY_PSEUDO = "select * from utilisateurs where pseudo = :pseudo";
 	
 	
 	@Override
@@ -109,9 +110,6 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 	    return nbOccurrencesPseudo > 0;
 	}
 
-	
-
-
 	@Override
 	public Utilisateur read(int noUtilisateur) {
 		MapSqlParameterSource namedParameterSource = new MapSqlParameterSource();
@@ -158,6 +156,13 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 		MapSqlParameterSource namedParameterSource = new MapSqlParameterSource();
 		namedParameterSource.addValue("id", id);
 		namedParameterJdbcTemplate.update(DELETE_BY_ID, namedParameterSource);
+	}
+
+	@Override
+	public Utilisateur getUtilisateurByPseudo(String pseudo) {
+		MapSqlParameterSource namedParameterSource = new MapSqlParameterSource();
+		namedParameterSource.addValue("pseudo", pseudo);
+		return namedParameterJdbcTemplate.queryForObject(SELECT_BY_PSEUDO, namedParameterSource, new UtilisateurRowMapper()) ;
 	}
 
 }

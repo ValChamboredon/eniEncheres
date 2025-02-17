@@ -71,6 +71,16 @@ public class ProfilController {
             return "profil-detail";
         }else {
             try {
+                // Vérification de la correspondance des mots de passe
+            	 if (motDePasseNouveau != null && !motDePasseNouveau.isEmpty()) {
+        	      if (!motDePasseNouveau.equals(motDePasseConfirme)) {
+        	          bindingResult.rejectValue("motDePasse", "error.utilisateur", "Les mots de passe ne correspondent pas.");
+        	          return "profil-detail";
+        	      } else {
+        	          utilisateur.setMotDePasse(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(motDePasseNouveau));
+        	      	}
+            	 }
+            	  
             	//modification en bdd
                 utilisateurService.modifier(utilisateur);
                 
@@ -101,18 +111,6 @@ public class ProfilController {
         
         return "index";
     }
-    
-    // Vérification de la correspondance des mots de passe
-//  if (motDePasseNouveau != null && !motDePasseNouveau.isEmpty()) {
-//      if (!motDePasseNouveau.equals(motDePasseConfirme)) {
-//          bindingResult.rejectValue("motDePasse", "error.utilisateur", "Les mots de passe ne correspondent pas.");
-//          return "profil-detail";
-//      } else {
-//          utilisateur.setMotDePasse(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(motDePasseNouveau));
-//      }
-//  }
-
-
 	
 	@GetMapping("/profil/detail")
 	public String afficherProfilDetail(Model model) {

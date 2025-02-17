@@ -76,7 +76,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 		BusinessException be = new BusinessException();
 		
 		boolean valider = validerEmail(utilisateur.getEmail(), utilisateur.getNoUtilisateur(), be);
-//		valider &= validerPseudo(utilisateur.getPseudo(), utilisateur.getNoUtilisateur());
+		valider &= validerPseudo(utilisateur.getPseudo(), utilisateur.getNoUtilisateur(), be);
 				
 		if(valider) {
 			utilisateurDAO.update(utilisateur);
@@ -87,12 +87,10 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 	}
 	
 	private boolean validerEmail(String email, int noUtilisateur, BusinessException be) {
-		
 		boolean valide = true;
 		
 		try {
 			Utilisateur utilisateurTrouve = utilisateurDAO.getUtilisateur(email);
-			System.out.println(utilisateurDAO.getUtilisateur(email).getEmail());
 			if(utilisateurTrouve != null && utilisateurTrouve.getNoUtilisateur() != noUtilisateur) {
 				valide = false;
 				be.addCleErreur("modification.profil.email.existe");
@@ -104,10 +102,22 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 		return valide;
 	}
 	
-//	private boolean validerPseudo(String pseudo, int noUtilisateur) {
-//	    Utilisateur utilisateur = utilisateurDAO.getUtilisateur(pseudo));
-//	    return utilisateur != null && !utilisateur.getId().equals(id);
-//	}
+	private boolean validerPseudo(String pseudo, int noUtilisateur, BusinessException be) {
+		boolean valide = true;
+		
+		try {
+			Utilisateur utilisateurTrouve = utilisateurDAO.getUtilisateurByPseudo(pseudo);
+			if(utilisateurTrouve != null && utilisateurTrouve.getNoUtilisateur() != noUtilisateur) {
+				valide = false;
+				be.addCleErreur("modification.profil.pseudo.existe");
+			}
+		}catch(EmptyResultDataAccessException e) {
+			valide = true;
+		}
+		
+		return valide;
+		
+	}
 	
 	@Override
     public boolean pseudoExistant(String pseudo) {
@@ -144,6 +154,5 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 		Utilisateur utilisateur = utilisateurDAO.getUtilisateur(email);
 		return utilisateur.getNoUtilisateur();
 	}
-
 
 }
