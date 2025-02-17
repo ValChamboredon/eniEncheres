@@ -1,53 +1,70 @@
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page d'accueil</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page d'accueil</title>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
 <div th:replace="~{fragments/fragment-entete :: entete}"></div>
 <main class="bg-gray-100 min-h-screen p-6">
 
-    <div class="container mx-auto">
-    
-        <div class="bg-white p-6 shadow-md rounded-lg mb-6">
-            <div sec:authorize="isAuthenticated()" class="statutConnection">
-                <p class="text-gray-700 font-semibold">
-                    <span sec:authentication="name" class="text-blue-600"></span> est connecté.e
-                </p>
-            </div>
+	<div class="container mx-auto">
 
-            <p class="font-bold mt-4">Filtres :</p>
-            <div class="flex space-x-2">
-                <input type="search" id="recherche" name="recherche"
-                    placeholder="Le nom de l'article contient"
-                    class="border border-gray-300 p-2 rounded w-full">
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Rechercher
-                </button>
-            </div>
-        </div>
+		<div class="bg-white p-6 shadow-md rounded-lg mb-6">
+			<p class="font-bold mt-4">Filtres :</p>
+
+			<form th:action="@{/encheres}" method="get" class="flex space-x-2">
+				<!-- Champ de recherche -->
+				<input type="text" name="recherche" id="recherche"
+					placeholder="Le nom de l'article contient"
+					class="border border-gray-300 p-2 rounded w-full"
+					th:value="${recherche}">
+
+				<!-- Sélecteur de catégorie -->
+				<select name="categorie" id="categorie"
+					class="border border-gray-300 p-2 rounded" >
+					<option value="">Toutes les catégories</option>
+					<option th:each="cat : ${CategoriesEnSession}"
+						th:value="${cat.noCategorie}" th:text="${cat.libelle}"
+						th:selected="${categorie != null and categorie == cat.noCategorie}">
+					</option>
+				</select>
+
+				<!-- Bouton de recherche -->
+				<button type="submit"
+					class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+					Rechercher</button>
+			</form>
+		</div>
 
 
-        <!-- Liste des articles -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="bg-white shadow-lg rounded-lg p-4 border hover:shadow-xl transition duration-300" data-th-each="article : ${articles}">
-                <div class="card-product-infos">
-                    <h2 class="text-lg font-bold text-blue-600 hover:underline">
-                        <a data-th-href="@{/encheres/article/detail/{id}(id=${article.noArticle})}"
-                            data-th-text="${article.nomArticle}"></a>
-                    </h2>
-                    <p class="text-gray-700">
-                        Prix : <span class="font-semibold" data-th-text="${article.prixVente}"></span> points
-                    </p>
-                    <p class="text-gray-600">
-                        Fin de l'enchère : <span class="italic" data-th-text="${article.dateFinEncheres}"></span>
-                    </p>
-                    <p class="text-gray-800">
-                        Vendeur : <span class="font-medium" data-th-text="${article.vendeur.pseudo}"></span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
+
+
+		<!-- Liste des articles -->
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			<div
+				class="bg-white shadow-lg rounded-lg p-4 border hover:shadow-xl transition duration-300"
+				data-th-each="article : ${articles}">
+				<div class="card-product-infos">
+					<h2 class="text-lg font-bold text-blue-600 hover:underline">
+						<a
+							data-th-href="@{/encheres/article/detail/{id}(id=${article.noArticle})}"
+							data-th-text="${article.nomArticle}"></a>
+					</h2>
+					<p class="text-gray-700">
+						Prix : <span class="font-semibold"
+							data-th-text="${article.prixVente}"></span> points
+					</p>
+					<p class="text-gray-600">
+						Fin de l'enchère : <span class="italic"
+							data-th-text="${article.dateFinEncheres}"></span>
+					</p>
+					<p class="text-gray-800">
+						Vendeur : <span class="font-medium"
+							data-th-text="${article.vendeur.pseudo}"></span>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
 
 </main>

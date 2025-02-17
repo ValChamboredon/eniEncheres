@@ -80,85 +80,84 @@ public class ArticleServiceImpl implements ArticleService {
 	 */
 	@Override
 	public List<ArticleVendu> consulterTout() {
-	    List<ArticleVendu> articles = articleDAO.getAllArticles();
+		List<ArticleVendu> articles = articleDAO.getAllArticles();
 
-	    for (ArticleVendu article : articles) {
-	        mettreAJourEtatVente(article);
-	    }
+		for (ArticleVendu article : articles) {
+			mettreAJourEtatVente(article);
+		}
 
-	    return articles;
+		return articles;
 	}
 
 	@Override
 	public ArticleVendu getArticleById(int noArticle) {
-	    ArticleVendu article = articleDAO.getArticleById(noArticle);
-	    
-	    System.out.println("Vérification état vente pour l'article: " + article.getNoArticle());
-	    System.out.println("Date de début: " + article.getDateDebutEncheres());
-	    System.out.println("Date de fin: " + article.getDateFinEncheres());
-	    System.out.println("Date actuelle: " + LocalDate.now());
-	    System.out.println("État actuel: " + article.getEtatVente());
+		ArticleVendu article = articleDAO.getArticleById(noArticle);
 
-	    // Vérifier si l'enchère doit passer à "EN_COURS"
-	    if (article.getEtatVente() == EtatVente.CREEE &&
-	       (LocalDate.now().isEqual(article.getDateDebutEncheres()) || LocalDate.now().isAfter(article.getDateDebutEncheres()))) {
-	        
-	        article.setEtatVente(EtatVente.EN_COURS);
-	        System.out.println("Mise à jour en EN_COURS pour l'article: " + article.getNoArticle());
-	        articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.EN_COURS);
-	    }
+		System.out.println("Vérification état vente pour l'article: " + article.getNoArticle());
+		System.out.println("Date de début: " + article.getDateDebutEncheres());
+		System.out.println("Date de fin: " + article.getDateFinEncheres());
+		System.out.println("Date actuelle: " + LocalDate.now());
+		System.out.println("État actuel: " + article.getEtatVente());
 
-	    // Vérifier si l'enchère doit passer à "ENCHERES_TERMINEES"
-	    if (article.getEtatVente() == EtatVente.EN_COURS && LocalDate.now().isAfter(article.getDateFinEncheres())) {
-	        article.setEtatVente(EtatVente.ENCHERES_TERMINEES);
-	        System.out.println("Mise à jour en ENCHERES_TERMINEES pour l'article: " + article.getNoArticle());
-	        articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.ENCHERES_TERMINEES);
-	    }
+		// Vérifier si l'enchère doit passer à "EN_COURS"
+		if (article.getEtatVente() == EtatVente.CREEE && (LocalDate.now().isEqual(article.getDateDebutEncheres())
+				|| LocalDate.now().isAfter(article.getDateDebutEncheres()))) {
 
-	    return article;
+			article.setEtatVente(EtatVente.EN_COURS);
+			System.out.println("Mise à jour en EN_COURS pour l'article: " + article.getNoArticle());
+			articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.EN_COURS);
+		}
+
+		// Vérifier si l'enchère doit passer à "ENCHERES_TERMINEES"
+		if (article.getEtatVente() == EtatVente.EN_COURS && LocalDate.now().isAfter(article.getDateFinEncheres())) {
+			article.setEtatVente(EtatVente.ENCHERES_TERMINEES);
+			System.out.println("Mise à jour en ENCHERES_TERMINEES pour l'article: " + article.getNoArticle());
+			articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.ENCHERES_TERMINEES);
+		}
+
+		return article;
 	}
 
 	@Override
 	public void supprimerArticle(int articleId) {
-	    try {
-	        articleDAO.deleteArticle(articleId);
-	        System.out.println("Article supprimé avec succès : " + articleId);
-	    } catch (Exception e) {
-	        System.err.println("Erreur lors de la suppression de l'article : " + e.getMessage());
-	    }
+		try {
+			articleDAO.deleteArticle(articleId);
+			System.out.println("Article supprimé avec succès : " + articleId);
+		} catch (Exception e) {
+			System.err.println("Erreur lors de la suppression de l'article : " + e.getMessage());
+		}
 	}
 
-
 	public void modifierArticle(ArticleVendu article) {
-	    articleDAO.modifierArticle(article);
+		articleDAO.modifierArticle(article);
 	}
 
 	/**
-	 * Met à jour l'état de vente d'un article en fonction de la date actuelle. Pour l'index 
+	 * Met à jour l'état de vente d'un article en fonction de la date actuelle. Pour
+	 * l'index
 	 */
 	public void mettreAJourEtatVente(ArticleVendu article) {
-	    LocalDate today = LocalDate.now();
+		LocalDate today = LocalDate.now();
 
-	    
+		if (article.getEtatVente() == EtatVente.CREEE
+				&& (today.isEqual(article.getDateDebutEncheres()) || today.isAfter(article.getDateDebutEncheres()))) {
 
-	    if (article.getEtatVente() == EtatVente.CREEE && 
-	        (today.isEqual(article.getDateDebutEncheres()) || today.isAfter(article.getDateDebutEncheres()))) {
+			article.setEtatVente(EtatVente.EN_COURS);
+			System.out.println("Mise à jour en EN_COURS pour l'article: " + article.getNoArticle());
+			articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.EN_COURS);
+		}
 
-	        article.setEtatVente(EtatVente.EN_COURS);
-	        System.out.println("Mise à jour en EN_COURS pour l'article: " + article.getNoArticle());
-	        articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.EN_COURS);
-	    }
-
-	    if (article.getEtatVente() == EtatVente.EN_COURS && today.isAfter(article.getDateFinEncheres())) {
-	        article.setEtatVente(EtatVente.ENCHERES_TERMINEES);
-	        System.out.println("Mise à jour en ENCHERES_TERMINEES pour l'article: " + article.getNoArticle());
-	        articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.ENCHERES_TERMINEES);
-	    }
+		if (article.getEtatVente() == EtatVente.EN_COURS && today.isAfter(article.getDateFinEncheres())) {
+			article.setEtatVente(EtatVente.ENCHERES_TERMINEES);
+			System.out.println("Mise à jour en ENCHERES_TERMINEES pour l'article: " + article.getNoArticle());
+			articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.ENCHERES_TERMINEES);
+		}
 	}
 
-
-
-
-
+	// Filtre non connecté
+	@Override
+	public List<ArticleVendu> rechercherArticles(String recherche, Integer noCategorie) {
+		return articleDAO.searchArticles(recherche, noCategorie);
+	}
 
 }

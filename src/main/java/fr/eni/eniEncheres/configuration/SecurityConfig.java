@@ -18,28 +18,32 @@ public class SecurityConfig {
 
 	@Bean
 	SecurityFilterChain getFilterChain(HttpSecurity security) throws Exception {
-		security.authorizeHttpRequests(auth -> {
-			// Configurez d'abord les correspondances spécifiques
-			auth.requestMatchers("/css/*", "/images/*").permitAll();
-			auth.requestMatchers("/encheres", "/articles", "/inscription", "/connexion").permitAll();
+	    security.authorizeHttpRequests(auth -> {
+	        // Ressources statiques accessibles à tous
+	        auth.requestMatchers("/css/*", "/images/*").permitAll();
+	        
+	        // Pages accessibles sans authentification
+	        auth.requestMatchers("/", "/encheres", "/articles", "/inscription", "/connexion").permitAll();
 
-			// Protégez les routes qui nécessitent une authentification
-			auth.requestMatchers("/profil/**", "/encheres/**", "/articles/new", "/articles/edit/**").authenticated();
+	        // Pages nécessitant une authentification
+	        auth.requestMatchers("/profil/**", "/articles/new", "/articles/edit/**").authenticated();
 
-			// Exiger l'authentification pour /encheres
-			auth.requestMatchers("/encheres").authenticated();
+	        // Utilisation de anyRequest() en dernier
+	        auth.anyRequest().authenticated();
+	    });
 
-			// Utilisez anyRequest() en dernier
-			auth.anyRequest().authenticated();
-		});
+	    security.formLogin(formLogin -> {
+	        formLogin.loginPage("/connexion").defaultSuccessUrl("/encheres", true).permitAll();
+	    });
 
-		security.formLogin(formLogin -> {
-			formLogin.loginPage("/connexion").defaultSuccessUrl("/encheres", true);
-		}).logout(logout -> logout.invalidateHttpSession(true)
-				.logoutRequestMatcher(new AntPathRequestMatcher("/deconnexion", "GET")).logoutSuccessUrl("/encheres"));
+	    security.logout(logout -> logout.invalidateHttpSession(true)
+	            .logoutRequestMatcher(new AntPathRequestMatcher("/deconnexion", "GET"))
+	            .logoutSuccessUrl("/encheres")
+	            .permitAll());
 
-		return security.build();
+	    return security.build();
 	}
+
 
 	@Bean
 	UserDetailsManager users(DataSource dataSource) {

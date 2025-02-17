@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import org.springframework.web.bind.annotation.*;
 
-
 import fr.eni.eniEncheres.bll.ArticleService;
 import fr.eni.eniEncheres.bll.CategorieService;
 //import fr.eni.eniEncheres.bll.EnchereService;
@@ -48,180 +47,209 @@ import jakarta.validation.Valid;
 @SessionAttributes("CategoriesEnSession")
 public class ArticleController {
 
+	private final ArticleService articleService;
+	private final CategorieService categorieService;
+	private final UtilisateurService utilisateurService;
 
-    private final ArticleService articleService;
-    private final CategorieService categorieService;
-    private final UtilisateurService utilisateurService;
+	/**
+	 * Constructeur avec injection des dépendances.
+	 */
+	public ArticleController(ArticleService articleService, CategorieService categorieService,
+			UtilisateurService utilisateurService) {
+		this.articleService = articleService;
+		this.categorieService = categorieService;
+		this.utilisateurService = utilisateurService;
+	}
 
-    /**
-     * Constructeur avec injection des dépendances.
-     */
-    public ArticleController(ArticleService articleService, CategorieService categorieService, 
-                             UtilisateurService utilisateurService) {
-        this.articleService = articleService;
-        this.categorieService = categorieService;
-        this.utilisateurService = utilisateurService;
-    }
+	/**
+	 * Affiche la liste des articles sur la page principale.
+	 */
+	@GetMapping
+	public String afficherLesArticles(
+	        @RequestParam(value = "recherche", required = false) String recherche,
+	        @RequestParam(value = "categorie", required = false, defaultValue = "0") Integer noCategorie,
+	        Model model, Principal principal) {
 
-    /**
-     * Affiche la liste des articles sur la page principale.
-     */
-    @GetMapping
-    public String afficherLesArticles(Model model, Principal principal) {
-        List<ArticleVendu> articles = articleService.consulterTout();
-        model.addAttribute("articles", articles);
+	    // Vérification et correction si `noCategorie` est null
+	    if (noCategorie == null) {
+	        noCategorie = 0; // Par défaut : "Toutes les catégories"
+	    }
 
-        if (principal != null) {
-            Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
-            model.addAttribute("creditsUtilisateur", utilisateur.getCredit());
-        }
+	    // Récupération des articles filtrés
+	    List<ArticleVendu> articlesFiltres = articleService.rechercherArticles(recherche, noCategorie);
 
-        return "index";
-    }
+	    // Ajouter les articles et les filtres au modèle
+	    model.addAttribute("articles", articlesFiltres);
+	    model.addAttribute("recherche", recherche);
+	    model.addAttribute("categorie", noCategorie);
 
+	    // Ajouter les crédits si l'utilisateur est connecté
+	    if (principal != null) {
+	        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+	        model.addAttribute("creditsUtilisateur", utilisateur.getCredit());
+	    }
 
-    /**
-     * Charge les catégories en session pour toutes les pages.
-     */
-    @ModelAttribute("CategoriesEnSession")
-    public List<Categorie> chargerCategories() throws BusinessException {
-        return categorieService.getAllCategories();
-    }
-
-
-    /**
-     * Affiche le formulaire de mise en vente d'un article.
-     */
-    @GetMapping("/vendre")
-    public String afficherFormulaireVendreArticle(Model model) {
-        model.addAttribute("article", new ArticleVendu());
-        return "formulaireArticle";
-    }
-
-    /**
-     * Enregistre un article mis en vente.
-     */
-    @PostMapping("/vendre")
-    public String mettreArticleEnVente(@Valid @ModelAttribute("article") ArticleVendu article,
-                                       BindingResult bindingResult, Model model, Principal principal) {
-        if (bindingResult.hasErrors()) {
-            return "formulaireArticle";
-        }
-
-        if (principal != null) {
-            Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
-            article.setVendeur(utilisateur);
-
-            try {
-                articleService.creerArticle(article);
-                return "redirect:/encheres";
-            } catch (BusinessException be) {
-                bindingResult.addError(new ObjectError("globalError", be.getMessage()));
-                return "formulaireArticle";
-            }
-        }
+	    return "index"; // Retourne la vue index.html
+	}
 
 
-        return "redirect:/encheres/connexion";
-    }
+	/**
+	 * Charge les catégories en session pour toutes les pages.
+	 */
+	@ModelAttribute("CategoriesEnSession")
+	public List<Categorie> chargerCategories() throws BusinessException {
+		return categorieService.getAllCategories();
+	}
 
-    /**
-     * Affiche le détail d'un article.
-     */
-    @GetMapping("/article/detail/{noArticle}")
-    public String afficherDetailArticle(@PathVariable("noArticle") int noArticle, Model model, Principal principal) {
-        ArticleVendu article = articleService.getArticleById(noArticle);
+	/**
+	 * Affiche le formulaire de mise en vente d'un article.
+	 */
+	@GetMapping("/vendre")
+	public String afficherFormulaireVendreArticle(Model model, Principal principal) {
+		model.addAttribute("article", new ArticleVendu());
 
-        if (article == null) {
-            return "redirect:/encheres";
-        }
+		if (principal != null) {
+			Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+			model.addAttribute("utilisateurConnecte", utilisateur); // Envoie les infos de l'utilisateur à Thymeleaf
+		}
 
-        if (article.getLieuDeRetrait() == null) {
-            article.setLieuDeRetrait(new Retrait(
-                    article.getVendeur().getRue(),
-                    article.getVendeur().getCodePostal(),
-                    article.getVendeur().getVille()
-            ));
-        }
+		return "formulaireArticle";
+	}
 
-        model.addAttribute("article", article);
-        return "detailArticle";
-    }
+	/**
+	 * Enregistre un article mis en vente.
+	 */
+	@PostMapping("/vendre")
+	public String mettreArticleEnVente(@Valid @ModelAttribute("article") ArticleVendu article,
+			BindingResult bindingResult, Model model, Principal principal) {
+		if (bindingResult.hasErrors()) {
+			return "formulaireArticle";
+		}
 
-    /**
-     * Supprime un article si l'utilisateur connecté est bien le vendeur.
-     */
-    @PostMapping("/supprimer")
-    public String supprimerArticle(@RequestParam("articleId") int articleId, Principal principal) {
-        ArticleVendu article = articleService.getArticleById(articleId);
+		if (principal != null) {
+			Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+			article.setVendeur(utilisateur);
 
-        if (article != null && article.getVendeur().getEmail().equals(principal.getName())) {
-            if (article.getEtatVente() == EtatVente.ENCHERES_TERMINEES || article.getEtatVente() == EtatVente.RETRAIT_EFFECTUE) {
-                return "redirect:/encheres?error=suppressionNonAutorisee";
-            }
-            articleService.supprimerArticle(articleId);
-        }
+			try {
+				articleService.creerArticle(article);
+				return "redirect:/encheres";
+			} catch (BusinessException be) {
+				bindingResult.addError(new ObjectError("globalError", be.getMessage()));
+				return "formulaireArticle";
+			}
+		}
 
+		return "redirect:/encheres/connexion";
+	}
 
-        return "redirect:/encheres";
-    }
+	/**
+	 * Affiche le détail d'un article.
+	 */
+	@GetMapping("/article/detail/{noArticle}")
+	public String afficherDetailArticle(@PathVariable("noArticle") int noArticle, Model model, Principal principal) {
+		ArticleVendu article = articleService.getArticleById(noArticle);
 
-    /**
-     * Affiche le formulaire de modification d’un article si l’enchère n’a pas commencé.
-     */
-    @GetMapping("/modifier")
-    public String afficherFormulaireModification(@RequestParam("articleId") int articleId, Principal principal, Model model) {
-        ArticleVendu article = articleService.getArticleById(articleId);
+		if (article == null) {
+			return "redirect:/encheres";
+		}
 
+		if (article.getLieuDeRetrait() == null) {
+			article.setLieuDeRetrait(new Retrait(article.getVendeur().getRue(), article.getVendeur().getCodePostal(),
+					article.getVendeur().getVille()));
+		}
 
-        if (article != null && article.getEtatVente() == EtatVente.CREEE
-                && article.getVendeur().getEmail().equals(principal.getName())) {
-            model.addAttribute("article", article);
-            return "modifierArticle";
-        }
+		model.addAttribute("article", article);
+		return "detailArticle";
+	}
 
-        return "redirect:/encheres";
-    }
+	/**
+	 * Supprime un article si l'utilisateur connecté est bien le vendeur.
+	 */
+	@PostMapping("/supprimer")
+	public String supprimerArticle(@RequestParam("articleId") int articleId, Principal principal) {
+		ArticleVendu article = articleService.getArticleById(articleId);
 
+		if (article != null && article.getVendeur().getEmail().equals(principal.getName())) {
+			if (article.getEtatVente() == EtatVente.ENCHERES_TERMINEES
+					|| article.getEtatVente() == EtatVente.RETRAIT_EFFECTUE) {
+				return "redirect:/encheres?error=suppressionNonAutorisee";
+			}
+			articleService.supprimerArticle(articleId);
+		}
 
-    /**
-     * Modifie un article si l’utilisateur est le vendeur et que l’état est encore `CREEE`.
-     */
-    @PostMapping("/modifier")
-    public String modifierArticle(@RequestParam("articleId") int articleId,
-                                  @RequestParam("nomArticle") String nomArticle,
-                                  @RequestParam("description") String description,
-                                  @RequestParam("miseAPrix") int miseAPrix,
-                                  @RequestParam("dateDebutEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateDebutEncheres,
-                                  @RequestParam("dateFinEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFinEncheres,
-                                  Principal principal) {
+		return "redirect:/encheres";
+	}
 
-        ArticleVendu article = articleService.getArticleById(articleId);
+	/**
+	 * Affiche le formulaire de modification d’un article si l’enchère n’a pas
+	 * commencé.
+	 */
+	@GetMapping("/modifier")
+	public String afficherFormulaireModification(@RequestParam("articleId") int articleId, Principal principal,
+			Model model) {
+		ArticleVendu article = articleService.getArticleById(articleId);
 
-        if (article != null && article.getEtatVente() == EtatVente.CREEE
-                && article.getVendeur().getEmail().equals(principal.getName())) {
-            article.setNomArticle(nomArticle);
-            article.setDescription(description);
-            article.setMiseAPrix(miseAPrix);
-            article.setDateDebutEncheres(dateDebutEncheres);
-            article.setDateFinEncheres(dateFinEncheres);
+		if (article != null && article.getEtatVente() == EtatVente.CREEE
+				&& article.getVendeur().getEmail().equals(principal.getName())) {
+			model.addAttribute("article", article);
+			return "modifierArticle";
+		}
 
-            articleService.modifierArticle(article);
-        }
+		return "redirect:/encheres";
+	}
 
-        return "redirect:/encheres/article/detail/" + articleId;
-    }
+	/**
+	 * Modifie un article si l’utilisateur est le vendeur et que l’état est encore
+	 * `CREEE`.
+	 */
+	@PostMapping("/modifier")
+	public String modifierArticle(@RequestParam("articleId") int articleId,
+			@RequestParam("nomArticle") String nomArticle, @RequestParam("description") String description,
+			@RequestParam("miseAPrix") int miseAPrix,
+			@RequestParam("dateDebutEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateDebutEncheres,
+			@RequestParam("dateFinEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFinEncheres,
+			Principal principal) {
 
-    /**
-     * Charge les crédits de l'utilisateur connecté.
-     */
-    @ModelAttribute("creditsUtilisateur")
-    public Integer chargerCreditsUtilisateur(Principal principal) {
-        if (principal != null) {
-            Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
-            return utilisateur.getCredit();
-        }
-        return 0;
-    }
+		ArticleVendu article = articleService.getArticleById(articleId);
+
+		if (article != null && article.getEtatVente() == EtatVente.CREEE
+				&& article.getVendeur().getEmail().equals(principal.getName())) {
+			article.setNomArticle(nomArticle);
+			article.setDescription(description);
+			article.setMiseAPrix(miseAPrix);
+			article.setDateDebutEncheres(dateDebutEncheres);
+			article.setDateFinEncheres(dateFinEncheres);
+
+			articleService.modifierArticle(article);
+		}
+
+		return "redirect:/encheres/article/detail/" + articleId;
+	}
+
+	/**
+	 * Charge les crédits de l'utilisateur connecté.
+	 */
+	@ModelAttribute("creditsUtilisateur")
+	public Integer chargerCreditsUtilisateur(Principal principal) {
+		if (principal != null) {
+			Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+			return utilisateur.getCredit();
+		}
+		return 0;
+	}
+
+	@GetMapping("/recherche")
+	public String rechercherArticles(@RequestParam(value = "recherche", required = false) String recherche,
+			@RequestParam(value = "categorie", required = false, defaultValue = "0") Integer noCategorie, Model model) {
+
+		// Récupération des articles filtrés
+		List<ArticleVendu> articlesFiltres = articleService.rechercherArticles(recherche, noCategorie);
+
+		// Ajouter les articles filtrés au modèle pour l'affichage dans la vue
+		model.addAttribute("articles", articlesFiltres);
+
+		// Redirige vers la page des enchères avec la liste filtrée
+		return "index";
+	}
+
 }
-

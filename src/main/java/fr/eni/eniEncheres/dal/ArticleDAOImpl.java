@@ -28,6 +28,8 @@ public class ArticleDAOImpl implements ArticleDAO {
  
 	@Override
 	public ArticleVendu getArticleById(int noArticle) {
+		
+	    
 		String sql = "SELECT av.*, " +
 	             "u.pseudo, u.nom, u.prenom, u.email, u.telephone, u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, " +
 	             "c.libelle, " +
@@ -131,16 +133,34 @@ public class ArticleDAOImpl implements ArticleDAO {
  
 
  
- 
- 
+	//filtre pour les enchères
+	//affiche les articles en COURS uniquement sur l'index avec cette requête SQL
 	@Override
 	public List<ArticleVendu> searchArticles(String keyword, int categoryId) {
-		String sql = "SELECT * FROM ARTICLES_VENDUS WHERE nom_article LIKE :keyword AND (:categoryId = 0 OR no_categorie = :categoryId)";
-		MapSqlParameterSource params = new MapSqlParameterSource();
-	    params.addValue("keyword", "%" + keyword + "%");
+	    String sql = "SELECT av.*, " +
+	                 "u.no_utilisateur, u.pseudo, u.email, " +
+	                 "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, " +
+	                 "c.no_categorie, c.libelle, " +
+	                 "COALESCE(r.rue, u.rue) AS retrait_rue, " +
+	                 "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, " +
+	                 "COALESCE(r.ville, u.ville) AS retrait_ville " +
+	                 "FROM ARTICLES_VENDUS av " +
+	                 "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur " +
+	                 "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie " +
+	                 "LEFT JOIN RETRAITS r ON av.no_article = r.no_article " +
+	                 "WHERE av.etat_vente = 'EN_COURS' " + 
+	                 "AND (:keyword IS NULL OR av.nom_article LIKE :keyword) " +
+	                 "AND (:categoryId = 0 OR av.no_categorie = :categoryId)";
+
+	    MapSqlParameterSource params = new MapSqlParameterSource();
+	    params.addValue("keyword", keyword != null && !keyword.isEmpty() ? "%" + keyword + "%" : null);
 	    params.addValue("categoryId", categoryId);
-	    return namedParameterJdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(ArticleVendu.class));
+
+	    return namedParameterJdbcTemplate.query(sql, params, new ArticleRowMapper());
 	}
+
+
+
 	
 	@Override
 	public List<ArticleVendu> getArticlesTermines() {
@@ -181,7 +201,17 @@ public class ArticleDAOImpl implements ArticleDAO {
 	            article.getNoArticle()
 	    );
 
-	}}
+	}
+	
+
+
+	
+
+	
+
+
+	
+}
 
 
 
