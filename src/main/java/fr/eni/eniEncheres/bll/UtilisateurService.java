@@ -18,6 +18,8 @@ public interface UtilisateurService {
 	
 	Utilisateur getUtilisateurByEmail(String email);
 	
+	Utilisateur getUtilisateurByPseudo(String pseudo);
+	
 	int getIdByEmail(String email);
 	
 	void supprimerByEmail(String email);

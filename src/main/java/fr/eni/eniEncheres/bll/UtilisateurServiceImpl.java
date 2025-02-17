@@ -155,4 +155,9 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 		return utilisateur.getNoUtilisateur();
 	}
 
+	@Override
+	public Utilisateur getUtilisateurByPseudo(String pseudo) {
+		return utilisateurDAO.getUtilisateurByPseudo(pseudo);
+	}
+
 }

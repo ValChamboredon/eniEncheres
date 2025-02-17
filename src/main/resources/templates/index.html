@@ -36,35 +36,26 @@
 			</form>
 		</div>
 
-
-
-
-		<!-- Liste des articles -->
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-			<div
-				class="bg-white shadow-lg rounded-lg p-4 border hover:shadow-xl transition duration-300"
-				data-th-each="article : ${articles}">
-				<div class="card-product-infos">
-					<h2 class="text-lg font-bold text-blue-600 hover:underline">
-						<a
-							data-th-href="@{/encheres/article/detail/{id}(id=${article.noArticle})}"
-							data-th-text="${article.nomArticle}"></a>
-					</h2>
-					<p class="text-gray-700">
-						Prix : <span class="font-semibold"
-							data-th-text="${article.prixVente}"></span> points
-					</p>
-					<p class="text-gray-600">
-						Fin de l'enchère : <span class="italic"
-							data-th-text="${article.dateFinEncheres}"></span>
-					</p>
-					<p class="text-gray-800">
-						Vendeur : <span class="font-medium"
-							data-th-text="${article.vendeur.pseudo}"></span>
-					</p>
-				</div>
-			</div>
-		</div>
-	</div>
+        <!-- Liste des articles -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-white shadow-lg rounded-lg p-4 border hover:shadow-xl transition duration-300" data-th-each="article : ${articles}">
+                <div class="card-product-infos">
+                    <h2 class="text-lg font-bold text-blue-600 hover:underline">
+                        <a data-th-href="@{/encheres/article/detail/{id}(id=${article.noArticle})}"
+                            data-th-text="${article.nomArticle}"></a>
+                    </h2>
+                    <p class="text-gray-700">
+                        Prix : <span class="font-semibold" data-th-text="${article.prixVente}"></span> points
+                    </p>
+                    <p class="text-gray-600">
+                        Fin de l'enchère : <span class="italic" data-th-text="${article.dateFinEncheres}"></span>
+                    </p>
+                    <p class="text-gray-800">
+                        <a th:href="@{encheres/vendeur(pseudo=${article.vendeur.pseudo})}" class="text-blue-500 hover:text-blue-700 font-medium">Vendeur : <span th:text="${article.vendeur.pseudo}"></span></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </main>

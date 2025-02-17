@@ -34,8 +34,11 @@
                             </span> 
                             <span th:if="${article.lieuDeRetrait == null}">Non spécifié</span>
                         </p>
-                        <p><strong>Vendeur :</strong> <span th:text="${article.vendeur.pseudo}"></span></p>
+	                    <p class="text-gray-800">
+	                        <a th:href="@{/encheres/vendeur(pseudo=${article.vendeur.pseudo})}" class="text-blue-500 hover:text-blue-700 font-medium">Vendeur : <span th:text="${article.vendeur.pseudo}"></span></a>
+	                    </p>
                     </div>
+                    
 
 
                     <!-- Formulaire pour enchérir -->
