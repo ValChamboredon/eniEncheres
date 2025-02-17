@@ -19,6 +19,9 @@ public interface ArticleService {
 	    
 	void mettreAJourEtatVente(ArticleVendu article);
 
+	//Filtre
+	public List<ArticleVendu> rechercherArticles(String recherche, Integer noCategorie);
+
 
 
 }
