@@ -1,11 +1,17 @@
 package fr.eni.eniEncheres.controller;
 
 import java.util.Collections;
-
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,7 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
-
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
 
 import fr.eni.eniEncheres.bll.ArticleService;
@@ -40,7 +46,9 @@ import fr.eni.eniEncheres.bo.Utilisateur;
 import fr.eni.eniEncheres.bo.*;
 
 import fr.eni.eniEncheres.exception.BusinessException;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import java.nio.file.Path;
 
 @Controller
 @RequestMapping("/encheres")
@@ -50,6 +58,9 @@ public class ArticleController {
 	private final ArticleService articleService;
 	private final CategorieService categorieService;
 	private final UtilisateurService utilisateurService;
+	
+    @Value("${upload.dir}")
+    private String uploadDir;
 
 	/**
 	 * Constructeur avec injection des dépendances.
@@ -105,9 +116,24 @@ public class ArticleController {
     }
     
 	@GetMapping("/vendeur")
-	public String afficherProfilVendeur(@RequestParam("pseudo") String pseudo, Model model) {
+	public String afficherProfilVendeur(@RequestParam("pseudo") String pseudo, Model model, HttpSession session) {
+		//retrouver le vendeur de l'article
 		Utilisateur vendeur = utilisateurService.getUtilisateurByPseudo(pseudo);
 		model.addAttribute("vendeur", vendeur);
+		
+		//récupérer l'utilisateur actif
+		Authentication authentification = SecurityContextHolder.getContext().getAuthentication();
+		String email = authentification.getName();
+		System.out.println(email);
+		int userId = utilisateurService.getIdByEmail(email);
+		Utilisateur utilisateur = utilisateurService.getUtilisateurById(userId);
+
+	    if (utilisateur != null) {
+	        model.addAttribute("isAdmin", utilisateur.isAdministrateur());  // Assurez-vous que isAdmin est ajouté
+	        model.addAttribute("vendeur", utilisateur);  // Si tu utilises vendeur pour l'utilisateur
+	    } else {
+	        model.addAttribute("isAdmin", false);  // Si l'utilisateur n'est pas connecté ou admin
+	    }
 		
 		return "vendeur-profil";
 	}
@@ -141,10 +167,28 @@ public class ArticleController {
 	 */
 	@PostMapping("/vendre")
 	public String mettreArticleEnVente(@Valid @ModelAttribute("article") ArticleVendu article,
-			BindingResult bindingResult, Model model, Principal principal) {
+			BindingResult bindingResult, Model model, Principal principal, @RequestParam("image") MultipartFile image) {
 		if (bindingResult.hasErrors()) {
 			return "formulaireArticle";
 		}
+        
+        // Définir le dossier de destination
+//        File destinationDir = new File("");
+//        if (!destinationDir.exists()) {
+//        	destinationDir.mkdirs(); // Crée le dossier s'il n'existe pas
+//        }
+//
+//        // Construire le chemin du fichier
+//        File destinationFile = new File(uploadDir + image.getOriginalFilename());
+//
+//        // Sauvegarde du fichier
+//        try {
+//			image.transferTo(destinationFile);
+//		} catch (IllegalStateException | IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+        
 
 		if (principal != null) {
 			Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());

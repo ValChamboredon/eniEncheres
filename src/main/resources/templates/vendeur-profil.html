@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Vendeur</title>
-<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
@@ -45,6 +45,13 @@
                 <label class="block font-medium">Ville</label>
                 <input type="text" name="ville" class="w-full p-2 border rounded-lg" th:value="${vendeur.ville}" required readonly>
             </div>
+        </form>
+        
+        <form th:action="@{/encheres/vendeur/supprimer}" method="post" th:value="${vendeur}">
+        	<th:block th:if="${isAdmin}">
+        		<input type="hidden" th:value="${vendeur.noUtilisateur}" />
+            	<button type="submit" class="w-full bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50 mt-4">Supprimer le compte</button>
+			</th:block>
         </form>
     </div>
 </body>
