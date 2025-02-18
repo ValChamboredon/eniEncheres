@@ -170,6 +170,8 @@ public class ArticleDAOImpl implements ArticleDAO {
 
 	}
 
+	
+	//Methode pour filtrer les ventes en fonction de l'utilisateur co. Vente en cours,terminées et pas commencées.
 	@Override
 	public List<ArticleVendu> filtrerVentes(int userId, Boolean ventesEnCours, Boolean ventesNonDebutees, Boolean ventesTerminees) {
 	    StringBuilder sql = new StringBuilder(
@@ -202,6 +204,7 @@ public class ArticleDAOImpl implements ArticleDAO {
 	    }
 
 	    // Vérifier s'il y a des conditions et les ajouter proprement
+	    // chatgpt j'ai pas compris pourquoi il faut faire ça
 	    if (!conditions.isEmpty()) {
 	        sql.append(" AND (").append(String.join(" OR ", conditions)).append(") ");
 	    }

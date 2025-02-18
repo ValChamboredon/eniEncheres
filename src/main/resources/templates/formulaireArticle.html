@@ -50,21 +50,33 @@
 						data-th-name="miseAPrix" min="1" required
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
-
+				<!-- Section Date enchère -->
 				<div>
 					<label for="dateDebutEncheres"
-						class="block font-medium text-gray-700">Début de l'enchère
-						:</label> <input type="date" id="dateDebutEncheres"
-						data-th-name="dateDebutEncheres" required
-						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
+						class="block font-medium text-gray-700"> Début de
+						l'enchère : </label>
+					<div class="flex space-x-2">
+						<input type="date" id="dateDebutEncheres"
+							data-th-name="dateDebutEncheres" required
+							class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
+						<input type="time" id="heureDebutEncheres"
+							th:name="heureDebutEncheres" required
+							class="border border-gray-300 p-2 w-1/2 rounded focus:ring-2 focus:ring-blue-500">
+					</div>
 				</div>
 
 				<div>
 					<label for="dateFinEncheres"
-						class="block font-medium text-gray-700">Fin de l'enchère :</label>
-					<input type="date" id="dateFinEncheres"
-						data-th-name="dateFinEncheres" required
-						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
+						class="block font-medium text-gray-700"> Fin de l'enchère
+						: </label>
+					<div class="flex space-x-2">
+						<input type="date" id="dateFinEncheres"
+							data-th-name="dateFinEncheres" required
+							class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
+						<input type="time" id="heureFinEncheres"
+							th:name="heureFinEncheres" required
+							class="border border-gray-300 p-2 w-1/2 rounded focus:ring-2 focus:ring-blue-500">
+					</div>
 				</div>
 
 				<!-- Section Retrait -->
@@ -74,8 +86,10 @@
 					<div class="mt-2">
 						<label for="rue" class="block font-medium text-gray-700">Rue
 							:</label> <input type="text" id="rue" name="rue"
-							th:value="${utilisateurConnecte.rue}" required
+							th:value="${utilisateurConnecte != null ? utilisateurConnecte.rue : ''}"
+							required
 							class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
+
 					</div>
 
 					<div class="mt-2">

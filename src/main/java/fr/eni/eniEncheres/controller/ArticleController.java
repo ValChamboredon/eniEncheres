@@ -4,6 +4,7 @@ import java.util.Collections;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -126,15 +127,20 @@ public class ArticleController {
 	 */
 	@GetMapping("/vendre")
 	public String afficherFormulaireVendreArticle(Model model, Principal principal) {
-		model.addAttribute("article", new ArticleVendu());
+	    model.addAttribute("article", new ArticleVendu());
 
-		if (principal != null) {
-			Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
-			model.addAttribute("utilisateurConnecte", utilisateur); // Envoie les infos de l'utilisateur à Thymeleaf
-		}
+	    if (principal != null) {
+	        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+	        
+	        // Ajout d'un log pour voir si l'utilisateur est bien récupéré
+	        System.out.println("Utilisateur récupéré : " + utilisateur);
 
-		return "formulaireArticle";
+	        model.addAttribute("utilisateurConnecte", utilisateur);
+	    }
+
+	    return "formulaireArticle";
 	}
+
 
 	/**
 	 * Enregistre un article mis en vente.
@@ -226,8 +232,8 @@ public class ArticleController {
 	public String modifierArticle(@RequestParam("articleId") int articleId,
 			@RequestParam("nomArticle") String nomArticle, @RequestParam("description") String description,
 			@RequestParam("miseAPrix") int miseAPrix,
-			@RequestParam("dateDebutEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateDebutEncheres,
-			@RequestParam("dateFinEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFinEncheres,
+			@RequestParam("dateDebutEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime dateDebutEncheres,
+			@RequestParam("dateFinEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime dateFinEncheres,
 			Principal principal) {
 
 		ArticleVendu article = articleService.getArticleById(articleId);
