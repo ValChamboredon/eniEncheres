@@ -20,7 +20,7 @@ public class SecurityConfig {
 	SecurityFilterChain getFilterChain(HttpSecurity security) throws Exception {
 	    security.authorizeHttpRequests(auth -> {
 	        // Ressources statiques accessibles à tous
-	        auth.requestMatchers("/css/*", "/images/*").permitAll();
+	        auth.requestMatchers("/css/*", "/images/*", "/img/*").permitAll();
 	        
 	        // Pages accessibles sans authentification
 	        auth.requestMatchers("/", "/encheres", "/articles", "/inscription", "/connexion").permitAll();

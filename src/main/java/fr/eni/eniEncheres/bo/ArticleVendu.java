@@ -42,6 +42,8 @@ public class ArticleVendu {
 
     
     private Retrait lieuDeRetrait;
+    
+    private 
 
     /**
      * Constructeur par défaut
