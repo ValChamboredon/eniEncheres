@@ -4,6 +4,7 @@ import java.util.Collections;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,11 +23,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
-
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.*;
 
 import fr.eni.eniEncheres.bll.ArticleService;
 import fr.eni.eniEncheres.bll.CategorieService;
+import fr.eni.eniEncheres.bll.EnchereService;
 //import fr.eni.eniEncheres.bll.EnchereService;
 import fr.eni.eniEncheres.bll.UtilisateurService;
 
@@ -50,15 +52,17 @@ public class ArticleController {
 	private final ArticleService articleService;
 	private final CategorieService categorieService;
 	private final UtilisateurService utilisateurService;
+	private EnchereService enchereService;
 
 	/**
 	 * Constructeur avec injection des dépendances.
 	 */
 	public ArticleController(ArticleService articleService, CategorieService categorieService,
-			UtilisateurService utilisateurService) {
+			UtilisateurService utilisateurService, EnchereService enchereService) {
 		this.articleService = articleService;
 		this.categorieService = categorieService;
 		this.utilisateurService = utilisateurService;
+		this.enchereService = enchereService;
 	}
 
 	/**
@@ -116,10 +120,18 @@ public class ArticleController {
 	public String afficherFormulaireVendreArticle(Model model, Principal principal) {
 		model.addAttribute("article", new ArticleVendu());
 
+		Utilisateur utilisateur = null;
 		if (principal != null) {
-			Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
-			model.addAttribute("utilisateurConnecte", utilisateur); // Envoie les infos de l'utilisateur à Thymeleaf
+			utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
 		}
+		if (utilisateur == null) {
+	        utilisateur = new Utilisateur(); // Évite null dans le modèle
+	        utilisateur.setRue(""); 
+	        utilisateur.setCodePostal(""); 
+	        utilisateur.setVille("");
+	    }
+
+	    model.addAttribute("utilisateurConnecte", utilisateur);
 
 		return "formulaireArticle";
 	}
@@ -214,8 +226,8 @@ public class ArticleController {
 	public String modifierArticle(@RequestParam("articleId") int articleId,
 			@RequestParam("nomArticle") String nomArticle, @RequestParam("description") String description,
 			@RequestParam("miseAPrix") int miseAPrix,
-			@RequestParam("dateDebutEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateDebutEncheres,
-			@RequestParam("dateFinEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFinEncheres,
+			@RequestParam("dateDebutEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime dateDebutEncheres,
+			@RequestParam("dateFinEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime dateFinEncheres,
 			Principal principal) {
 
 		ArticleVendu article = articleService.getArticleById(articleId);
@@ -259,5 +271,61 @@ public class ArticleController {
 		// Redirige vers la page des enchères avec la liste filtrée
 		return "index";
 	}
+	
+	@PostMapping("/encherir")
+    public String encherir(@RequestParam("articleId") int articleId,
+                          @RequestParam("montantEnchere") int montantEnchere,
+                          RedirectAttributes redirectAttributes) {
+    	System.out.println("Début méthode encherir - articleId: " + articleId + ", montant: " + montantEnchere);
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("Auth: " + (auth != null ? auth.getName() : "null"));
+            if (auth == null || !auth.isAuthenticated()) {
+            	System.out.println("Utilisateur non authentifié");
+                return "redirect:/connexion";
+            }
+
+            // Récupération de l'utilisateur connecté
+            Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(auth.getName());
+            System.out.println("Utilisateur récupéré: " + utilisateur.getPseudo());
+            
+            // Récupération de l'article
+            ArticleVendu article = articleService.getArticleById(articleId);
+            System.out.println("Article récupéré: " + article.getNomArticle() + ", état: " + article.getEtatVente());
+            
+         // Vérification que l'article est bien EN_COURS
+            if (article.getEtatVente() != EtatVente.EN_COURS) {
+            	System.out.println("Article non en vente: " + article.getEtatVente());
+                redirectAttributes.addFlashAttribute("erreur", "ERR_ARTICLE_NON_EN_VENTE");
+                return "redirect:/encheres/article/detail/" + articleId;
+            }
+            
+            // Création de l'enchère
+            Enchere enchere = new Enchere();
+            enchere.setArticle(article);
+            enchere.setUtilisateur(utilisateur);
+            enchere.setMontantEnchere(montantEnchere);
+            enchere.setDateEnchere(LocalDateTime.now());
+            System.out.println("Enchère créée: " + enchere);
+
+            // Sauvegarde de l'enchère
+            enchereService.ajouterEnchere(enchere);
+            System.out.println("Enchère sauvegardée avec succès");
+            
+            redirectAttributes.addFlashAttribute("success", "Votre enchère a été enregistrée avec succès!");
+            return "redirect:/encheres/article/detail/" + articleId;
+            
+        } catch (BusinessException be) {
+            System.out.println("BusinessException: " + be.getClesErreurs());
+            be.printStackTrace();
+            redirectAttributes.addFlashAttribute("erreurs", be.getClesErreurs());
+            return "redirect:/encheres/article/detail/" + articleId;
+        } catch (Exception e) {
+            System.out.println("Exception générale: " + e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("erreur", "Erreur technique");
+            return "redirect:/encheres/article/detail/" + articleId;
+        }
+    }
 
 }

@@ -1,6 +1,5 @@
 package fr.eni.eniEncheres.bo;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Enchere {
@@ -12,7 +11,7 @@ public class Enchere {
     private ArticleVendu article;
     
     public boolean isValidEnchere(ArticleVendu article) {
-        LocalDate now = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
         return montantEnchere > 0 
                && now.isAfter(article.getDateDebutEncheres())
                && now.isBefore(article.getDateFinEncheres());

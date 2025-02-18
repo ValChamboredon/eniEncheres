@@ -202,11 +202,17 @@ public class ArticleDAOImpl implements ArticleDAO {
 	    );
 
 	}
-	
 
+	@Override
+	public void updatePrixVente(int noArticle, int nouveauPrix) {
+	    String sql = "UPDATE ARTICLES_VENDUS SET prix_vente = :prix_vente WHERE no_article = :no_article";
+	    
+	    MapSqlParameterSource params = new MapSqlParameterSource();
+	    params.addValue("prix_vente", nouveauPrix);
+	    params.addValue("no_article", noArticle);
 
-	
-
+	    namedParameterJdbcTemplate.update(sql, params);
+	}
 	
 
 

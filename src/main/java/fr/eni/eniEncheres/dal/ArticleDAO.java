@@ -18,6 +18,7 @@ public interface ArticleDAO {
     List<ArticleVendu> getArticlesTermines();
     
     void updateEtatVente(int noArticle, EtatVente nouvelEtat);
+    void updatePrixVente(int noArticle, int nouveauPrix);
     void deleteArticle(int articleId);
 
     public void modifierArticle(ArticleVendu article);

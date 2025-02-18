@@ -2,6 +2,7 @@ package fr.eni.eniEncheres.dal.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +27,15 @@ public class ArticleRowMapper implements RowMapper<ArticleVendu> {
 	    article.setNoArticle(rs.getInt("no_article"));
 	    article.setNomArticle(rs.getString("nom_article"));
 	    article.setDescription(rs.getString("description"));
-	    article.setDateDebutEncheres(rs.getDate("date_debut_encheres").toLocalDate());
-	    article.setDateFinEncheres(rs.getDate("date_fin_encheres").toLocalDate());
+	    Timestamp debutEncheresTimestamp = rs.getTimestamp("date_debut_encheres");
+        if (debutEncheresTimestamp != null) {
+            article.setDateDebutEncheres(debutEncheresTimestamp.toLocalDateTime());
+        }
+        
+        Timestamp finEncheresTimestamp = rs.getTimestamp("date_fin_encheres");
+        if (finEncheresTimestamp != null) {
+            article.setDateFinEncheres(finEncheresTimestamp.toLocalDateTime());
+        }
 	    article.setMiseAPrix(rs.getInt("prix_initial"));
 	    article.setPrixVente(rs.getInt("prix_vente"));
 

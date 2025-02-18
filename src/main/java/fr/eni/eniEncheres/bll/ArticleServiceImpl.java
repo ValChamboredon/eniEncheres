@@ -1,6 +1,7 @@
 package fr.eni.eniEncheres.bll;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,7 +44,7 @@ public class ArticleServiceImpl implements ArticleService {
 		BusinessException be = new BusinessException();
 
 		// Test de la date de début d'enchère (erreur si elle est déjà passée)
-		if (article.getDateDebutEncheres().isBefore(LocalDate.now())) {
+		if (article.getDateDebutEncheres().isBefore(LocalDateTime.now())) {
 			be.getMessagesErreur().add("La date de début d'enchère est inférieure à la date du jour");
 		}
 
@@ -88,6 +89,29 @@ public class ArticleServiceImpl implements ArticleService {
 
 		return articles;
 	}
+	
+	private void verifierEtMettreAJourEtatVente(ArticleVendu article) {
+        LocalDateTime now = LocalDateTime.now();
+        
+        // Vérification pour passage à EN_COURS
+        if (article.getEtatVente() == EtatVente.CREEE && 
+            (now.isEqual(article.getDateDebutEncheres()) || 
+             now.isAfter(article.getDateDebutEncheres()))) {
+            
+            article.setEtatVente(EtatVente.EN_COURS);
+            articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.EN_COURS);
+            System.out.println("Mise à jour en EN_COURS pour l'article: " + article.getNoArticle());
+        }
+
+        // Vérification pour passage à ENCHERES_TERMINEES
+        if (article.getEtatVente() == EtatVente.EN_COURS && 
+            now.isAfter(article.getDateFinEncheres())) {
+            
+            article.setEtatVente(EtatVente.ENCHERES_TERMINEES);
+            articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.ENCHERES_TERMINEES);
+            System.out.println("Mise à jour en ENCHERES_TERMINEES pour l'article: " + article.getNoArticle());
+        }
+    }
 
 	@Override
 	public ArticleVendu getArticleById(int noArticle) {
@@ -98,22 +122,8 @@ public class ArticleServiceImpl implements ArticleService {
 		System.out.println("Date de fin: " + article.getDateFinEncheres());
 		System.out.println("Date actuelle: " + LocalDate.now());
 		System.out.println("État actuel: " + article.getEtatVente());
-
-		// Vérifier si l'enchère doit passer à "EN_COURS"
-		if (article.getEtatVente() == EtatVente.CREEE && (LocalDate.now().isEqual(article.getDateDebutEncheres())
-				|| LocalDate.now().isAfter(article.getDateDebutEncheres()))) {
-
-			article.setEtatVente(EtatVente.EN_COURS);
-			System.out.println("Mise à jour en EN_COURS pour l'article: " + article.getNoArticle());
-			articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.EN_COURS);
-		}
-
-		// Vérifier si l'enchère doit passer à "ENCHERES_TERMINEES"
-		if (article.getEtatVente() == EtatVente.EN_COURS && LocalDate.now().isAfter(article.getDateFinEncheres())) {
-			article.setEtatVente(EtatVente.ENCHERES_TERMINEES);
-			System.out.println("Mise à jour en ENCHERES_TERMINEES pour l'article: " + article.getNoArticle());
-			articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.ENCHERES_TERMINEES);
-		}
+		
+		verifierEtMettreAJourEtatVente(article);
 
 		return article;
 	}
@@ -137,21 +147,7 @@ public class ArticleServiceImpl implements ArticleService {
 	 * l'index
 	 */
 	public void mettreAJourEtatVente(ArticleVendu article) {
-		LocalDate today = LocalDate.now();
-
-		if (article.getEtatVente() == EtatVente.CREEE
-				&& (today.isEqual(article.getDateDebutEncheres()) || today.isAfter(article.getDateDebutEncheres()))) {
-
-			article.setEtatVente(EtatVente.EN_COURS);
-			System.out.println("Mise à jour en EN_COURS pour l'article: " + article.getNoArticle());
-			articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.EN_COURS);
-		}
-
-		if (article.getEtatVente() == EtatVente.EN_COURS && today.isAfter(article.getDateFinEncheres())) {
-			article.setEtatVente(EtatVente.ENCHERES_TERMINEES);
-			System.out.println("Mise à jour en ENCHERES_TERMINEES pour l'article: " + article.getNoArticle());
-			articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.ENCHERES_TERMINEES);
-		}
+		verifierEtMettreAJourEtatVente(article);
 	}
 
 	// Filtre non connecté
