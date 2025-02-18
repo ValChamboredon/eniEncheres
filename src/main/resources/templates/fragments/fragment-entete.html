@@ -21,8 +21,8 @@
 
                 <!-- Options pour utilisateur non connecté -->
                 <div sec:authorize="!isAuthenticated()">
-                    <a th:href="@{/encheres/inscription}" class="text-white hover:underline mr-4">S'inscrire</a>
-                    <a th:href="@{/encheres/connexion}" class="text-white hover:underline">Se connecter</a>
+                    <a th:href="@{/inscription}" class="text-white hover:underline mr-4">S'inscrire</a>
+                    <a th:href="@{/connexion}" class="text-white hover:underline">Se connecter</a>
                 </div>
 
                 <!-- Options pour utilisateur connecté -->
