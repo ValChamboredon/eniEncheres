@@ -2,6 +2,7 @@ package fr.eni.eniEncheres.bo;
 
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class ArticleVendu {
      * Constructeur avec tous les attributs
      */
 
-    public ArticleVendu(String nomArticle, String description, LocalDate dateDebutEncheres, LocalDate dateFinEncheres,
+    public ArticleVendu(String nomArticle, String description, LocalDateTime dateDebutEncheres, LocalDateTime dateFinEncheres,
                         int miseAPrix, int prixVente, Utilisateur vendeur, Categorie categorie, Retrait lieuDeRetrait, String imageUrl) {
 
         this.nomArticle = nomArticle;

@@ -43,8 +43,8 @@ public class ArticleRowMapper implements RowMapper<ArticleVendu> {
 	    article.setPrixVente(rs.getInt("prix_vente"));
 
 	    // **Gestion des dates (sans les heures)**
-	    article.setDateDebutEncheres(rs.getDate("date_debut_encheres").toLocalDate());
-	    article.setDateFinEncheres(rs.getDate("date_fin_encheres").toLocalDate());
+	    article.setDateDebutEncheres(debutEncheresTimestamp != null ? debutEncheresTimestamp.toLocalDateTime() : null);
+	    article.setDateFinEncheres(finEncheresTimestamp != null ? finEncheresTimestamp.toLocalDateTime() : null);
 
 	    // **Vendeur**
 	    Utilisateur vendeur = new Utilisateur();

@@ -43,7 +43,7 @@ public class SecurityConfig {
         });
 
         security.formLogin(formLogin -> {
-            formLogin.loginPage("/connexion")..loginProcessingUrl("/connexion").defaultSuccessUrl("/encheres", true).permitAll();
+            formLogin.loginPage("/connexion").loginProcessingUrl("/connexion").defaultSuccessUrl("/encheres", true).permitAll();
         });
 
         security.logout(logout -> logout.invalidateHttpSession(true)
