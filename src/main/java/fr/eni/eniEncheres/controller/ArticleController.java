@@ -4,15 +4,11 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,20 +21,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import fr.eni.eniEncheres.bll.ArticleService;
 import fr.eni.eniEncheres.bll.CategorieService;
 import fr.eni.eniEncheres.bll.EnchereService;
-import org.springframework.web.multipart.MultipartFile;
-
-
 import fr.eni.eniEncheres.bll.UtilisateurService;
 import fr.eni.eniEncheres.bo.ArticleVendu;
 import fr.eni.eniEncheres.bo.Categorie;
+import fr.eni.eniEncheres.bo.Enchere;
 import fr.eni.eniEncheres.bo.EtatVente;
 import fr.eni.eniEncheres.bo.Retrait;
 import fr.eni.eniEncheres.bo.Utilisateur;
 
 import fr.eni.eniEncheres.exception.BusinessException;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-import java.nio.file.Path;
 
 @Controller
 @RequestMapping("/encheres")
@@ -91,22 +83,7 @@ public class ArticleController {
 	    }
 
 	    return "index"; // Retourne la vue index.html
-
-    }
-
-		Utilisateur utilisateur = null;
-		if (principal != null) {
-			utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
-		}
-		if (utilisateur == null) {
-	        utilisateur = new Utilisateur(); // Évite null dans le modèle
-	        utilisateur.setRue(""); 
-	        utilisateur.setCodePostal(""); 
-	        utilisateur.setVille("");
-	    }
-
-	    model.addAttribute("utilisateurConnecte", utilisateur);
-
+	}
 
     /**
      * Affiche la liste des articles sur la page principale avec les filtres.
@@ -233,13 +210,6 @@ public class ArticleController {
 	        return "redirect:/encheres/vendre";
 	    }
 	}
-	/**
-	 * Affiche le détail d'un article.
-	 */
-	@GetMapping("/article/detail/{noArticle}")
-	public String afficherDetailArticle(@PathVariable("noArticle") int noArticle, Model model, Principal principal) {
-		ArticleVendu article = articleService.getArticleById(noArticle);
-
 
     /**
      * Affiche le détail d'un article.
@@ -258,29 +228,7 @@ public class ArticleController {
         return "detailArticle";
     }
 
-    /**
-     * Modifie un article.
-     */
-    @PostMapping("/modifier")
-    public String modifierArticle(@RequestParam("articleId") int articleId,
-                                  @RequestParam("nomArticle") String nomArticle,
-                                  @RequestParam("description") String description,
-                                  @RequestParam("miseAPrix") int miseAPrix,
-                                  @RequestParam("dateDebutEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateDebutEncheres,
-                                  @RequestParam("dateFinEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFinEncheres,
-                                  Principal principal) {
-        ArticleVendu article = articleService.getArticleById(articleId);
-        if (article != null && article.getEtatVente().equals("CREEE") &&
-                article.getVendeur().getEmail().equals(principal.getName())) {
-            article.setNomArticle(nomArticle);
-            article.setDescription(description);
-            article.setMiseAPrix(miseAPrix);
-            article.setDateDebutEncheres(dateDebutEncheres);
-            article.setDateFinEncheres(dateFinEncheres);
-            articleService.modifierArticle(article);
-        }
-        return "redirect:/encheres/article/detail/" + articleId;
-    }
+  
     
     //@ModelAttribute("creditsUtilisateur")
 

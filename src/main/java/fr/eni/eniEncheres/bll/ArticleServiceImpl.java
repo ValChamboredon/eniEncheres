@@ -172,6 +172,16 @@ public class ArticleServiceImpl implements ArticleService {
 		return articleDAO.searchArticles(recherche, noCategorie);
 	}
 
+	@Override
+	public List<ArticleVendu> filtrerVentes(int userId, Boolean ventesEnCours, Boolean ventesNonDebutees,
+			Boolean ventesTerminees) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	}
+
 
 }
 
