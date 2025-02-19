@@ -1,5 +1,6 @@
 package fr.eni.eniEncheres.bo;
 
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,9 @@ public class ArticleVendu {
 
     
     private Retrait lieuDeRetrait;
-
+    
+    private String imageUrl;
+    
     /**
      * Constructeur par défaut
      */
@@ -53,8 +56,10 @@ public class ArticleVendu {
     /**
      * Constructeur avec tous les attributs
      */
-    public ArticleVendu(String nomArticle, String description, LocalDateTime dateDebutEncheres, LocalDateTime dateFinEncheres,
-                        int miseAPrix, int prixVente, Utilisateur vendeur, Categorie categorie, Retrait lieuDeRetrait) {
+
+    public ArticleVendu(String nomArticle, String description, LocalDate dateDebutEncheres, LocalDate dateFinEncheres,
+                        int miseAPrix, int prixVente, Utilisateur vendeur, Categorie categorie, Retrait lieuDeRetrait, String imageUrl) {
+
         this.nomArticle = nomArticle;
         this.description = description;
         this.dateDebutEncheres = dateDebutEncheres;
@@ -65,6 +70,7 @@ public class ArticleVendu {
         this.categorie = categorie;
         this.lieuDeRetrait = lieuDeRetrait != null ? lieuDeRetrait : new Retrait(vendeur.getRue(), vendeur.getCodePostal(), vendeur.getVille());
         this.etatVente = EtatVente.CREEE; // Valeur par défaut
+        this.imageUrl = imageUrl;
     }
 
     // Getters & Setters
@@ -159,6 +165,14 @@ public class ArticleVendu {
     public Retrait getLieuDeRetrait() {
         return lieuDeRetrait;
     }
+    
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
 
     public void setLieuDeRetrait(Retrait lieuDeRetrait) {
         // Si le retrait est null, on met l'adresse du vendeur par défaut

@@ -1,16 +1,17 @@
 package fr.eni.eniEncheres.bll;
 
 import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.eni.eniEncheres.bll.ArticleService;
 import fr.eni.eniEncheres.bo.ArticleVendu;
 import fr.eni.eniEncheres.bo.EtatVente;
 import fr.eni.eniEncheres.dal.ArticleDAO;
@@ -171,4 +172,6 @@ public class ArticleServiceImpl implements ArticleService {
 		return articleDAO.searchArticles(recherche, noCategorie);
 	}
 
+
 }
+

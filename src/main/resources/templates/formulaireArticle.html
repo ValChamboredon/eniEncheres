@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Enchères - Vendre un article</title>
+<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -13,13 +14,12 @@
 
 	<main class="container mx-auto p-6">
 		<div class="bg-white shadow-lg rounded-lg p-6 max-w-2xl mx-auto">
-			<h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Nouvelle
-				vente</h2>
+			<h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Nouvelle vente</h2>
 
-			<form th:action="@{/encheres/vendre}" method="post"
-				th:object="${article}" class="space-y-4">
+			<form th:action="@{/encheres/vendre}" method="post" th:object="${article}" class="space-y-4" enctype="multipart/form-data">
 
 				<div>
+
 					<label for="article" class="block font-medium text-gray-700">Article
 						:</label> <input type="text" id="article" name="nomArticle"
 						pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$" required
@@ -32,6 +32,7 @@
 					<textarea id="description" name="description"
 						pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$" rows="4" required
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"></textarea>
+
 				</div>
 
 				<div>
@@ -50,20 +51,24 @@
 						name="miseAPrix" min="1" required
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
-
+				<!-- Section Date enchère -->
 				<div>
 					<label for="dateDebutEncheres"
 						class="block font-medium text-gray-700">Début de l'enchère
+
 						:</label> <input type="datetime-local" id="dateDebutEncheres"
 						name="dateDebutEncheres" required
+
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
 
 				<div>
 					<label for="dateFinEncheres"
 						class="block font-medium text-gray-700">Fin de l'enchère :</label>
+
 					<input type="datetime-local" id="dateFinEncheres"
 						name="dateFinEncheres" required
+
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
 
@@ -77,6 +82,7 @@
 							th:value="${utilisateurConnecte != null ? utilisateurConnecte.rue : ''}"
 							required
 							class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
+
 					</div>
 
 					<div class="mt-2">
@@ -115,5 +121,6 @@
 </body>
 
 </html>
+
 
 

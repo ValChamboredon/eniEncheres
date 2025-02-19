@@ -122,7 +122,8 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 		namedParameterSource.addValue("email", email);
 		return namedParameterJdbcTemplate.queryForObject(FIND_BY_EMAIL, namedParameterSource, new UtilisateurRowMapper());
 	}
-
+	//	Supprimer le compte avec l'email, il faut que tous les articles qui ont été mit en vente par ce compte soient suppr aussi. 
+	//	Idem pour les enchères de faites. TODO
 	@Override
 	public void supprimerByEmail(String email) {
 		MapSqlParameterSource namedParameterSource = new MapSqlParameterSource();

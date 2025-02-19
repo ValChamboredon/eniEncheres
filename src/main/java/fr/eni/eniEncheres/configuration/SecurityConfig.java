@@ -2,24 +2,36 @@ package fr.eni.eniEncheres.configuration;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import fr.eni.eniEncheres.bll.UtilisateurService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+  
+  	@Autowired
+	private RememberMe rememberMe;
+
     @Bean
     SecurityFilterChain getFilterChain(HttpSecurity security) throws Exception {
         security.authorizeHttpRequests(auth -> {
             // Ressources statiques accessibles à tous
-            auth.requestMatchers("/css/*", "/images/*").permitAll();
+            auth.requestMatchers("/css/*", "/images/*", "/img/*").permitAll();
             
             // Pages accessibles sans authentification
             auth.requestMatchers("/", "/encheres", "/articles", "/inscription", "/connexion").permitAll();
@@ -31,7 +43,7 @@ public class SecurityConfig {
         });
 
         security.formLogin(formLogin -> {
-            formLogin.loginPage("/connexion").defaultSuccessUrl("/encheres", true).permitAll();
+            formLogin.loginPage("/connexion")..loginProcessingUrl("/connexion").defaultSuccessUrl("/encheres", true).permitAll();
         });
 
         security.logout(logout -> logout.invalidateHttpSession(true)
@@ -54,4 +66,5 @@ public class SecurityConfig {
                 "SELECT email AS username, 'ROLE_USER' AS authority FROM UTILISATEURS WHERE email = ?");
         return userManager;
     }
+
 }
