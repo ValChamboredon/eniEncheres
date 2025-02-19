@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Enchères - Vendre un article</title>
+<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -53,30 +54,18 @@
 				<!-- Section Date enchère -->
 				<div>
 					<label for="dateDebutEncheres"
-						class="block font-medium text-gray-700"> Début de
-						l'enchère : </label>
-					<div class="flex space-x-2">
-						<input type="date" id="dateDebutEncheres"
-							data-th-name="dateDebutEncheres" required
-							class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
-						<input type="time" id="heureDebutEncheres"
-							th:name="heureDebutEncheres" required
-							class="border border-gray-300 p-2 w-1/2 rounded focus:ring-2 focus:ring-blue-500">
-					</div>
+						class="block font-medium text-gray-700">Début de l'enchère
+						:</label> <input type="date" id="dateDebutEncheres"
+						th:field="*{dateDebutEncheres}" required
+						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
 
 				<div>
 					<label for="dateFinEncheres"
-						class="block font-medium text-gray-700"> Fin de l'enchère
-						: </label>
-					<div class="flex space-x-2">
-						<input type="date" id="dateFinEncheres"
-							data-th-name="dateFinEncheres" required
-							class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
-						<input type="time" id="heureFinEncheres"
-							th:name="heureFinEncheres" required
-							class="border border-gray-300 p-2 w-1/2 rounded focus:ring-2 focus:ring-blue-500">
-					</div>
+						class="block font-medium text-gray-700">Fin de l'enchère :</label>
+					<input type="date" id="dateFinEncheres"
+						th:field="*{dateFinEncheres}" required
+						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
 
 				<!-- Section Retrait -->
@@ -125,5 +114,6 @@
 </body>
 
 </html>
+
 
 

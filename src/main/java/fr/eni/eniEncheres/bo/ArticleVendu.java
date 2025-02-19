@@ -21,8 +21,8 @@ public class ArticleVendu {
     @NotBlank
     private String description;
 
-    private LocalDateTime dateDebutEncheres;
-    private LocalDateTime dateFinEncheres;
+    private LocalDate dateDebutEncheres;
+    private LocalDate dateFinEncheres;
 
     @Min(value = 1)
     private int miseAPrix;
@@ -54,7 +54,7 @@ public class ArticleVendu {
     /**
      * Constructeur avec tous les attributs
      */
-    public ArticleVendu(String nomArticle, String description, LocalDateTime dateDebutEncheres, LocalDateTime dateFinEncheres,
+    public ArticleVendu(String nomArticle, String description, LocalDate dateDebutEncheres, LocalDate dateFinEncheres,
                         int miseAPrix, int prixVente, Utilisateur vendeur, Categorie categorie, Retrait lieuDeRetrait) {
         this.nomArticle = nomArticle;
         this.description = description;
@@ -93,19 +93,19 @@ public class ArticleVendu {
         this.description = description;
     }
 
-    public LocalDateTime getDateDebutEncheres() {
+    public LocalDate getDateDebutEncheres() {
         return dateDebutEncheres;
     }
 
-    public void setDateDebutEncheres(LocalDateTime dateDebutEncheres) {
+    public void setDateDebutEncheres(LocalDate dateDebutEncheres) {
         this.dateDebutEncheres = dateDebutEncheres;
     }
 
-    public LocalDateTime getDateFinEncheres() {
+    public LocalDate getDateFinEncheres() {
         return dateFinEncheres;
     }
 
-    public void setDateFinEncheres(LocalDateTime dateFinEncheres) {
+    public void setDateFinEncheres(LocalDate dateFinEncheres) {
         this.dateFinEncheres = dateFinEncheres;
     }
 

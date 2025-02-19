@@ -29,6 +29,9 @@ public interface ArticleDAO {
 
 	public void modifierArticle(ArticleVendu article);
 
-	List<ArticleVendu> filtrerVentes(int userId, Boolean ventesEnCours, Boolean ventesNonDebutees,Boolean ventesTerminees);
+	List<ArticleVendu> filtrerVentes(int userId, Boolean ventesEnCours, Boolean ventesNonDebutees,
+			Boolean ventesTerminees);
 
+	List<ArticleVendu> filtrerAchats(int userId, Boolean encheresOuvertes, Boolean mesEncheresEnCours,
+			Boolean mesEncheresRemportees);
 }

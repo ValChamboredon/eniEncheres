@@ -21,44 +21,43 @@ public class ArticleRowMapper implements RowMapper<ArticleVendu> {
 
 	@Override
 	public ArticleVendu mapRow(ResultSet rs, int rowNum) throws SQLException {
-		ArticleVendu article = new ArticleVendu();
+	    ArticleVendu article = new ArticleVendu();
 
-		// Récupération des informations de l'article
-		article.setNoArticle(rs.getInt("no_article"));
-		article.setNomArticle(rs.getString("nom_article"));
-		article.setDescription(rs.getString("description"));
-		article.setMiseAPrix(rs.getInt("prix_initial"));
-		article.setPrixVente(rs.getInt("prix_vente"));
+	    // Récupération des informations de l'article
+	    article.setNoArticle(rs.getInt("no_article"));
+	    article.setNomArticle(rs.getString("nom_article"));
+	    article.setDescription(rs.getString("description"));
+	    article.setMiseAPrix(rs.getInt("prix_initial"));
+	    article.setPrixVente(rs.getInt("prix_vente"));
 
-		// **Gestion des dates et heures**
+	    // **Gestion des dates (sans les heures)**
+	    article.setDateDebutEncheres(rs.getDate("date_debut_encheres").toLocalDate());
+	    article.setDateFinEncheres(rs.getDate("date_fin_encheres").toLocalDate());
 
-		article.setDateDebutEncheres(rs.getTimestamp("date_debut_encheres").toLocalDateTime());
-		article.setDateFinEncheres(rs.getTimestamp("date_fin_encheres").toLocalDateTime());
+	    // **Vendeur**
+	    Utilisateur vendeur = new Utilisateur();
+	    vendeur.setNoUtilisateur(rs.getInt("no_utilisateur"));
+	    vendeur.setPseudo(rs.getString("pseudo"));
+	    vendeur.setEmail(rs.getString("email"));
+	    vendeur.setRue(rs.getString("user_rue"));
+	    vendeur.setCodePostal(rs.getString("user_code_postal"));
+	    vendeur.setVille(rs.getString("user_ville"));
+	    article.setVendeur(vendeur);
 
-		// **Vendeur**
-		Utilisateur vendeur = new Utilisateur();
-		vendeur.setNoUtilisateur(rs.getInt("no_utilisateur"));
-		vendeur.setPseudo(rs.getString("pseudo"));
-		vendeur.setEmail(rs.getString("email"));
-		vendeur.setRue(rs.getString("user_rue"));
-		vendeur.setCodePostal(rs.getString("user_code_postal"));
-		vendeur.setVille(rs.getString("user_ville"));
-		article.setVendeur(vendeur);
+	    // **Catégorie**
+	    Categorie categorie = new Categorie();
+	    categorie.setNoCategorie(rs.getInt("no_categorie"));
+	    categorie.setLibelle(rs.getString("libelle"));
+	    article.setCategorie(categorie);
 
-		// **Catégorie**
-		Categorie categorie = new Categorie();
-		categorie.setNoCategorie(rs.getInt("no_categorie"));
-		categorie.setLibelle(rs.getString("libelle"));
-		article.setCategorie(categorie);
+	    // **Lieu de retrait**
+	    Retrait lieuDeRetrait = new Retrait();
+	    lieuDeRetrait.setRue(rs.getString("retrait_rue"));
+	    lieuDeRetrait.setCodePostal(rs.getString("retrait_code_postal"));
+	    lieuDeRetrait.setVille(rs.getString("retrait_ville"));
+	    article.setLieuDeRetrait(lieuDeRetrait);
 
-		// **Lieu de retrait**
-		Retrait lieuDeRetrait = new Retrait();
-		lieuDeRetrait.setRue(rs.getString("retrait_rue"));
-		lieuDeRetrait.setCodePostal(rs.getString("retrait_code_postal"));
-		lieuDeRetrait.setVille(rs.getString("retrait_ville"));
-		article.setLieuDeRetrait(lieuDeRetrait);
-
-		return article;
+	    return article;
 	}
 
 }
