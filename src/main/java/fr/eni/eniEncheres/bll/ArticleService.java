@@ -18,6 +18,8 @@ public interface ArticleService {
 	public void modifierArticle(ArticleVendu article);
 	    
 	void mettreAJourEtatVente(ArticleVendu article);
+	
+	void mettreAJourEtatDesArticles();
 
 	//Filtre
 	public List<ArticleVendu> rechercherArticles(String recherche, Integer noCategorie);

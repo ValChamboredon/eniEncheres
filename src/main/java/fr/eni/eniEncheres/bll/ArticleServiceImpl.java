@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import fr.eni.eniEncheres.bo.ArticleVendu;
 import fr.eni.eniEncheres.bo.EtatVente;
@@ -93,6 +94,12 @@ public class ArticleServiceImpl implements ArticleService {
 	private void verifierEtMettreAJourEtatVente(ArticleVendu article) {
         LocalDateTime now = LocalDateTime.now();
         
+        System.out.println("Vérification article #" + article.getNoArticle());
+        System.out.println("État actuel : " + article.getEtatVente());
+        System.out.println("Date début : " + article.getDateDebutEncheres());
+        System.out.println("Date fin : " + article.getDateFinEncheres());
+        System.out.println("Date actuelle : " + now);
+        
         // Vérification pour passage à EN_COURS
         if (article.getEtatVente() == EtatVente.CREEE && 
             (now.isEqual(article.getDateDebutEncheres()) || 
@@ -148,6 +155,14 @@ public class ArticleServiceImpl implements ArticleService {
 	 */
 	public void mettreAJourEtatVente(ArticleVendu article) {
 		verifierEtMettreAJourEtatVente(article);
+	}
+	
+	@Transactional
+	public void mettreAJourEtatDesArticles() {
+	    List<ArticleVendu> articles = articleDAO.getAllArticles();
+	    for (ArticleVendu article : articles) {
+	        verifierEtMettreAJourEtatVente(article);
+	    }
 	}
 
 	// Filtre non connecté

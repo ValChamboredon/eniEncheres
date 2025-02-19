@@ -1,14 +1,10 @@
 package fr.eni.eniEncheres.controller;
 
-import java.util.Collections;
-
 import java.security.Principal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -24,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.bind.annotation.*;
-
 import fr.eni.eniEncheres.bll.ArticleService;
 import fr.eni.eniEncheres.bll.CategorieService;
 import fr.eni.eniEncheres.bll.EnchereService;
@@ -38,8 +32,6 @@ import fr.eni.eniEncheres.bo.Enchere;
 import fr.eni.eniEncheres.bo.EtatVente;
 import fr.eni.eniEncheres.bo.Retrait;
 import fr.eni.eniEncheres.bo.Utilisateur;
-
-import fr.eni.eniEncheres.bo.*;
 
 import fr.eni.eniEncheres.exception.BusinessException;
 import jakarta.validation.Valid;
@@ -140,28 +132,74 @@ public class ArticleController {
 	 * Enregistre un article mis en vente.
 	 */
 	@PostMapping("/vendre")
-	public String mettreArticleEnVente(@Valid @ModelAttribute("article") ArticleVendu article,
-			BindingResult bindingResult, Model model, Principal principal) {
-		if (bindingResult.hasErrors()) {
-			return "formulaireArticle";
-		}
+	public String mettreArticleEnVente(
+	    @RequestParam("nomArticle") String nomArticle,
+	    @RequestParam("description") String description,
+	    @RequestParam("categorie") int categorieId,
+	    @RequestParam("miseAPrix") int miseAPrix,
+	    @RequestParam("dateDebutEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateDebutEncheres,
+	    @RequestParam("dateFinEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateFinEncheres,
+	    @RequestParam("rue") String rue,
+	    @RequestParam("codePostal") String codePostal,
+	    @RequestParam("ville") String ville,
+	    RedirectAttributes redirectAttributes,
+	    Principal principal) {
 
-		if (principal != null) {
-			Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
-			article.setVendeur(utilisateur);
+	    try {
+	        // Récupérer l'utilisateur connecté
+	        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+	        
+	        // Récupérer la catégorie
+	        Categorie categorie = categorieService.getCategorieById(categorieId);
 
-			try {
-				articleService.creerArticle(article);
-				return "redirect:/encheres";
-			} catch (BusinessException be) {
-				bindingResult.addError(new ObjectError("globalError", be.getMessage()));
-				return "formulaireArticle";
-			}
-		}
+	        // Créer un nouvel article
+	        ArticleVendu article = new ArticleVendu();
+	        article.setNomArticle(nomArticle);
+	        article.setDescription(description);
+	        article.setVendeur(utilisateur);
+	        article.setCategorie(categorie);
+	        article.setMiseAPrix(miseAPrix);
+	        article.setDateDebutEncheres(dateDebutEncheres);
+	        article.setDateFinEncheres(dateFinEncheres);
+	        
+	     // Ajouter des logs de débogage
+	        System.out.println("Création d'article:");
+	        System.out.println("Nom: " + nomArticle);
+	        System.out.println("Description: " + description);
+	        System.out.println("Catégorie ID: " + categorieId);
+	        System.out.println("Mise à prix: " + miseAPrix);
+	        System.out.println("Date début: " + dateDebutEncheres);
+	        System.out.println("Date fin: " + dateFinEncheres);
 
-		return "redirect:/encheres/connexion";
+	        // Définir le lieu de retrait
+	        Retrait retrait = new Retrait(rue, codePostal, ville);
+	        article.setLieuDeRetrait(retrait);
+
+	        // Prix de vente initial = mise à prix
+	        article.setPrixVente(miseAPrix);
+
+	        // Créer l'article
+	        articleService.creerArticle(article);
+
+	        redirectAttributes.addFlashAttribute("success", "Article mis en vente avec succès");
+	        return "redirect:/encheres";
+
+	    } catch (BusinessException be) {
+	        // Log des erreurs métier
+	        System.err.println("Erreurs de validation :");
+	        be.getMessagesErreur().forEach(System.err::println);
+
+	        redirectAttributes.addFlashAttribute("erreurs", be.getMessagesErreur());
+	        return "redirect:/encheres/vendre";
+	    } catch (Exception e) {
+	        // Log de l'exception technique
+	        System.err.println("Erreur technique lors de la création de l'article:");
+	        e.printStackTrace();
+
+	        redirectAttributes.addFlashAttribute("erreur", "Erreur technique lors de la création de l'article");
+	        return "redirect:/encheres/vendre";
+	    }
 	}
-
 	/**
 	 * Affiche le détail d'un article.
 	 */
@@ -296,7 +334,22 @@ public class ArticleController {
          // Vérification que l'article est bien EN_COURS
             if (article.getEtatVente() != EtatVente.EN_COURS) {
             	System.out.println("Article non en vente: " + article.getEtatVente());
-                redirectAttributes.addFlashAttribute("erreur", "ERR_ARTICLE_NON_EN_VENTE");
+                redirectAttributes.addFlashAttribute("erreur", "L'article n'est pas en cours d'enchère");
+                return "redirect:/encheres/article/detail/" + articleId;
+            }
+            
+         // Récupérer l'enchère courante la plus haute
+            Enchere enchereActuelle = enchereService.getMeilleureEnchere(articleId);
+            
+         // Vérifier que le montant est supérieur à l'enchère actuelle
+            if (enchereActuelle != null && montantEnchere <= enchereActuelle.getMontantEnchere()) {
+                redirectAttributes.addFlashAttribute("erreur", "Le montant doit être supérieur à l'enchère actuelle");
+                return "redirect:/encheres/article/detail/" + articleId;
+            }
+            
+         // Vérifier que l'utilisateur a assez de crédits
+            if (utilisateur.getCredit() < montantEnchere) {
+                redirectAttributes.addFlashAttribute("erreur", "Crédit insuffisant");
                 return "redirect:/encheres/article/detail/" + articleId;
             }
             

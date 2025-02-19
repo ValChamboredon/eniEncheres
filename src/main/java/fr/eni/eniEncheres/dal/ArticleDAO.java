@@ -23,7 +23,7 @@ public interface ArticleDAO {
 
     public void modifierArticle(ArticleVendu article);
 
- 
+   
 
     
 }

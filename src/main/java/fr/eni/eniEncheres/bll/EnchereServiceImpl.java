@@ -65,11 +65,11 @@ public class EnchereServiceImpl implements EnchereService {
             businessException.addCleErreur("ERR_ARTICLE_OBLIGATOIRE");
         }
 
-        try {
+       
             // 1. Obtenir la meilleure enchère actuelle
             List<Enchere> encheres = enchereDAO.getEnchereParArticle(article);
             Enchere meilleureEnchere = encheres.isEmpty() ? null : encheres.get(0);
-
+            try {
             // 2. Vérifier que l'utilisateur a assez de crédit
             creditService.verifierCredit(enchere.getUtilisateur().getNoUtilisateur(), enchere.getMontantEnchere());
 
@@ -81,6 +81,8 @@ public class EnchereServiceImpl implements EnchereService {
                     meilleureEnchere.getUtilisateur().getNoUtilisateur(),  // destination (ancien enchérisseur)
                     meilleureEnchere.getMontantEnchere()
                 );
+                
+              enchereDAO.supprimerEnchere(meilleureEnchere);
             }
 
             // 4. Débiter le nouvel enchérisseur
@@ -186,6 +188,13 @@ public class EnchereServiceImpl implements EnchereService {
             throw creditException;
         }
     }
+
+	@Override
+	public Enchere getMeilleureEnchere(int articleId) throws BusinessException {
+		ArticleVendu article = articleDAO.getArticleById(articleId);
+		List<Enchere> encheres = enchereDAO.getEnchereParArticle(article);
+		return encheres.isEmpty() ? null : encheres.get(0);
+	}
 
 //    @Override
 //    public List<Enchere> getEncheresByUtilisateur(int noUtilisateur) throws BusinessException {

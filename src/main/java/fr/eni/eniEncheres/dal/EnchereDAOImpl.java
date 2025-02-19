@@ -21,14 +21,30 @@ public class EnchereDAOImpl implements EnchereDAO {
     @Override
     public void ajouterEnchere(Enchere enchere) throws BusinessException {
         try {
+        	// D'abord, supprimez l'ancienne enchère de cet utilisateur pour cet article
+            String deleteSql = "DELETE FROM ENCHERES WHERE no_utilisateur = ? AND no_article = ?";
+            jdbcTemplate.update(deleteSql, 
+                enchere.getUtilisateur().getNoUtilisateur(),
+                enchere.getArticle().getNoArticle()
+            );
+            // Ensuite, insérez la nouvelle enchère
             String sql = "INSERT INTO ENCHERES (no_utilisateur, no_article, date_enchere, montant_enchere) VALUES (?, ?, ?, ?)";
-            jdbcTemplate.update(sql, 
+            int rowsAffected = jdbcTemplate.update(sql, 
                 enchere.getUtilisateur().getNoUtilisateur(),
                 enchere.getArticle().getNoArticle(),
                 enchere.getDateEnchere(),
                 enchere.getMontantEnchere()
             );
+            
+         // Ajoutez ces logs pour vérifier
+            System.out.println("Rows affected: " + rowsAffected);
+            System.out.println("Utilisateur ID: " + enchere.getUtilisateur().getNoUtilisateur());
+            System.out.println("Article ID: " + enchere.getArticle().getNoArticle());
+            System.out.println("Date Enchère: " + enchere.getDateEnchere());
+            System.out.println("Montant Enchère: " + enchere.getMontantEnchere());
+            
         } catch (Exception e) {
+        	e.printStackTrace();
             BusinessException be = new BusinessException();
             be.addCleErreur("ERR_INSERTION_ENCHERE");
             throw be;
@@ -102,6 +118,21 @@ public class EnchereDAOImpl implements EnchereDAO {
             throw be;
         }
     }
+
+	@Override
+	public void supprimerEnchere(Enchere enchere) throws BusinessException {
+		try {
+	        String sql = "DELETE FROM ENCHERES WHERE no_utilisateur = ? AND no_article = ?";
+	        jdbcTemplate.update(sql, 
+	            enchere.getUtilisateur().getNoUtilisateur(),
+	            enchere.getArticle().getNoArticle()
+	        );
+	    } catch (Exception e) {
+	        BusinessException be = new BusinessException();
+	        be.addCleErreur("ERR_SUPPRESSION_ENCHERE");
+	        throw be;
+	    }
+	}
 
 //	@Override
 //	public List<Enchere> getEncheresByUtilisateur(int noUtilisateur) {

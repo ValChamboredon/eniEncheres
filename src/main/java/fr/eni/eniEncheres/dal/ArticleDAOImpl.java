@@ -148,7 +148,8 @@ public class ArticleDAOImpl implements ArticleDAO {
 	                 "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur " +
 	                 "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie " +
 	                 "LEFT JOIN RETRAITS r ON av.no_article = r.no_article " +
-	                 "WHERE av.etat_vente = 'EN_COURS' " + 
+	                 "WHERE (av.etat_vente = 'CREEE' AND av.date_debut_encheres <= CURRENT_TIMESTAMP) " + 
+	                 "   OR av.etat_vente = 'EN_COURS' " +
 	                 "AND (:keyword IS NULL OR av.nom_article LIKE :keyword) " +
 	                 "AND (:categoryId = 0 OR av.no_categorie = :categoryId)";
 
@@ -176,7 +177,10 @@ public class ArticleDAOImpl implements ArticleDAO {
 	    params.addValue("etat_vente", nouvelEtat.name());  // Convertit l'Enum en String
 	    params.addValue("no_article", noArticle);
 
-	    namedParameterJdbcTemplate.update(sql, params);
+	    int rowsUpdated = namedParameterJdbcTemplate.update(sql, params);
+	    System.out.println("Mise à jour de l'état de vente - Article #" + noArticle + 
+	                       ", Nouvel état : " + nouvelEtat.name() + 
+	                       ", Lignes mises à jour : " + rowsUpdated);
 	}
 
 	@Override

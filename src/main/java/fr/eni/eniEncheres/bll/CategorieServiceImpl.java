@@ -10,7 +10,8 @@ import java.util.List;
 	@Service
 	public class CategorieServiceImpl implements CategorieService {
 	
-	    private final CategorieDAO categorieDAO;
+		@Autowired
+	    private CategorieDAO categorieDAO;
 	
 	    public CategorieServiceImpl(CategorieDAO categorieDAO) {
 	        this.categorieDAO = categorieDAO;
@@ -33,13 +34,8 @@ import java.util.List;
 	    }
 	
 	    @Override
-	    public Categorie getCategorieById(int noCategorie) throws BusinessException {
-	        if (noCategorie <= 0) {
-	            BusinessException be = new BusinessException();
-	            be.addCleErreur("ERR_CATEGORIE_ID_INVALIDE");
-	            throw be;
-	        }
-	        return categorieDAO.getCategorieById(noCategorie);
+	    public Categorie getCategorieById(int id) throws BusinessException {
+	        return categorieDAO.getCategorieById(id);
 	    }
 	
 	    @Override

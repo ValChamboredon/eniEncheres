@@ -10,7 +10,7 @@ public interface EnchereDAO {
     void ajouterEnchere(Enchere enchere) throws BusinessException;
     List<Enchere> getEnchereParArticle(ArticleVendu articleVendu) throws BusinessException;
 //    Enchere getEnchereMaxParArticle(int noArticle) throws BusinessException;
-    //void supprimerEncheresParArticle(int noArticle) throws BusinessException;
+    void supprimerEnchere(Enchere enchere) throws BusinessException;
     void mettreAJourEnchere(Enchere enchere) throws BusinessException;
 	//List<Enchere> getEncheresByUtilisateur(int noUtilisateur);
 }

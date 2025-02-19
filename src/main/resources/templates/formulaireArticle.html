@@ -21,7 +21,7 @@
 
 				<div>
 					<label for="article" class="block font-medium text-gray-700">Article
-						:</label> <input type="text" id="article" data-th-name="nomArticle"
+						:</label> <input type="text" id="article" name="nomArticle"
 						pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$" required
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
@@ -29,14 +29,14 @@
 				<div>
 					<label for="description" class="block font-medium text-gray-700">Description
 						:</label>
-					<textarea id="description" data-th-name="description"
+					<textarea id="description" name="description"
 						pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$" rows="4" required
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"></textarea>
 				</div>
 
 				<div>
 					<label for="categorie" class="block font-medium text-gray-700">Catégorie
-						:</label> <select id="categorie" data-th-name="categorie" required
+						:</label> <select id="categorie" name="categorie" required
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 						<option value="">Veuillez sélectionner une catégorie</option>
 						<option data-th-each="cat : ${CategoriesEnSession}"
@@ -47,23 +47,23 @@
 				<div>
 					<label for="miseAPrix" class="block font-medium text-gray-700">Mise
 						à prix :</label> <input type="number" id="miseAPrix"
-						data-th-name="miseAPrix" min="1" required
+						name="miseAPrix" min="1" required
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
 
 				<div>
 					<label for="dateDebutEncheres"
 						class="block font-medium text-gray-700">Début de l'enchère
-						:</label> <input type="date" id="dateDebutEncheres"
-						data-th-name="dateDebutEncheres" required
+						:</label> <input type="datetime-local" id="dateDebutEncheres"
+						name="dateDebutEncheres" required
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
 
 				<div>
 					<label for="dateFinEncheres"
 						class="block font-medium text-gray-700">Fin de l'enchère :</label>
-					<input type="date" id="dateFinEncheres"
-						data-th-name="dateFinEncheres" required
+					<input type="datetime-local" id="dateFinEncheres"
+						name="dateFinEncheres" required
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
 

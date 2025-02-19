@@ -25,7 +25,7 @@ public interface EnchereService {
     /**
      * Récupère l'enchère la plus élevée pour un article
      */
-  //  Enchere getEnchereMaxParArticle(int noArticle) throws BusinessException;
+    Enchere getMeilleureEnchere(int articleId) throws BusinessException;
 
     /**
      * Supprime toutes les enchères d'un article
