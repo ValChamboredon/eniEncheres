@@ -118,22 +118,29 @@ public class ArticleDAOImpl implements ArticleDAO {
 	// utilisateur pas co
 	@Override
 	public List<ArticleVendu> searchArticles(String keyword, int categoryId) {
-		String sql = "SELECT av.*, " + "u.no_utilisateur, u.pseudo, u.email, "
-				+ "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, "
-				+ "c.no_categorie, c.libelle, " + "COALESCE(r.rue, u.rue) AS retrait_rue, "
-				+ "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, "
-				+ "COALESCE(r.ville, u.ville) AS retrait_ville " + "FROM ARTICLES_VENDUS av "
-				+ "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur "
-				+ "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie "
-				+ "LEFT JOIN RETRAITS r ON av.no_article = r.no_article " + "WHERE av.etat_vente = 'EN_COURS' "
-				+ "AND (:keyword IS NULL OR av.nom_article LIKE :keyword) "
-				+ "AND (:categoryId = 0 OR av.no_categorie = :categoryId)";
 
-		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("keyword", keyword != null && !keyword.isEmpty() ? "%" + keyword + "%" : null);
-		params.addValue("categoryId", categoryId);
+	    String sql = "SELECT av.*, " +
+	                 "u.no_utilisateur, u.pseudo, u.email, " +
+	                 "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, " +
+	                 "c.no_categorie, c.libelle, " +
+	                 "COALESCE(r.rue, u.rue) AS retrait_rue, " +
+	                 "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, " +
+	                 "COALESCE(r.ville, u.ville) AS retrait_ville " +
+	                 "FROM ARTICLES_VENDUS av " +
+	                 "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur " +
+	                 "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie " +
+	                 "LEFT JOIN RETRAITS r ON av.no_article = r.no_article " +
+	                 "WHERE (av.etat_vente = 'CREEE' AND av.date_debut_encheres <= CURRENT_TIMESTAMP) " + 
+	                 "   OR av.etat_vente = 'EN_COURS' " +
+	                 "AND (:keyword IS NULL OR av.nom_article LIKE :keyword) " +
+	                 "AND (:categoryId = 0 OR av.no_categorie = :categoryId)";
 
-		return namedParameterJdbcTemplate.query(sql, params, new ArticleRowMapper());
+	    MapSqlParameterSource params = new MapSqlParameterSource();
+	    params.addValue("keyword", keyword != null && !keyword.isEmpty() ? "%" + keyword + "%" : null);
+	    params.addValue("categoryId", categoryId);
+
+	    return namedParameterJdbcTemplate.query(sql, params, new ArticleRowMapper());
+
 	}
 
 	@Override
@@ -150,7 +157,12 @@ public class ArticleDAOImpl implements ArticleDAO {
 		params.addValue("etat_vente", nouvelEtat.name()); // Convertit l'Enum en String
 		params.addValue("no_article", noArticle);
 
-		namedParameterJdbcTemplate.update(sql, params);
+
+	    int rowsUpdated = namedParameterJdbcTemplate.update(sql, params);
+	    System.out.println("Mise à jour de l'état de vente - Article #" + noArticle + 
+	                       ", Nouvel état : " + nouvelEtat.name() + 
+	                       ", Lignes mises à jour : " + rowsUpdated);
+
 	}
 
 	@Override
@@ -170,6 +182,20 @@ public class ArticleDAOImpl implements ArticleDAO {
 				article.getDateFinEncheres(), article.getMiseAPrix(), article.getNoArticle());
 
 	}
+
+
+	@Override
+	public void updatePrixVente(int noArticle, int nouveauPrix) {
+	    String sql = "UPDATE ARTICLES_VENDUS SET prix_vente = :prix_vente WHERE no_article = :no_article";
+	    
+	    MapSqlParameterSource params = new MapSqlParameterSource();
+	    params.addValue("prix_vente", nouveauPrix);
+	    params.addValue("no_article", noArticle);
+
+	    namedParameterJdbcTemplate.update(sql, params);
+	}
+	
+
 
 	
 	//Methode pour filtrer les ventes en fonction de l'utilisateur co. Vente en cours,terminées et pas commencées.
@@ -212,6 +238,7 @@ public class ArticleDAOImpl implements ArticleDAO {
 
 	    return namedParameterJdbcTemplate.query(sql.toString(), params, new ArticleRowMapper());
 	}
+
 
 
 	//filtrer les achats en fonction de l'utilisateur co. Toutes les enchères, les enchères auxquelles il participe et les enchères win

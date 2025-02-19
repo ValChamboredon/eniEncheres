@@ -19,23 +19,25 @@
 			<form th:action="@{/encheres/vendre}" method="post" th:object="${article}" class="space-y-4" enctype="multipart/form-data">
 
 				<div>
-					<label for="article" class="block font-medium text-gray-700">Article:</label> 
-					<input type="text" id="article" data-th-name="nomArticle" pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$" required class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
+
+					<label for="article" class="block font-medium text-gray-700">Article
+						:</label> <input type="text" id="article" name="nomArticle"
+						pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$" required
+						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
 
 				<div>
-					<label for="description" class="block font-medium text-gray-700">Description :</label>
-					<textarea id="description" data-th-name="description" pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$" rows="4" required class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"></textarea>
-				</div>
-				
-				<div>
-					<label for="image" class="block font-medium text-gray-700">Insérer une image</label>
-					<input type="file" id="image" data-th-name="image">
+					<label for="description" class="block font-medium text-gray-700">Description
+						:</label>
+					<textarea id="description" name="description"
+						pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$" rows="4" required
+						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"></textarea>
+
 				</div>
 
 				<div>
 					<label for="categorie" class="block font-medium text-gray-700">Catégorie
-						:</label> <select id="categorie" data-th-name="categorie" required
+						:</label> <select id="categorie" name="categorie" required
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 						<option value="">Veuillez sélectionner une catégorie</option>
 						<option data-th-each="cat : ${CategoriesEnSession}"
@@ -46,23 +48,27 @@
 				<div>
 					<label for="miseAPrix" class="block font-medium text-gray-700">Mise
 						à prix :</label> <input type="number" id="miseAPrix"
-						data-th-name="miseAPrix" min="1" required
+						name="miseAPrix" min="1" required
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
 				<!-- Section Date enchère -->
 				<div>
 					<label for="dateDebutEncheres"
 						class="block font-medium text-gray-700">Début de l'enchère
-						:</label> <input type="date" id="dateDebutEncheres"
-						th:field="*{dateDebutEncheres}" required
+
+						:</label> <input type="datetime-local" id="dateDebutEncheres"
+						name="dateDebutEncheres" required
+
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
 
 				<div>
 					<label for="dateFinEncheres"
 						class="block font-medium text-gray-700">Fin de l'enchère :</label>
-					<input type="date" id="dateFinEncheres"
-						th:field="*{dateFinEncheres}" required
+
+					<input type="datetime-local" id="dateFinEncheres"
+						name="dateFinEncheres" required
+
 						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
 
@@ -82,17 +88,20 @@
 					<div class="mt-2">
 						<label for="codePostal" class="block font-medium text-gray-700">Code
 							postal :</label> <input type="text" id="codePostal" name="codePostal"
-							th:value="${utilisateurConnecte.codePostal}" required
+							th:value="${utilisateurConnecte != null ? utilisateurConnecte.codePostal : ''}"
+							required
 							class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 					</div>
 
 					<div class="mt-2">
 						<label for="ville" class="block font-medium text-gray-700">Ville
 							:</label> <input type="text" id="ville" name="ville"
-							th:value="${utilisateurConnecte.ville}" required
+							th:value="${utilisateurConnecte != null ? utilisateurConnecte.ville : ''}"
+							required
 							class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 					</div>
 				</fieldset>
+
 
 
 				<!-- Boutons -->

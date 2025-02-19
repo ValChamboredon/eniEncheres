@@ -1,6 +1,6 @@
 package fr.eni.eniEncheres.bo;
 
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +21,8 @@ public class ArticleVendu {
     @NotBlank
     private String description;
 
-    private LocalDate dateDebutEncheres;
-    private LocalDate dateFinEncheres;
+    private LocalDateTime dateDebutEncheres;
+    private LocalDateTime dateFinEncheres;
 
     @Min(value = 1)
     private int miseAPrix;
@@ -56,8 +56,10 @@ public class ArticleVendu {
     /**
      * Constructeur avec tous les attributs
      */
+
     public ArticleVendu(String nomArticle, String description, LocalDate dateDebutEncheres, LocalDate dateFinEncheres,
                         int miseAPrix, int prixVente, Utilisateur vendeur, Categorie categorie, Retrait lieuDeRetrait, String imageUrl) {
+
         this.nomArticle = nomArticle;
         this.description = description;
         this.dateDebutEncheres = dateDebutEncheres;
@@ -96,19 +98,19 @@ public class ArticleVendu {
         this.description = description;
     }
 
-    public LocalDate getDateDebutEncheres() {
+    public LocalDateTime getDateDebutEncheres() {
         return dateDebutEncheres;
     }
 
-    public void setDateDebutEncheres(LocalDate dateDebutEncheres) {
+    public void setDateDebutEncheres(LocalDateTime dateDebutEncheres) {
         this.dateDebutEncheres = dateDebutEncheres;
     }
 
-    public LocalDate getDateFinEncheres() {
+    public LocalDateTime getDateFinEncheres() {
         return dateFinEncheres;
     }
 
-    public void setDateFinEncheres(LocalDate dateFinEncheres) {
+    public void setDateFinEncheres(LocalDateTime dateFinEncheres) {
         this.dateFinEncheres = dateFinEncheres;
     }
 

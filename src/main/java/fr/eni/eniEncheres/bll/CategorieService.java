@@ -18,7 +18,7 @@ public interface CategorieService {
      * @return La catégorie trouvée ou null si inexistante.
      * @throws BusinessException en cas d'erreur lors de la récupération
      */
-    Categorie getCategorieById(int noCategorie) throws BusinessException;
+    Categorie getCategorieById(int id) throws BusinessException;
 
     /**
      * Récupère la liste de toutes les catégories.

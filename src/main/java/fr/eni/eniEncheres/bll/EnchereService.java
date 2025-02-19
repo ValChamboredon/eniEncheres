@@ -1,45 +1,44 @@
+package fr.eni.eniEncheres.bll;
 
-// * Interface du service métier pour la gestion des enchères.
-// * Définit les opérations métiers possibles sur les enchères
-// */
-//package fr.eni.eniEncheres.bll;
-//
-//import fr.eni.eniEncheres.bo.Enchere;
-//import fr.eni.eniEncheres.exception.BusinessException;
-//
-//import java.util.List;
-//
-//public interface EnchereService {
-//    /**
-//     * Ajoute une nouvelle enchère.
-//     * @param enchere L'enchère à ajouter.
-//     */
-//    void ajouterEnchere(Enchere enchere) throws BusinessException;
-//
-//    /**
-//     * Récupère toutes les enchères associées à un article donné.
-//     * @param noArticle Identifiant de l'article.
-//     * @return Liste des enchères associées.
-//     */
-//    List<Enchere> getEncheresParArticle(int noArticle) throws BusinessException;
-//
-//    /**
-//     * Récupère l'enchère avec le montant le plus élevé pour un article donné.
-//     * @param noArticle Identifiant de l'article.
-//     * @return L'enchère avec le montant maximal.
-//     */
-//    Enchere getEnchereMaxParArticle(int noArticle) throws BusinessException;
-//
-//    /**
-//     * Supprime toutes les enchères liées à un article donné.
-//     * @param noArticle Identifiant de l'article.
-//     */
-//    void supprimerEncheresParArticle(int noArticle) throws BusinessException;
-//
-//    /**
-//     * Met à jour une enchère existante.
-//     * @param enchere L'enchère mise à jour.
-//     */
-//    void mettreAJourEnchere(Enchere enchere) throws BusinessException;
-//}
+import fr.eni.eniEncheres.bo.ArticleVendu;
+import fr.eni.eniEncheres.bo.Enchere;
+import fr.eni.eniEncheres.exception.BusinessException;
+import java.util.List;
 
+public interface EnchereService {
+    /**
+     * Ajoute une nouvelle enchère.
+     * Vérifie que le montant est supérieur à l'enchère actuelle,
+     * que l'utilisateur a assez de crédit,
+     * et gère le remboursement de l'enchérisseur précédent.
+     *
+     * @param enchere L'enchère à ajouter
+     * @throws BusinessException si l'enchère n'est pas valide ou si l'utilisateur n'a pas assez de crédit
+     */
+    void ajouterEnchere(Enchere enchere) throws BusinessException;
+
+    /**
+     * Récupère toutes les enchères pour un article
+     */
+    List<Enchere> getEncheresParArticle(ArticleVendu noArticle) throws BusinessException;
+
+    /**
+     * Récupère l'enchère la plus élevée pour un article
+     */
+    Enchere getMeilleureEnchere(int articleId) throws BusinessException;
+
+    /**
+     * Supprime toutes les enchères d'un article
+     */
+   // void supprimerEncheresParArticle(int noArticle) throws BusinessException;
+
+    /**
+     * Met à jour une enchère existante
+     */
+    void mettreAJourEnchere(Enchere enchere) throws BusinessException;
+
+    /**
+     * Récupère les enchères d'un utilisateur
+     */
+  //  List<Enchere> getEncheresByUtilisateur(int noUtilisateur) throws BusinessException;
+}
