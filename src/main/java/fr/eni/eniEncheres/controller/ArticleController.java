@@ -85,58 +85,92 @@ public class ArticleController {
 	    return "index"; // Retourne la vue index.html
 	}
 
-    /**
-     * Affiche la liste des articles sur la page principale avec les filtres.
-     */
-    @GetMapping
-    public String afficherLesArticles(
-            @RequestParam(value = "recherche", required = false) String recherche,
-            @RequestParam(value = "categorie", required = false, defaultValue = "0") Integer noCategorie,
-            @RequestParam(value = "typeRecherche", required = false) String typeRecherche,
-            @RequestParam(value = "encheresOuvertes", required = false) Boolean encheresOuvertes,
-            @RequestParam(value = "mesEncheresEnCours", required = false) Boolean mesEncheresEnCours,
-            @RequestParam(value = "mesEncheresRemportees", required = false) Boolean mesEncheresRemportees,
-            @RequestParam(value = "ventesEnCours", required = false) Boolean ventesEnCours,
-            @RequestParam(value = "ventesNonDebutees", required = false) Boolean ventesNonDebutees,
-            @RequestParam(value = "ventesTerminees", required = false) Boolean ventesTerminees,
-            Model model, Principal principal) {
+//    /**
+//     * Affiche la liste des articles sur la page principale avec les filtres.
+//     */
+//    @GetMapping
+//    public String afficherLesArticles(
+//            @RequestParam(value = "recherche", required = false) String recherche,
+//            @RequestParam(value = "categorie", required = false, defaultValue = "0") Integer noCategorie,
+//            @RequestParam(value = "typeRecherche", required = false) String typeRecherche,
+//            @RequestParam(value = "encheresOuvertes", required = false) Boolean encheresOuvertes,
+//            @RequestParam(value = "mesEncheresEnCours", required = false) Boolean mesEncheresEnCours,
+//            @RequestParam(value = "mesEncheresRemportees", required = false) Boolean mesEncheresRemportees,
+//            @RequestParam(value = "ventesEnCours", required = false) Boolean ventesEnCours,
+//            @RequestParam(value = "ventesNonDebutees", required = false) Boolean ventesNonDebutees,
+//            @RequestParam(value = "ventesTerminees", required = false) Boolean ventesTerminees,
+//            Model model, Principal principal) {
+//
+//        List<ArticleVendu> articlesFiltres;
+//
+//        if (principal != null && "mesVentes".equals(typeRecherche)) {
+//            // Gestion du filtre "Mes ventes"
+//            Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+//            articlesFiltres = articleService.filtrerVentes(
+//                    utilisateur.getNoUtilisateur(), ventesEnCours, ventesNonDebutees, ventesTerminees
+//            );
+//            model.addAttribute("creditsUtilisateur", utilisateur.getCredit());
+//
+//        } else if (principal != null && "achats".equals(typeRecherche)) {
+//            // Gestion du filtre "Achats"
+//            Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+//            articlesFiltres = articleService.filtrerAchats(
+//                    utilisateur.getNoUtilisateur(), encheresOuvertes, mesEncheresEnCours, mesEncheresRemportees
+//            );
+//        } else {
+//            // Recherche standard (par mot-clé et catégorie)
+//            articlesFiltres = articleService.rechercherArticles(recherche, noCategorie);
+//        }
+//
+//        // Ajouter les articles et filtres au modèle
+//        model.addAttribute("articles", articlesFiltres);
+//        model.addAttribute("recherche", recherche);
+//        model.addAttribute("categorie", noCategorie);
+//        model.addAttribute("typeRecherche", typeRecherche);
+//        model.addAttribute("encheresOuvertes", encheresOuvertes);
+//        model.addAttribute("mesEncheresEnCours", mesEncheresEnCours);
+//        model.addAttribute("mesEncheresRemportees", mesEncheresRemportees);
+//        model.addAttribute("ventesEnCours", ventesEnCours);
+//        model.addAttribute("ventesNonDebutees", ventesNonDebutees);
+//        model.addAttribute("ventesTerminees", ventesTerminees);
+//
+//        return "index";
+//    }
 
-        List<ArticleVendu> articlesFiltres;
+	@GetMapping(value = "/vendre")
+	public String afficherFormulaireVendreArticle(Model model, Principal principal) {
+	    // Récupérer l'utilisateur connecté
+	    Utilisateur utilisateur = null;
+	    if (principal != null) {
+	        utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+	    }
 
-        if (principal != null && "mesVentes".equals(typeRecherche)) {
-            // Gestion du filtre "Mes ventes"
-            Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
-            articlesFiltres = articleService.filtrerVentes(
-                    utilisateur.getNoUtilisateur(), ventesEnCours, ventesNonDebutees, ventesTerminees
-            );
-            model.addAttribute("creditsUtilisateur", utilisateur.getCredit());
+	    // Si pas d'utilisateur, créer un utilisateur vide
+	    if (utilisateur == null) {
+	        utilisateur = new Utilisateur();
+	        utilisateur.setRue("");
+	        utilisateur.setCodePostal("");
+	        utilisateur.setVille("");
+	    }
 
-        } else if (principal != null && "achats".equals(typeRecherche)) {
-            // Gestion du filtre "Achats"
-            Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
-            articlesFiltres = articleService.filtrerAchats(
-                    utilisateur.getNoUtilisateur(), encheresOuvertes, mesEncheresEnCours, mesEncheresRemportees
-            );
-        } else {
-            // Recherche standard (par mot-clé et catégorie)
-            articlesFiltres = articleService.rechercherArticles(recherche, noCategorie);
-        }
+	    // Créer un nouvel article
+	    ArticleVendu article = new ArticleVendu();
 
-        // Ajouter les articles et filtres au modèle
-        model.addAttribute("articles", articlesFiltres);
-        model.addAttribute("recherche", recherche);
-        model.addAttribute("categorie", noCategorie);
-        model.addAttribute("typeRecherche", typeRecherche);
-        model.addAttribute("encheresOuvertes", encheresOuvertes);
-        model.addAttribute("mesEncheresEnCours", mesEncheresEnCours);
-        model.addAttribute("mesEncheresRemportees", mesEncheresRemportees);
-        model.addAttribute("ventesEnCours", ventesEnCours);
-        model.addAttribute("ventesNonDebutees", ventesNonDebutees);
-        model.addAttribute("ventesTerminees", ventesTerminees);
+	    // Ajouter les attributs au modèle
+	    model.addAttribute("article", article);
+	    model.addAttribute("utilisateurConnecte", utilisateur);
 
-        return "index";
-    }
+	    // Charger les catégories
+	    try {
+	        List<Categorie> categories = categorieService.getAllCategories();
+	        model.addAttribute("CategoriesEnSession", categories);  // Changez ici
+	    } catch (BusinessException e) {
+	        // Gérer l'erreur de chargement des catégories
+	        model.addAttribute("erreur", "Impossible de charger les catégories");
+	    }
 
+	    return "formulaireArticle";
+	}
 
 	/**
 	 * Enregistre un article mis en vente.

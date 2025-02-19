@@ -38,12 +38,13 @@ public class SecurityConfig {
             // Pages nécessitant une authentification
             auth.requestMatchers("/profil/**", "/articles/new", "/articles/edit/**").authenticated();
             auth.requestMatchers("/encheres/encherir", "/encheres/article/*/encherir").authenticated();
+            auth.requestMatchers("/encheres/vendre").authenticated();
             // Utilisation de anyRequest() en dernier
             auth.anyRequest().authenticated();
         });
 
         security.formLogin(formLogin -> {
-            formLogin.loginPage("/connexion").loginProcessingUrl("/connexion").defaultSuccessUrl("/encheres", true).permitAll();
+            formLogin.loginPage("/connexion").loginProcessingUrl("/connexion").defaultSuccessUrl("/encheres").permitAll();
         });
 
         security.logout(logout -> logout.invalidateHttpSession(true)
