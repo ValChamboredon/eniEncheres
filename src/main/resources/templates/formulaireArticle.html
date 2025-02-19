@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Enchères - Vendre un article</title>
-<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -14,25 +14,23 @@
 
 	<main class="container mx-auto p-6">
 		<div class="bg-white shadow-lg rounded-lg p-6 max-w-2xl mx-auto">
-			<h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Nouvelle
-				vente</h2>
+			<h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Nouvelle vente</h2>
 
-			<form th:action="@{/encheres/vendre}" method="post"
-				th:object="${article}" class="space-y-4">
+			<form th:action="@{/encheres/vendre}" method="post" th:object="${article}" class="space-y-4" enctype="multipart/form-data">
 
 				<div>
-					<label for="article" class="block font-medium text-gray-700">Article
-						:</label> <input type="text" id="article" data-th-name="nomArticle"
-						pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$" required
-						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
+					<label for="article" class="block font-medium text-gray-700">Article:</label> 
+					<input type="text" id="article" data-th-name="nomArticle" pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$" required class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
 				</div>
 
 				<div>
-					<label for="description" class="block font-medium text-gray-700">Description
-						:</label>
-					<textarea id="description" data-th-name="description"
-						pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$" rows="4" required
-						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"></textarea>
+					<label for="description" class="block font-medium text-gray-700">Description :</label>
+					<textarea id="description" data-th-name="description" pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$" rows="4" required class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"></textarea>
+				</div>
+				
+				<div>
+					<label for="image" class="block font-medium text-gray-700">Insérer une image</label>
+					<input type="file" id="image" data-th-name="image">
 				</div>
 
 				<div>

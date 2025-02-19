@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Projet enchere login</title>
-<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
@@ -24,24 +24,23 @@
 
 
 			<form th:action="@{/connexion}" method="POST">
+			
 				<div class="mb-4">
-
-					<label for="idUsername" class="block text-gray-700">Email</label> <input
-						id="idUsername" type="text" name="username"
-						class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-
-
-
+					<label for="idUsername" class="block text-gray-700">Email</label> 
+					<input id="idUsername" type="text" name="username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" th:value="${rememberedEmail}">
 				</div>
+				
 				<div class="mb-6">
-					<label for="idPassword" class="block text-gray-700">Mot de
-						passe</label> <input id="idPassword" type="password" name="password"
-						class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+					<label for="idPassword" class="block text-gray-700">Mot de passe</label> 
+					<input id="idPassword" type="password" name="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
 				</div>
+				
+				<label for="remember-me">
+        			<input type="checkbox" id="remember-me" name="rememberMe" class="mb-8"/> Se souvenir de moi
+   				</label>
+				
 				<div>
-					<button type="submit"
-						class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-						Se connecter</button>
+					<button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Se connecter</button>
 				</div>
 
 				<!-- ✅ Ajout du bouton "S'inscrire" -->
