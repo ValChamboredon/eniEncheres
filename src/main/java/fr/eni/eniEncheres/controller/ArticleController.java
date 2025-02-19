@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,7 +20,7 @@ import fr.eni.eniEncheres.bo.Categorie;
 import fr.eni.eniEncheres.bo.Retrait;
 import fr.eni.eniEncheres.bo.Utilisateur;
 import fr.eni.eniEncheres.exception.BusinessException;
-
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -115,6 +117,7 @@ public class ArticleController {
         return "formulaireArticle";
     }
 
+    
     /**
      * Enregistre un article mis en vente.
      */
@@ -190,4 +193,63 @@ public class ArticleController {
         }
         return "redirect:/encheres/article/detail/" + articleId;
     }
+    
+    @ModelAttribute("creditsUtilisateur")
+	public Integer chargerCreditsUtilisateur(Principal principal) {
+		if (principal != null) {
+			Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+			return utilisateur.getCredit();
+		}
+		return 0;
+	}
+    
+    @GetMapping("/recherche")
+	public String rechercherArticles(@RequestParam(value = "recherche", required = false) String recherche,
+			@RequestParam(value = "categorie", required = false, defaultValue = "0") Integer noCategorie, Model model) {
+ 
+		// Récupération des articles filtrés
+		List<ArticleVendu> articlesFiltres = articleService.rechercherArticles(recherche, noCategorie);
+ 
+		// Ajouter les articles filtrés au modèle pour l'affichage dans la vue
+		model.addAttribute("articles", articlesFiltres);
+ 
+		// Redirige vers la page des enchères avec la liste filtrée
+		return "index";
+	}
+    
+    @GetMapping("/vendeur")
+	public String afficherProfilVendeur(@RequestParam("pseudo") String pseudo, Model model, HttpSession session) {
+		//retrouver le vendeur de l'article
+		Utilisateur vendeur = utilisateurService.getUtilisateurByPseudo(pseudo);
+		model.addAttribute("vendeur", vendeur);
+		
+		//récupérer l'utilisateur actif
+		Authentication authentification = SecurityContextHolder.getContext().getAuthentication();
+		String email = authentification.getName();
+		System.out.println(email);
+		int userId = utilisateurService.getIdByEmail(email);
+		Utilisateur utilisateur = utilisateurService.getUtilisateurById(userId);
+ 
+	    if (utilisateur != null) {
+	        model.addAttribute("isAdmin", utilisateur.isAdministrateur());  // Assurez-vous que isAdmin est ajouté
+	        model.addAttribute("vendeur", utilisateur);  // Si tu utilises vendeur pour l'utilisateur
+	    } else {
+	        model.addAttribute("isAdmin", false);  // Si l'utilisateur n'est pas connecté ou admin
+	    }
+		
+		return "vendeur-profil";
+	}
+    
+    @GetMapping("/modifier")
+    public String afficherFormulaireModification(@RequestParam("articleId") int articleId, Model model, Principal principal) {
+        ArticleVendu article = articleService.getArticleById(articleId);
+
+        if (article != null && article.getVendeur().getEmail().equals(principal.getName())) {
+            model.addAttribute("article", article);
+            return "modifierArticle"; // Assurez-vous que cette vue existe !
+        }
+
+        return "redirect:/encheres"; // Redirection si l'article n'existe pas ou que l'utilisateur n'a pas les droits
+    }
+
 }
