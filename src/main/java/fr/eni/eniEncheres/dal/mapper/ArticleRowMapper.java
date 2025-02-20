@@ -63,12 +63,25 @@ public class ArticleRowMapper implements RowMapper<ArticleVendu> {
 	    article.setCategorie(categorie);
 
 	    // **Lieu de retrait**
-	    Retrait lieuDeRetrait = new Retrait();
-	    lieuDeRetrait.setRue(rs.getString("retrait_rue"));
-	    lieuDeRetrait.setCodePostal(rs.getString("retrait_code_postal"));
-	    lieuDeRetrait.setVille(rs.getString("retrait_ville"));
-	    article.setLieuDeRetrait(lieuDeRetrait);
-
+	 
+	 // Création du lieu de retrait uniquement s'il existe spécifiquement en base
+	    String retraitRue = rs.getString("retrait_rue");
+	    if (retraitRue != null) {
+	        Retrait retrait = new Retrait(
+	            retraitRue,
+	            rs.getString("retrait_code_postal"),
+	            rs.getString("retrait_ville")
+	        );
+	        article.setLieuDeRetrait(retrait);
+	    } else {
+	        // Si pas de retrait spécifique, on utilise l'adresse du vendeur
+	        Retrait retrait = new Retrait(
+	            rs.getString("user_rue"),
+	            rs.getString("user_code_postal"),
+	            rs.getString("user_ville")
+	        );
+	        article.setLieuDeRetrait(retrait);
+	    }
 	    return article;
 	}
 
