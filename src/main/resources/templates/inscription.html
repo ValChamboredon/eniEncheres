@@ -1,112 +1,191 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Inscription</title>
-<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
-<link
-	href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-	rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{inscription.page.title}">Inscription</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
+    <link
+        href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+        rel="stylesheet">
 </head>
 
-
 <body>
-	<div th:replace="~{fragments/fragment-entete :: entete}"></div>
-	<div
-		class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+    <!-- Header Fragment (if you have one) -->
+    <div th:replace="~{fragments/fragment-entete :: entete}"></div>
 
+    <!-- Outer Container: Center Content Vertically & Horizontally -->
+    <div class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+        
+        <!-- Responsive Card -->
+        <!-- 
+             - `w-full` ensures it shrinks or expands with viewport width.
+             - `max-w-xl` on small, up to `max-w-4xl` on larger screens.
+             - `sm:p-6 md:p-8` for responsive padding inside the card.
+         -->
+        <div class="bg-white shadow-lg rounded-lg w-full max-w-xl md:max-w-4xl p-4 sm:p-6 md:p-8 mt-4">
+            
+            <!-- Page Title -->
+            <h1 class="text-center text-2xl font-bold mb-6" th:text="#{inscription.title}">
+                Mon profil
+            </h1>
 
+            <!-- Form -->
+            <form th:action="@{/inscription}"
+                  th:object="${utilisateur}"
+                  method="post"
+                  class="mx-auto">
+                  
 
-		<div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-4xl mt-4">
-			<h1 class="text-center text-2xl font-bold mb-6">Mon profil</h1>
+                <!-- Global Errors (e.g. from 'erreurs' list) -->
+                <div th:if="${erreurs != null and #lists.size(erreurs) > 0}"
+                     class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+                     role="alert">
+                    <strong class="font-bold" th:text="#{inscription.error.title}">Erreur :</strong>
+                    <ul>
+                        <li th:each="erreur : ${erreurs}" th:text="${erreur}"></li>
+                    </ul>
+                </div>
 
-			<form th:action="@{/inscription}" th:object="${utilisateur}"
-				method="post" class="max-w-4xl mx-auto">
+                <!-- 1 column on mobile, 2 columns on md+ screens -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Pseudo -->
+                    <div>
+                        <label for="pseudo" th:text="#{inscription.form.pseudo}">Pseudo :</label>
+                        <input type="text"
+                               id="pseudo"
+                               th:field="*{pseudo}"
+                               class="border px-3 py-2 w-full">
+                        <!-- Field-specific error -->
+                        <p class="text-red-600 text-sm"
+                           th:if="${#fields.hasErrors('pseudo')}"
+                           th:errors="*{pseudo}"></p>
+                    </div>
 
-				<!-- Affichage des erreurs globaux -->
-				<div
-					th:if="${(erreurs != null and #lists.size(erreurs) > 0) or #fields.hasErrors('*')}"
-					class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-					role="alert">
-					<strong class="font-bold">Erreur :</strong>
-					<ul>
-						<li th:each="erreur : ${erreurs}" th:text="${erreur}"></li>
-						<li th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}"></li>
-						<li th:if="${#fields.hasErrors('prenom')}" th:errors="*{prenom}"></li>
-						<li th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></li>
-						<li th:if="${#fields.hasErrors('telephone')}"
-							th:errors="*{telephone}"></li>
-						<li th:if="${#fields.hasErrors('rue')}" th:errors="*{rue}"></li>
-						<li th:if="${#fields.hasErrors('codePostal')}"
-							th:errors="*{codePostal}"></li>
-						<li th:if="${#fields.hasErrors('ville')}" th:errors="*{ville}"></li>
-						<li th:if="${#fields.hasErrors('motDePasse')}"
-							th:errors="*{motDePasse}"></li>
-						<li th:if="${#fields.hasErrors('confirmationMotDePasse')}"
-							th:errors="*{confirmationMotDePasse}"></li>
-					</ul>
-				</div>
+                    <!-- Nom -->
+                    <div>
+                        <label for="nom" th:text="#{inscription.form.nom}">Nom :</label>
+                        <input type="text"
+                               id="nom"
+                               th:field="*{nom}"
+                               class="border px-3 py-2 w-full">
+                        <p class="text-red-600 text-sm"
+                           th:if="${#fields.hasErrors('nom')}"
+                           th:errors="*{nom}"></p>
+                    </div>
 
-				<div class="grid grid-cols-2 gap-6">
-					<div>
-						<label for="pseudo">Pseudo :</label> <input type="text"
-							id="pseudo" th:field="*{pseudo}" class="border px-3 py-2 w-full">
-					</div>
-					<div>
-						<label for="nom">Nom :</label> <input type="text" id="nom"
-							th:field="*{nom}" class="border px-3 py-2 w-full">
+                    <!-- Prénom -->
+                    <div>
+                        <label for="prenom" th:text="#{inscription.form.prenom}">Prénom :</label>
+                        <input type="text"
+                               id="prenom"
+                               th:field="*{prenom}"
+                               class="border px-3 py-2 w-full">
+                        <p class="text-red-600 text-sm"
+                           th:if="${#fields.hasErrors('prenom')}"
+                           th:errors="*{prenom}"></p>
+                    </div>
 
-					</div>
-					<div>
-						<label for="prenom">Prénom :</label> <input type="text"
-							id="prenom" th:field="*{prenom}" class="border px-3 py-2 w-full">
-					</div>
-					<div>
-						<label for="email">Email :</label> <input type="email" id="email"
-							th:field="*{email}" class="border px-3 py-2 w-full">
-					</div>
-					<div>
-						<label for="telephone">Téléphone :</label> <input type="tel"
-							id="telephone" th:field="*{telephone}"
-							class="border px-3 py-2 w-full">
-					</div>
-					<div>
-						<label for="rue">Rue :</label> <input type="text" id="rue"
-							th:field="*{rue}" class="border px-3 py-2 w-full">
-					</div>
-					<div>
-						<label for="codePostal">Code postal :</label> <input type="text"
-							id="codePostal" th:field="*{codePostal}"
-							class="border px-3 py-2 w-full">
-					</div>
-					<div>
-						<label for="ville">Ville :</label> <input type="text" id="ville"
-							th:field="*{ville}" class="border px-3 py-2 w-full">
-					</div>
-					<div>
-						<label for="motDePasse">Mot de passe :</label> <input
-							type="password" id="motDePasse" th:field="*{motDePasse}"
-							class="border px-3 py-2 w-full">
-					</div>
-					<div>
-						<label for="confirmationMotDePasse">Confirmation :</label> <input
-							type="password" id="confirmationMotDePasse"
-							th:field="*{confirmationMotDePasse}"
-							class="border px-3 py-2 w-full">
-					</div>
-				</div>
+                    <!-- Email -->
+                    <div>
+                        <label for="email" th:text="#{inscription.form.email}">Email :</label>
+                        <input type="email"
+                               id="email"
+                               th:field="*{email}"
+                               class="border px-3 py-2 w-full">
+                        <p class="text-red-600 text-sm"
+                           th:if="${#fields.hasErrors('email')}"
+                           th:errors="*{email}"></p>
+                    </div>
 
-				<!-- Boutons d'action -->
-				<div class="flex justify-center mt-6 space-x-8">
-					<button type="submit"
-						class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">
-						Créer</button>
-					<a th:href="@{/encheres}"
-						class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-6 rounded">
-						Annuler </a>
-				</div>
-			</form>
-		</div>
-	</div>
+                    <!-- Téléphone -->
+                    <div>
+                        <label for="telephone" th:text="#{inscription.form.telephone}">Téléphone :</label>
+                        <input type="tel"
+                               id="telephone"
+                               th:field="*{telephone}"
+                               class="border px-3 py-2 w-full">
+                        <p class="text-red-600 text-sm"
+                           th:if="${#fields.hasErrors('telephone')}"
+                           th:errors="*{telephone}"></p>
+                    </div>
+
+                    <!-- Rue -->
+                    <div>
+                        <label for="rue" th:text="#{inscription.form.rue}">Rue :</label>
+                        <input type="text"
+                               id="rue"
+                               th:field="*{rue}"
+                               class="border px-3 py-2 w-full">
+                        <p class="text-red-600 text-sm"
+                           th:if="${#fields.hasErrors('rue')}"
+                           th:errors="*{rue}"></p>
+                    </div>
+
+                    <!-- Code Postal -->
+                    <div>
+                        <label for="codePostal" th:text="#{inscription.form.codepostal}">Code postal :</label>
+                        <input type="text"
+                               id="codePostal"
+                               th:field="*{codePostal}"
+                               class="border px-3 py-2 w-full">
+                        <p class="text-red-600 text-sm"
+                           th:if="${#fields.hasErrors('codePostal')}"
+                           th:errors="*{codePostal}"></p>
+                    </div>
+
+                    <!-- Ville -->
+                    <div>
+                        <label for="ville" th:text="#{inscription.form.ville}">Ville :</label>
+                        <input type="text"
+                               id="ville"
+                               th:field="*{ville}"
+                               class="border px-3 py-2 w-full">
+                        <p class="text-red-600 text-sm"
+                           th:if="${#fields.hasErrors('ville')}"
+                           th:errors="*{ville}"></p>
+                    </div>
+
+                    <!-- Mot de Passe -->
+                    <div>
+                        <label for="motDePasse" th:text="#{inscription.form.password}">Mot de passe :</label>
+                        <input type="password"
+                               id="motDePasse"
+                               th:field="*{motDePasse}"
+                               class="border px-3 py-2 w-full">
+                        <p class="text-red-600 text-sm"
+                           th:if="${#fields.hasErrors('motDePasse')}"
+                           th:errors="*{motDePasse}"></p>
+                    </div>
+
+                    <!-- Confirmation de Mot de Passe -->
+                    <div>
+                        <label for="confirmationMotDePasse" th:text="#{inscription.form.confirmation}">Confirmation :</label>
+                        <input type="password"
+                               id="confirmationMotDePasse"
+                               th:field="*{confirmationMotDePasse}"
+                               class="border px-3 py-2 w-full">
+                        <p class="text-red-600 text-sm"
+                           th:if="${#fields.hasErrors('confirmationMotDePasse')}"
+                           th:errors="*{confirmationMotDePasse}"></p>
+                    </div>
+                </div>
+
+ 				<!-- Action Buttons -->
+                <div class="flex justify-center mt-6 space-x-8">
+                    <button type="submit"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
+                            th:text="#{inscription.form.create}">
+                        Créer
+                    </button>
+                    <a th:href="@{/encheres}"
+                       class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-6 rounded"
+                       th:text="#{inscription.form.cancel}">
+                        Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

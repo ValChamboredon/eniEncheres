@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modifier l'Article</title>
+    <title th:text="#{articleEdit.page.title}">Modifier l'Article</title>
 <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
@@ -12,34 +12,36 @@
 
     <main class="container mx-auto p-4">
         <div class="bg-white p-6 rounded-lg shadow-md">
-            <h1 class="text-2xl font-bold mb-4 text-center">Modifier l'Article</h1>
+            <h1 class="text-2xl font-bold mb-4 text-center" th:text="#{articleEdit.title}">
+            >Modifier l'Article</h1>
 
             <form th:action="@{/encheres/modifier}" method="post">
                 <input type="hidden" name="articleId" th:value="${article.noArticle}" />
 
-                <label class="block font-semibold">Nom de l'Article :</label>
+                <label class="block font-semibold" th:text="#{articleEdit.form.label.name}">
+                 	   Nom de l'Article :</label>
                 <input type="text" name="nomArticle" th:value="${article.nomArticle}"
                        class="border rounded w-full px-3 py-2 mb-2" required/>
 
-                <label class="block font-semibold">Description :</label>
+                <label class="block font-semibold" th:text="#{articleEdit.form.label.description}">Description :</label>
                 <textarea name="description" class="border rounded w-full px-3 py-2 mb-2"
                           th:text="${article.description}" required></textarea>
-
-                <label class="block font-semibold">Mise à prix :</label>
+ 
+                <label class="block font-semibold" th:text="#{articleEdit.form.label.startingPrice}">Mise à prix :</label>
                 <input type="number" name="miseAPrix" th:value="${article.miseAPrix}"
                        class="border rounded w-full px-3 py-2 mb-2" required/>
 
-                <label class="block font-semibold">Date de début des enchères :</label>
+                <label class="block font-semibold" th:text="#{articleEdit.form.label.startDate}">Date de début des enchères :</label>
                 <input type="date" name="dateDebutEncheres"
                        th:value="${#temporals.format(article.dateDebutEncheres, 'yyyy-MM-dd')}"
                        class="border rounded w-full px-3 py-2 mb-2" required/>
 
-                <label class="block font-semibold">Date de fin des enchères :</label>
+                <label class="block font-semibold" th:text="#{articleEdit.form.label.endDate}">Date de fin des enchères :</label>
                 <input type="date" name="dateFinEncheres"
                        th:value="${#temporals.format(article.dateFinEncheres, 'yyyy-MM-dd')}"
                        class="border rounded w-full px-3 py-2 mb-2" required/>
 
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" th:text="#{articleEdit.form.button.save}">
                     Enregistrer les modifications
                 </button>
             </form>
@@ -48,4 +50,3 @@
 </body>
 
 </html>
-

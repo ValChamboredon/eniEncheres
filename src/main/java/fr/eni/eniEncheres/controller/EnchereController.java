@@ -70,6 +70,4 @@
 //        return enchereService.getEnchereMaxParArticle(id);
 //    }
     
-    
-
 

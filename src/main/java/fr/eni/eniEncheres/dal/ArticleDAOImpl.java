@@ -280,6 +280,4 @@ public class ArticleDAOImpl implements ArticleDAO {
 
 	    return namedParameterJdbcTemplate.query(sql.toString(), params, new ArticleRowMapper());
 	}
-	
-
 }

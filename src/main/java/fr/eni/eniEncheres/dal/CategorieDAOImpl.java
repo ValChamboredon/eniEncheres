@@ -1,9 +1,10 @@
 package fr.eni.eniEncheres.dal;
 
 import java.util.List;
-import org.springframework.dao.EmptyResultDataAccessException;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+
 import fr.eni.eniEncheres.bo.Categorie;
 import fr.eni.eniEncheres.dal.mapper.CategorieRowMapper;
 import fr.eni.eniEncheres.exception.BusinessException;

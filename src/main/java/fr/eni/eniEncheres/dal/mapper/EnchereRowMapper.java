@@ -34,4 +34,3 @@ public class EnchereRowMapper implements RowMapper<Enchere> {
         return enchere;
     }
 }
-

@@ -16,4 +16,3 @@ public enum EtatVente {
         return valeur;
     }
 }
-

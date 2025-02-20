@@ -24,5 +24,4 @@ public class CustomUserDetailService implements UserDetailsService{
                 .authorities(new ArrayList<>()) // Ajoutez les rôles ou autorités ici
                 .build();
 	}
-
 }

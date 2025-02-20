@@ -453,6 +453,4 @@ public class ArticleController {
 		
 		return "vendeur-profil";
 	}
-
-
 }
