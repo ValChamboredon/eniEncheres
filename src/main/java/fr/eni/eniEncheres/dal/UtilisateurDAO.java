@@ -6,10 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import fr.eni.eniEncheres.bo.Utilisateur;
 
-
-
-import fr.eni.eniEncheres.bo.Utilisateur;
-
 @Repository
 public interface UtilisateurDAO {
 	

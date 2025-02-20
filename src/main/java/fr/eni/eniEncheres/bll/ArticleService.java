@@ -18,11 +18,15 @@ public interface ArticleService {
 	public void modifierArticle(ArticleVendu article);
 	    
 	void mettreAJourEtatVente(ArticleVendu article);
+	
+	void mettreAJourEtatDesArticles();
 
 	//Filtre
 	public List<ArticleVendu> rechercherArticles(String recherche, Integer noCategorie);
 	
-	List<ArticleVendu> filtrerVentes(int userId, Boolean ventesEnCours, Boolean ventesNonDebutees, Boolean ventesTerminees);
+	//List<ArticleVendu> filtrerVentes(int userId, Boolean ventesEnCours, Boolean ventesNonDebutees, Boolean ventesTerminees);
+	
+	//List<ArticleVendu> filtrerAchats(int userId, Boolean encheresOuvertes, Boolean mesEncheresEnCours, Boolean mesEncheresRemportees);
 
 
 

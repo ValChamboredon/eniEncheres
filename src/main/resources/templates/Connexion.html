@@ -3,52 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Projet enchere login</title>
-<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+<title th:text="#{login.page.title}">Projet Enchère - Login</title>
+<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
+<div th:replace="~{fragments/fragment-entete :: entete}"></div>
+
 
 <div class="bg-gray-100 flex items-center justify-center h-screen">
 	<main class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
 		<div>
-			<h1 class="text-2xl font-bold mb-6 text-center">Se connecter</h1>
+		
+		    <!-- Page Title -->
+			<h1 class="text-2xl font-bold mb-6 text-center" th:text="#{login.title}">Se connecter</h1>
 
+
+            <!-- Error Message (if credentials invalid) -->
 			<div th:if="${param.error}"
 				class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
 				role="alert">
-				<strong class="font-bold">Erreur :</strong> <span>Identifiants
-					incorrects. Veuillez réessayer.</span>
+				<strong class="font-bold" th:text="#{login.error.title}">Erreur :</strong> 
+				<span th:text="#{login.error.message}"> Identifiants incorrects. Veuillez réessayer.</span>
 			</div>
 
-
-
 			<form th:action="@{/connexion}" method="POST">
+			
+                <!-- Email Field -->
 				<div class="mb-4">
-
-					<label for="idUsername" class="block text-gray-700">Email</label> <input
-						id="idUsername" type="text" name="username"
-						class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-
-
-
+					<label for="idUsername" 
+						   class="block text-gray-700" 
+						   th:text="#{login.email}">Email</label> 
+					<input id="idUsername" 
+						   type="text" 
+						   name="username" 
+						   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+						   th:value="${rememberedEmail}">
 				</div>
+				
+				<!-- Password Field -->
 				<div class="mb-6">
-					<label for="idPassword" class="block text-gray-700">Mot de
-						passe</label> <input id="idPassword" type="password" name="password"
-						class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+					<label for="idPassword" 
+						   class="block text-gray-700"
+						   th:text="#{login.password}">Mot de passe</label> 
+					<input id="idPassword" 
+						   type="password" 
+						   name="password" 
+						   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
 				</div>
+				
+                <!-- "Remember Me" Checkbox -->
+				<label for="remember-me" class="inline-flex items-center mb-8">
+        			<input type="checkbox" 
+        				   id="remember-me" 
+        				   name="rememberMe" 
+        				   class="mmr-2">
+                    <span th:text="#{login.remember.me}">Se souvenir de moi</span>
+   				</label>
+				
 				<div>
-					<button type="submit"
-						class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-						Se connecter</button>
+					<button type="submit" 
+							class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+							th:text="#{login.button}">Se connecter</button>
 				</div>
 
 				<!-- ✅ Ajout du bouton "S'inscrire" -->
 				<div class="mt-4 text-center">
-					<span class="text-gray-600">Pas encore de compte ?</span> <a
+					<span class="text-gray-600" th:text="#{login.noaccount}">Pas encore de compte ?</span> <a
 						th:href="@{/inscription}"
-						class="block mt-2 w-full bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+						class="block mt-2 w-full bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+						th:text="#{login.signup.button}">
 						S'inscrire </a>
 				</div>
 

@@ -1,12 +1,3 @@
-/**
- * Représente une catégorie d'articles.
- * Chaque catégorie contient une liste d'articles vendus.
- * 
- * Exemple : Électronique, Mobilier, Livres...
- * 
- * @author Mariami
- * @version 1.0
- */
 package fr.eni.eniEncheres.bo;
 
 import java.util.List;
@@ -36,4 +27,3 @@ public class Categorie {
         return "Categorie{noCategorie=" + noCategorie + ", libelle='" + libelle + "'}";
     }
 }
-

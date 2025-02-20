@@ -108,31 +108,39 @@ public class ArticleDAOImpl implements ArticleDAO {
 			return jdbcTemplate.query(sql, new ArticleRowMapper());
 		} catch (Exception e) {
 			System.err.println("Erreur SQL : " + e.getMessage());
-			e.printStackTrace();
+			
 			return new ArrayList<>();
 		}
 	}
 
 	// filtre pour les enchères
 	// affiche les articles en COURS uniquement sur l'index avec cette requête SQL
+	// utilisateur pas co
 	@Override
 	public List<ArticleVendu> searchArticles(String keyword, int categoryId) {
-		String sql = "SELECT av.*, " + "u.no_utilisateur, u.pseudo, u.email, "
-				+ "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, "
-				+ "c.no_categorie, c.libelle, " + "COALESCE(r.rue, u.rue) AS retrait_rue, "
-				+ "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, "
-				+ "COALESCE(r.ville, u.ville) AS retrait_ville " + "FROM ARTICLES_VENDUS av "
-				+ "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur "
-				+ "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie "
-				+ "LEFT JOIN RETRAITS r ON av.no_article = r.no_article " + "WHERE av.etat_vente = 'EN_COURS' "
-				+ "AND (:keyword IS NULL OR av.nom_article LIKE :keyword) "
-				+ "AND (:categoryId = 0 OR av.no_categorie = :categoryId)";
 
-		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("keyword", keyword != null && !keyword.isEmpty() ? "%" + keyword + "%" : null);
-		params.addValue("categoryId", categoryId);
+	    String sql = "SELECT av.*, " +
+	                 "u.no_utilisateur, u.pseudo, u.email, " +
+	                 "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, " +
+	                 "c.no_categorie, c.libelle, " +
+	                 "COALESCE(r.rue, u.rue) AS retrait_rue, " +
+	                 "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, " +
+	                 "COALESCE(r.ville, u.ville) AS retrait_ville " +
+	                 "FROM ARTICLES_VENDUS av " +
+	                 "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur " +
+	                 "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie " +
+	                 "LEFT JOIN RETRAITS r ON av.no_article = r.no_article " +
+	                 "WHERE (av.etat_vente = 'CREEE' AND av.date_debut_encheres <= CURRENT_TIMESTAMP) " + 
+	                 "   OR av.etat_vente = 'EN_COURS' " +
+	                 "AND (:keyword IS NULL OR av.nom_article LIKE :keyword) " +
+	                 "AND (:categoryId = 0 OR av.no_categorie = :categoryId)";
 
-		return namedParameterJdbcTemplate.query(sql, params, new ArticleRowMapper());
+	    MapSqlParameterSource params = new MapSqlParameterSource();
+	    params.addValue("keyword", keyword != null && !keyword.isEmpty() ? "%" + keyword + "%" : null);
+	    params.addValue("categoryId", categoryId);
+
+	    return namedParameterJdbcTemplate.query(sql, params, new ArticleRowMapper());
+
 	}
 
 	@Override
@@ -149,7 +157,12 @@ public class ArticleDAOImpl implements ArticleDAO {
 		params.addValue("etat_vente", nouvelEtat.name()); // Convertit l'Enum en String
 		params.addValue("no_article", noArticle);
 
-		namedParameterJdbcTemplate.update(sql, params);
+
+	    int rowsUpdated = namedParameterJdbcTemplate.update(sql, params);
+	    System.out.println("Mise à jour de l'état de vente - Article #" + noArticle + 
+	                       ", Nouvel état : " + nouvelEtat.name() + 
+	                       ", Lignes mises à jour : " + rowsUpdated);
+
 	}
 
 	@Override
@@ -169,6 +182,20 @@ public class ArticleDAOImpl implements ArticleDAO {
 				article.getDateFinEncheres(), article.getMiseAPrix(), article.getNoArticle());
 
 	}
+
+
+	@Override
+	public void updatePrixVente(int noArticle, int nouveauPrix) {
+	    String sql = "UPDATE ARTICLES_VENDUS SET prix_vente = :prix_vente WHERE no_article = :no_article";
+	    
+	    MapSqlParameterSource params = new MapSqlParameterSource();
+	    params.addValue("prix_vente", nouveauPrix);
+	    params.addValue("no_article", noArticle);
+
+	    namedParameterJdbcTemplate.update(sql, params);
+	}
+	
+
 
 	
 	//Methode pour filtrer les ventes en fonction de l'utilisateur co. Vente en cours,terminées et pas commencées.
@@ -213,5 +240,46 @@ public class ArticleDAOImpl implements ArticleDAO {
 	}
 
 
+
+	//filtrer les achats en fonction de l'utilisateur co. Toutes les enchères, les enchères auxquelles il participe et les enchères win
+	
+	@Override
+	public List<ArticleVendu> filtrerAchats(int userId, Boolean encheresOuvertes, Boolean mesEncheresEnCours, Boolean mesEncheresRemportees) {
+	    StringBuilder sql = new StringBuilder(
+	        "SELECT av.*, " +
+	        "u.no_utilisateur, u.pseudo, u.email, " +
+	        "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, " +
+	        "c.no_categorie, c.libelle, " +
+	        "COALESCE(r.rue, u.rue) AS retrait_rue, " +
+	        "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, " +
+	        "COALESCE(r.ville, u.ville) AS retrait_ville " +
+	        "FROM ARTICLES_VENDUS av " +
+	        "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur " +
+	        "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie " +
+	        "LEFT JOIN RETRAITS r ON av.no_article = r.no_article "
+	    );
+
+	    MapSqlParameterSource params = new MapSqlParameterSource();
+	    List<String> conditions = new ArrayList<>();
+
+	    if (encheresOuvertes != null && encheresOuvertes) {
+	        conditions.add("av.etat_vente = 'EN_COURS'");
+	    }
+	    if (mesEncheresEnCours != null && mesEncheresEnCours) {
+	        conditions.add("av.no_article IN (SELECT e.no_article FROM ENCHERES e WHERE e.no_utilisateur = :userId)");
+	        params.addValue("userId", userId);
+	    }
+	    if (mesEncheresRemportees != null && mesEncheresRemportees) {
+	        //TODO
+	    }
+
+	    // Ajout des conditions seulement si elles existent
+	    if (!conditions.isEmpty()) {
+	        sql.append(" WHERE ").append(String.join(" OR ", conditions));
+	    }
+
+	    return namedParameterJdbcTemplate.query(sql.toString(), params, new ArticleRowMapper());
+	}
+	
 
 }

@@ -1,39 +1,138 @@
 <header th:fragment="entete">
     <nav class="bg-gradient-to-r from-blue-900 to-blue-700 p-4 shadow-lg">
         <div class="container mx-auto flex items-center justify-between">
-            <div class="flex items-center">
-                <h1 class="text-white text-2xl font-bold">
-                    <a th:href="@{/encheres}" class="lienIndex">ENI - Enchères</a>
-                </h1>
+            
+            <!-- Left: Logo -->
+            <a th:href="@{/encheres}" class="text-white font-bold text-2xl md:text-3xl">
+                <span th:text="#{header.title}">ENI - Enchères</span>
+            </a>
+
+            <!-- Middle (Desktop Only): Credits + Links on one line -->
+            <div class="hidden md:flex items-center">
+                
+                <!-- Credits box -->
+                <div sec:authorize="isAuthenticated()"
+                     class="bg-white p-2 rounded-md shadow-md flex items-center space-x-2 ml-2">
+                    <span sec:authentication="name" class="font-semibold text-blue-600"></span>
+                    <span th:text="#{header.connected}">est connecté.e</span>,
+                    <span th:text="#{header.credits}">Crédits</span> :
+                    <span th:text="${creditsUtilisateur}">2000</span>
+                    <span th:text="#{header.points}">points</span>
+                </div>
+
+                <!-- Authenticated Links (Desktop) -->
+                <div sec:authorize="isAuthenticated()" class="flex items-center space-x-4 ml-4">
+                    <a th:href="@{/encheres/vendre}"
+                       class="text-white hover:underline"
+                       th:text="#{header.sell}">
+                        Vendre un article
+                    </a>
+                    <a th:href="@{/encheres/profil}"
+                       class="text-white hover:underline"
+                       th:text="#{header.profile}">
+                        Mon profil
+                    </a>
+                    <a th:href="@{/deconnexion}"
+                       class="text-white hover:underline"
+                       th:text="#{header.logout}">
+                        Déconnexion
+                    </a>
+                </div>
+
+                <!-- Non-Authenticated (Desktop) -->
+                <div sec:authorize="!isAuthenticated()" class="flex items-center space-x-4 ml-4">
+                    <a th:href="@{/inscription}"
+                       class="text-white hover:underline"
+                       th:text="#{header.register}">
+                        S'inscrire
+                    </a>
+                    <a th:href="@{/connexion}"
+                       class="text-white hover:underline"
+                       th:text="#{header.login}">
+                        Se connecter
+                    </a>
+                </div>
             </div>
 
+            <!-- Right: Languages + Hamburger (mobile) -->
             <div class="flex items-center space-x-4">
-                
-                <!-- Affichage des crédits pour l'utilisateur connecté -->
-                <div sec:authorize="isAuthenticated()" class="flex items-center bg-gray-100 p-3 rounded-md shadow-md">
-                    <p class="text-gray-700 font-semibold mr-3">
-                        <span sec:authentication="name" class="text-blue-600"></span> est connecté.e
-                    </p>
-                    <p class="text-gray-800 font-bold">
-                        Crédits : <span th:text="${creditsUtilisateur}"></span> points
-                    </p>
+                <!-- Single set of languages -->
+                <div>
+                    <a href="?lang=fr" class="text-white hover:underline mr-2">FR</a>
+                    <a href="?lang=en" class="text-white hover:underline">EN</a>
                 </div>
 
-                <!-- Options pour utilisateur non connecté -->
-                <div sec:authorize="!isAuthenticated()">
-                    <a th:href="@{/inscription}" class="text-white hover:underline mr-4">S'inscrire</a>
-                    <a th:href="@{/connexion}" class="text-white hover:underline">Se connecter</a>
-                </div>
+                <!-- Hamburger (hidden on desktop) -->
+                <button
+                    id="hamburgerBtn"
+                    class="md:hidden text-white text-2xl focus:outline-none"
+                    aria-label="Toggle menu"
+                >
+                    ☰
+                </button>
+            </div>
+        </div>
 
-                <!-- Options pour utilisateur connecté -->
-                <div sec:authorize="isAuthenticated()" class="flex items-center space-x-4">
-                    <a th:href="@{/encheres/vendre}" class="text-white hover:underline">Vendre un article</a>
-                    <a th:href="@{/encheres/profil}" class="text-white hover:underline">Mon profil</a>
-                    <a th:href="@{/deconnexion}" class="text-white hover:underline">Déconnexion</a>
-                </div>
+        <!-- Mobile Menu (hidden by default, toggled with JS) -->
+        <div
+            id="mobileMenu"
+            class="hidden md:hidden flex-col space-y-4 px-4 mt-4"
+        >
+            <!-- User Info (Mobile) -->
+            <div sec:authorize="isAuthenticated()" class="bg-white p-3 rounded-md shadow-md text-center">
+                <p>
+                    <span sec:authentication="name" class="font-semibold text-blue-600"></span>
+                    <span th:text="#{header.connected}">est connecté.e</span>
+                </p>
+                <p>
+                    <span th:text="#{header.credits}">Crédits</span> :
+                    <span th:text="${creditsUtilisateur}">2000</span>
+                    <span th:text="#{header.points}">points</span>
+                </p>
+            </div>
+
+            <!-- Authenticated Links (Mobile), side-by-side -->
+            <div sec:authorize="isAuthenticated()" class="flex flex-row justify-center space-x-4">
+                <a th:href="@{/encheres/vendre}"
+                   class="text-white hover:underline"
+                   th:text="#{header.sell}">
+                    Vendre un article
+                </a>
+                <a th:href="@{/encheres/profil}"
+                   class="text-white hover:underline"
+                   th:text="#{header.profile}">
+                    Mon profil
+                </a>
+                <a th:href="@{/deconnexion}"
+                   class="text-white hover:underline"
+                   th:text="#{header.logout}">
+                    Déconnexion
+                </a>
+            </div>
+
+            <!-- Non-Authenticated (Mobile) -->
+            <div sec:authorize="!isAuthenticated()" class="flex flex-row justify-center space-x-4">
+                <a th:href="@{/inscription}"
+                   class="text-white hover:underline"
+                   th:text="#{header.register}">
+                    S'inscrire
+                </a>
+                <a th:href="@{/connexion}"
+                   class="text-white hover:underline"
+                   th:text="#{header.login}">
+                    Se connecter
+                </a>
             </div>
         </div>
     </nav>
+
+    <!-- Minimal JS to toggle the mobile menu -->
+    <script>
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        hamburgerBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
 </header>
-
-

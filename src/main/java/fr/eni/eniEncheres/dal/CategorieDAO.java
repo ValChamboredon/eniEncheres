@@ -1,4 +1,3 @@
-//Interface DAO pour la gestion des catégories
 package fr.eni.eniEncheres.dal;
 
 import java.util.List;

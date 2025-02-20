@@ -1,130 +1,202 @@
 <!DOCTYPE html>
-<html lang="fr">
-
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Enchères - Vendre un article</title>
-<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
-<script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Page Title -->
+    <title th:text="#{enchereSell.page.title}">Enchères - Vendre un article</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen">
-	<div th:replace="~{fragments/fragment-entete :: entete}"></div>
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/fragment-entete :: entete}"></div>
 
-	<main class="container mx-auto p-6">
-		<div class="bg-white shadow-lg rounded-lg p-6 max-w-2xl mx-auto">
-			<h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Nouvelle
-				vente</h2>
+    <main class="container mx-auto p-6">
+        <div class="bg-white shadow-lg rounded-lg p-6 max-w-2xl mx-auto">
+            <!-- Heading -->
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6"
+                th:text="#{enchereSell.newSale}">
+                Nouvelle vente
+            </h2>
 
-			<form th:action="@{/encheres/vendre}" method="post"
-				th:object="${article}" class="space-y-4">
+            <!-- Form -->
+            <form th:action="@{/encheres/vendre}"
+                  method="post"
+                  th:object="${article}"
+                  class="space-y-4"
+                  enctype="multipart/form-data">
 
-				<div>
-					<label for="article" class="block font-medium text-gray-700">Article
-						:</label> <input type="text" id="article" data-th-name="nomArticle"
-						pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$" required
-						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
-				</div>
+                <!-- Article Name -->
+                <div>
+                    <label for="article"
+                           class="block font-medium text-gray-700"
+                           th:text="#{enchereSell.form.label.article}">
+                        Article :
+                    </label>
+                    <input type="text"
+                           id="article"
+                           name="nomArticle"
+                           pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$"
+                           required
+                           class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"
+                           th:placeholder="#{enchereSell.form.placeholder.article}"/>
+                </div>
 
-				<div>
-					<label for="description" class="block font-medium text-gray-700">Description
-						:</label>
-					<textarea id="description" data-th-name="description"
-						pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$" rows="4" required
-						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"></textarea>
-				</div>
+                <!-- Description -->
+                <div>
+                    <label for="description"
+                           class="block font-medium text-gray-700"
+                           th:text="#{enchereSell.form.label.description}">
+                        Description :
+                    </label>
+                    <textarea id="description"
+                              name="description"
+                              pattern="^[a-zA-Z0-9À-ÿ\s\p{P}]{2,}$"
+                              rows="4"
+                              required
+                              class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"
+                              th:placeholder="#{enchereSell.form.placeholder.description}">
+                    </textarea>
+                </div>
 
-				<div>
-					<label for="categorie" class="block font-medium text-gray-700">Catégorie
-						:</label> <select id="categorie" data-th-name="categorie" required
-						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
-						<option value="">Veuillez sélectionner une catégorie</option>
-						<option data-th-each="cat : ${CategoriesEnSession}"
-							data-th-text="${cat.libelle}" data-th-value="${cat.noCategorie}"></option>
-					</select>
-				</div>
+                <!-- Category -->
+                <div>
+                    <label for="categorie"
+                           class="block font-medium text-gray-700"
+                           th:text="#{enchereSell.form.label.category}">
+                        Catégorie :
+                    </label>
+                    <select id="categorie"
+                            name="categorie"
+                            required
+                            class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
+                        <option value=""
+                                th:text="#{enchereSell.form.category.placeholder}">
+                            Veuillez sélectionner une catégorie
+                        </option>
+                        <!-- Iteration over categories -->
+                        <option data-th-each="cat : ${CategoriesEnSession}"
+                                data-th-text="${cat.libelle}"
+                                data-th-value="${cat.noCategorie}">
+                        </option>
+                    </select>
+                </div>
 
-				<div>
-					<label for="miseAPrix" class="block font-medium text-gray-700">Mise
-						à prix :</label> <input type="number" id="miseAPrix"
-						data-th-name="miseAPrix" min="1" required
-						class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
-				</div>
-				<!-- Section Date enchère -->
-				<div>
-					<label for="dateDebutEncheres"
-						class="block font-medium text-gray-700"> Début de
-						l'enchère : </label>
-					<div class="flex space-x-2">
-						<input type="date" id="dateDebutEncheres"
-							data-th-name="dateDebutEncheres" required
-							class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
-						<input type="time" id="heureDebutEncheres"
-							th:name="heureDebutEncheres" required
-							class="border border-gray-300 p-2 w-1/2 rounded focus:ring-2 focus:ring-blue-500">
-					</div>
-				</div>
+                <!-- Starting Price -->
+                <div>
+                    <label for="miseAPrix"
+                           class="block font-medium text-gray-700"
+                           th:text="#{enchereSell.form.label.startingPrice}">
+                        Mise à prix :
+                    </label>
+                    <input type="number"
+                           id="miseAPrix"
+                           name="miseAPrix"
+                           min="1"
+                           required
+                           class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"
+                           th:placeholder="#{enchereSell.form.placeholder.startingPrice}"/>
+                </div>
 
-				<div>
-					<label for="dateFinEncheres"
-						class="block font-medium text-gray-700"> Fin de l'enchère
-						: </label>
-					<div class="flex space-x-2">
-						<input type="date" id="dateFinEncheres"
-							data-th-name="dateFinEncheres" required
-							class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
-						<input type="time" id="heureFinEncheres"
-							th:name="heureFinEncheres" required
-							class="border border-gray-300 p-2 w-1/2 rounded focus:ring-2 focus:ring-blue-500">
-					</div>
-				</div>
+                <!-- Auction Start -->
+                <div>
+                    <label for="dateDebutEncheres"
+                           class="block font-medium text-gray-700"
+                           th:text="#{enchereSell.form.label.startDate}">
+                        Début de l'enchère :
+                    </label>
+                    <input type="datetime-local"
+                           id="dateDebutEncheres"
+                           name="dateDebutEncheres"
+                           required
+                           class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"/>
+                </div>
 
-				<!-- Section Retrait -->
-				<fieldset class="border border-gray-300 p-4 rounded-lg">
-					<legend class="font-bold text-gray-700">Retrait</legend>
+                <!-- Auction End -->
+                <div>
+                    <label for="dateFinEncheres"
+                           class="block font-medium text-gray-700"
+                           th:text="#{enchereSell.form.label.endDate}">
+                        Fin de l'enchère :
+                    </label>
+                    <input type="datetime-local"
+                           id="dateFinEncheres"
+                           name="dateFinEncheres"
+                           required
+                           class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"/>
+                </div>
 
-					<div class="mt-2">
-						<label for="rue" class="block font-medium text-gray-700">Rue
-							:</label> <input type="text" id="rue" name="rue"
-							th:value="${utilisateurConnecte != null ? utilisateurConnecte.rue : ''}"
-							required
-							class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
+                <!-- Pickup Info -->
+                <fieldset class="border border-gray-300 p-4 rounded-lg">
+                    <legend class="font-bold text-gray-700"
+                            th:text="#{enchereSell.form.label.pickup}">
+                        Retrait
+                    </legend>
 
-					</div>
+                    <div class="mt-2">
+                        <label for="rue"
+                               class="block font-medium text-gray-700"
+                               th:text="#{enchereSell.form.label.street}">
+                            Rue :
+                        </label>
+                        <input type="text"
+                               id="rue"
+                               name="rue"
+                               th:value="${utilisateurConnecte != null ? utilisateurConnecte.rue : ''}"
+                               required
+                               class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"
+                               th:placeholder="#{enchereSell.form.placeholder.street}"/>
+                    </div>
 
-					<div class="mt-2">
-						<label for="codePostal" class="block font-medium text-gray-700">Code
-							postal :</label> <input type="text" id="codePostal" name="codePostal"
-							th:value="${utilisateurConnecte.codePostal}" required
-							class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
-					</div>
+                    <div class="mt-2">
+                        <label for="codePostal"
+                               class="block font-medium text-gray-700"
+                               th:text="#{enchereSell.form.label.postalCode}">
+                            Code postal :
+                        </label>
+                        <input type="text"
+                               id="codePostal"
+                               name="codePostal"
+                               th:value="${utilisateurConnecte != null ? utilisateurConnecte.codePostal : ''}"
+                               required
+                               class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"
+                               th:placeholder="#{enchereSell.form.placeholder.postalCode}"/>
+                    </div>
 
-					<div class="mt-2">
-						<label for="ville" class="block font-medium text-gray-700">Ville
-							:</label> <input type="text" id="ville" name="ville"
-							th:value="${utilisateurConnecte.ville}" required
-							class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500">
-					</div>
-				</fieldset>
+                    <div class="mt-2">
+                        <label for="ville"
+                               class="block font-medium text-gray-700"
+                               th:text="#{enchereSell.form.label.city}">
+                            Ville :
+                        </label>
+                        <input type="text"
+                               id="ville"
+                               name="ville"
+                               th:value="${utilisateurConnecte != null ? utilisateurConnecte.ville : ''}"
+                               required
+                               class="border border-gray-300 p-2 w-full rounded focus:ring-2 focus:ring-blue-500"
+                               th:placeholder="#{enchereSell.form.placeholder.city}"/>
+                    </div>
+                </fieldset>
 
+                <!-- Action Buttons -->
+                <div class="flex justify-between mt-6">
+                    <button type="submit"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            th:text="#{enchereSell.form.button.save}">
+                        Enregistrer
+                    </button>
+                    <button type="reset"
+                            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                            th:text="#{enchereSell.form.button.cancel}">
+                        Annuler
+                    </button>
+                </div>
 
-				<!-- Boutons -->
-				<div class="flex justify-between mt-6">
-					<button type="submit"
-						class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-						Enregistrer</button>
-					<button type="reset"
-						class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-						Annuler</button>
-				</div>
-
-			</form>
-		</div>
-	</main>
-
+            </form>
+        </div>
+    </main>
 </body>
-
 </html>
-
-

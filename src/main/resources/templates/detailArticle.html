@@ -1,88 +1,144 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détail de l'Article</title>
-    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="#{articleDetail.page.title}">Détail de l'Article</title>
+  <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
-    <div th:replace="~{fragments/fragment-entete :: entete}"></div>
+<body class="bg-gray-100 min-h-screen">
 
-    <main class="container mx-auto p-6">
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h1 th:text="${article.nomArticle}" class="text-2xl font-bold mb-4 text-center"></h1>
+  <!-- Header Fragment -->
+  <div th:replace="~{fragments/fragment-entete :: entete}"></div>
 
-            <div class="flex">
-                <div class="w-1/3 border mr-4">
-                    <div class="w-full h-64 bg-gray-200 flex items-center justify-center text-gray-600">
-                        Image de l'article (TODO)
-                    </div>
-                </div>
+  <!-- Main Container -->
+  <main class="container mx-auto px-4 py-6 md:py-8">
+    <!-- Card -->
+    <div class="bg-white p-6 md:p-8 rounded-lg shadow-md max-w-4xl mx-auto">
 
-                <div class="w-2/3">
-                    <div class="space-y-2">
-                        <p><strong>Description :</strong> <span th:text="${article.description}"></span></p>
-                        <p><strong>Catégorie :</strong> <span th:text="${article.categorie.libelle}"></span></p>
-                        <p><strong>Meilleure offre :</strong> <span th:text="${article.prixVente}"></span> points</p>
-                        <p><strong>Mise à prix :</strong> <span th:text="${article.miseAPrix}"></span> points</p>
-                        <p><strong>Début de l'enchère :</strong> <span th:text="${#temporals.format(article.dateDebutEncheres, 'dd/MM/yyyy')}"></span></p>
-                        <p><strong>Fin de l'enchère :</strong> <span th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}"></span></p>
-                        <p><strong>Retrait :</strong> 
-                            <span th:if="${article.lieuDeRetrait != null}" 
-                                  th:text="${article.lieuDeRetrait.rue + ' ' + article.lieuDeRetrait.codePostal + ' ' + article.lieuDeRetrait.ville}">
-                            </span> 
-                            <span th:if="${article.lieuDeRetrait == null}">Non spécifié</span>
-                        </p>
-	                    <p class="text-gray-800">
-	                        <a th:href="@{/encheres/vendeur(pseudo=${article.vendeur.pseudo})}" class="text-blue-500 hover:text-blue-700 font-medium">Vendeur : <span th:text="${article.vendeur.pseudo}"></span></a>
-	                    </p>
-                    </div>
-                    
-
-
-                    <!-- Formulaire pour enchérir -->
-                    <div th:if="${#authentication.authenticated}" class="mt-4">
-                        <form th:action="@{/encheres/nouvelle}" method="post" class="flex space-x-4">
-                            <input type="hidden" name="articleId" th:value="${article.noArticle}">
-                            <input type="number" name="montantEnchere" th:min="${article.prixVente + 1}"
-                                   class="flex-grow border rounded px-3 py-2">
-                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
-                                Enchérir
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Bouton Supprimer (Si l'utilisateur est le vendeur et l'enchère n'a pas encore commencé) -->
-                    <div th:if="${#authentication.name == article.vendeur.email and article.etatVente.name() == 'CREEE'}" class="mt-4">
-                        <form th:action="@{/encheres/supprimer}" method="post">
-                            <input type="hidden" name="articleId" th:value="${article.noArticle}" />
-                            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
-                                Supprimer l'article
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Bouton Modifier (Si l'utilisateur est le vendeur et l'état est CREEE) -->
-                    <div th:if="${#authentication.name == article.vendeur.email and article.etatVente.name() == 'CREEE'}" class="mt-4">
-                        <form th:action="@{/encheres/modifier}" method="get">
-                            <input type="hidden" name="articleId" th:value="${article.noArticle}" />
-                            <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
-                                Modifier l'article
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- DEBUG -->
-                    <p class="mt-4 font-bold text-gray-600">Debug : État de l'article : <span th:text="${article.etatVente.name()}"></span></p>
-                    <p class="font-bold text-gray-600">Utilisateur connecté : <span th:text="${#authentication.name}"></span></p>
-                    <p class="font-bold text-gray-600">Email du vendeur : <span th:text="${article.vendeur.email}"></span></p>
-
-                </div>
-            </div>
+      <!-- Article Title -->
+      <h1 th:text="${article.nomArticle}"
+          class="text-2xl font-bold mb-4 text-center">
+      </h1>
+	  
+      <!-- Main Grid (1 col on mobile, 2 cols on md+) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- Left Column: Article Details -->
+        <div class="space-y-4">
+          <p>
+            <strong th:text="#{articleDetail.description}">Description :</strong>
+            <span th:text="${article.description}"></span>
+          </p>
+          <p>
+            <strong th:text="#{articleDetail.category}">Catégorie :</strong>
+            <span th:text="${article.categorie != null ? article.categorie.libelle : 'Non spécifiée'}"></span>
+          </p>
+          <p>
+            <strong th:text="#{articleDetail.bestOffer}">Meilleure offre :</strong>
+            <span th:text="${article.prixVente}">0</span>
+            <span th:text="#{articleDetail.points}">points</span>
+          </p>
+          <p>
+            <strong th:text="#{articleDetail.startingPrice}">Mise à prix :</strong>
+            <span th:text="${article.miseAPrix}">0</span>
+            <span th:text="#{articleDetail.points}">points</span>
+          </p>
+          <p>
+            <strong th:text="#{articleDetail.endAuction}">Fin de l'enchère :</strong>
+            <span th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}"></span>
+          </p>
         </div>
-    </main>
+        
+        <!-- Right Column: Pickup/Vendor/Bid -->
+        <div class="space-y-4">
 
+          <!-- Pickup Info -->
+          <div class="border p-4 rounded-lg">
+            <h2 class="font-bold mb-2" th:text="#{articleDetail.pickup}">Retrait</h2>
+            <p th:if="${article.lieuDeRetrait != null}">
+              <span th:text="${article.lieuDeRetrait.rue}"></span><br>
+              <span th:text="${article.lieuDeRetrait.codePostal + ' ' + article.lieuDeRetrait.ville}"></span>
+            </p>
+            <p th:if="${article.lieuDeRetrait == null}"
+               th:text="#{articleDetail.pickupMissing}">
+              Lieu de retrait non spécifié
+            </p>
+          </div>
+
+          <!-- Seller Info -->
+          <div class="border p-4 rounded-lg">
+            <h2 class="font-bold mb-2" th:text="#{articleDetail.seller}">Vendeur</h2>
+            <p th:text="${article.vendeur.pseudo}"></p>
+          </div>
+
+          <!-- Bidding Form (if user is authenticated) -->
+          <div th:if="${#authentication.authenticated}" class="border p-4 rounded-lg">
+            <h2 class="font-bold mb-2" th:text="#{articleDetail.bid}">Enchérir</h2>
+            <form method="post" th:action="@{/encheres/encherir}" class="space-y-4">
+              <input type="hidden" name="articleId" th:value="${article.noArticle}">
+              
+              <div class="flex flex-col">
+                <label for="montantEnchere"
+                       th:text="#{articleDetail.yourOffer}">
+                  Votre offre :
+                </label>
+                <input type="number"
+                       id="montantEnchere"
+                       name="montantEnchere"
+                       th:min="${article.prixVente + 1}"
+                       class="border rounded px-3 py-2"
+                       required>
+              </div>
+              <button type="submit"
+                      class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                      th:text="#{articleDetail.bidButton}">
+                Enchérir
+              </button>
+            </form>
+          </div>
+
+          <!-- Delete Button (if current user is the vendor) -->
+          <div th:if="${#authentication.principal != null and #authentication.principal.username == article.vendeur.email}">
+            <form th:action="@{/encheres/article/supprimer/{id}(id=${article.noArticle})}"
+                  method="post"
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+              <button type="submit"
+                      class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                      th:text="#{articleDetail.deleteArticle}">
+                Supprimer l'article
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Best Bid Section -->
+      <div th:if="${meilleureEnchere != null}"
+           class="mt-6 p-4 bg-gray-50 rounded-lg">
+        <h2 class="font-bold mb-2" th:text="#{articleDetail.currentBestBid}">
+          Meilleure enchère actuelle
+        </h2>
+        <p>
+          <span th:text="${meilleureEnchere.utilisateur.pseudo}"></span>
+          <span th:text="#{articleDetail.bidOffered}">a proposé</span>
+          <span th:text="${meilleureEnchere.montantEnchere}">0</span>
+          <span th:text="#{articleDetail.points}">points</span>
+          <span th:text="#{articleDetail.bidOn}">le</span>
+          <span th:text="${#temporals.format(meilleureEnchere.dateEnchere, 'dd/MM/yyyy HH:mm')}"></span>
+        </p>
+      </div>
+
+      <!-- Error Messages -->
+      <div th:if="${erreurs != null}"
+           class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
+        <ul>
+          <li th:each="erreur : ${erreurs}"
+              th:text="${erreur}"></li>
+        </ul>
+      </div>
+    </div>
+  </main>
 </body>
 </html>

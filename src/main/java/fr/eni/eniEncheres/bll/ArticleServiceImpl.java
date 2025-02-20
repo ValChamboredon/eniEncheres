@@ -1,15 +1,17 @@
 package fr.eni.eniEncheres.bll;
 
 import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import fr.eni.eniEncheres.bll.ArticleService;
 import fr.eni.eniEncheres.bo.ArticleVendu;
 import fr.eni.eniEncheres.bo.EtatVente;
 import fr.eni.eniEncheres.dal.ArticleDAO;
@@ -89,32 +91,47 @@ public class ArticleServiceImpl implements ArticleService {
 
 		return articles;
 	}
+	
+	private void verifierEtMettreAJourEtatVente(ArticleVendu article) {
+        LocalDateTime now = LocalDateTime.now();
+        
+        System.out.println("Vérification article #" + article.getNoArticle());
+        System.out.println("État actuel : " + article.getEtatVente());
+        System.out.println("Date début : " + article.getDateDebutEncheres());
+        System.out.println("Date fin : " + article.getDateFinEncheres());
+        System.out.println("Date actuelle : " + now);
+        
+        // Vérification pour passage à EN_COURS
+        if (article.getEtatVente() == EtatVente.CREEE && 
+            (now.isEqual(article.getDateDebutEncheres()) || 
+             now.isAfter(article.getDateDebutEncheres()))) {
+            
+            article.setEtatVente(EtatVente.EN_COURS);
+            articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.EN_COURS);
+            System.out.println("Mise à jour en EN_COURS pour l'article: " + article.getNoArticle());
+        }
+
+        // Vérification pour passage à ENCHERES_TERMINEES
+        if (article.getEtatVente() == EtatVente.EN_COURS && 
+            now.isAfter(article.getDateFinEncheres())) {
+            
+            article.setEtatVente(EtatVente.ENCHERES_TERMINEES);
+            articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.ENCHERES_TERMINEES);
+            System.out.println("Mise à jour en ENCHERES_TERMINEES pour l'article: " + article.getNoArticle());
+        }
+    }
 
 	@Override
 	public ArticleVendu getArticleById(int noArticle) {
 		ArticleVendu article = articleDAO.getArticleById(noArticle);
-		//debug
+
 		System.out.println("Vérification état vente pour l'article: " + article.getNoArticle());
 		System.out.println("Date de début: " + article.getDateDebutEncheres());
 		System.out.println("Date de fin: " + article.getDateFinEncheres());
 		System.out.println("Date actuelle: " + LocalDate.now());
 		System.out.println("État actuel: " + article.getEtatVente());
-
-		// Vérifier si l'enchère doit passer à "EN_COURS"
-		if (article.getEtatVente() == EtatVente.CREEE && (LocalDateTime.now().isEqual(article.getDateDebutEncheres())
-				|| LocalDateTime.now().isAfter(article.getDateDebutEncheres()))) {
-
-			article.setEtatVente(EtatVente.EN_COURS);
-			System.out.println("Mise à jour en EN_COURS pour l'article: " + article.getNoArticle());
-			articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.EN_COURS);
-		}
-
-		// Vérifier si l'enchère doit passer à "ENCHERES_TERMINEES"
-		if (article.getEtatVente() == EtatVente.EN_COURS && LocalDateTime.now().isAfter(article.getDateFinEncheres())) {
-			article.setEtatVente(EtatVente.ENCHERES_TERMINEES);
-			System.out.println("Mise à jour en ENCHERES_TERMINEES pour l'article: " + article.getNoArticle());
-			articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.ENCHERES_TERMINEES);
-		}
+		
+		verifierEtMettreAJourEtatVente(article);
 
 		return article;
 	}
@@ -138,21 +155,15 @@ public class ArticleServiceImpl implements ArticleService {
 	 * l'index
 	 */
 	public void mettreAJourEtatVente(ArticleVendu article) {
-		LocalDateTime today = LocalDateTime.now();
-
-		if (article.getEtatVente() == EtatVente.CREEE
-				&& (today.isEqual(article.getDateDebutEncheres()) || today.isAfter(article.getDateDebutEncheres()))) {
-
-			article.setEtatVente(EtatVente.EN_COURS);
-			System.out.println("Mise à jour en EN_COURS pour l'article: " + article.getNoArticle());
-			articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.EN_COURS);
-		}
-
-		if (article.getEtatVente() == EtatVente.EN_COURS && today.isAfter(article.getDateFinEncheres())) {
-			article.setEtatVente(EtatVente.ENCHERES_TERMINEES);
-			System.out.println("Mise à jour en ENCHERES_TERMINEES pour l'article: " + article.getNoArticle());
-			articleDAO.updateEtatVente(article.getNoArticle(), EtatVente.ENCHERES_TERMINEES);
-		}
+		verifierEtMettreAJourEtatVente(article);
+	}
+	
+	@Transactional
+	public void mettreAJourEtatDesArticles() {
+	    List<ArticleVendu> articles = articleDAO.getAllArticles();
+	    for (ArticleVendu article : articles) {
+	        verifierEtMettreAJourEtatVente(article);
+	    }
 	}
 
 	// Filtre non connecté
@@ -161,10 +172,23 @@ public class ArticleServiceImpl implements ArticleService {
 		return articleDAO.searchArticles(recherche, noCategorie);
 	}
 
-	@Override
-	public List<ArticleVendu> filtrerVentes(int userId, Boolean ventesEnCours, Boolean ventesNonDebutees, Boolean ventesTerminees) {
-	    return articleDAO.filtrerVentes(userId, ventesEnCours, ventesNonDebutees, ventesTerminees);
+//	@Override
+//	public List<ArticleVendu> filtrerVentes(int userId, Boolean ventesEnCours, Boolean ventesNonDebutees,
+//			Boolean ventesTerminees) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
+
+//	@Override
+//	public List<ArticleVendu> filtrerAchats(int userId, Boolean encheresOuvertes, Boolean mesEncheresEnCours,
+//			Boolean mesEncheresRemportees) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
+
 	}
 
 
-}
+

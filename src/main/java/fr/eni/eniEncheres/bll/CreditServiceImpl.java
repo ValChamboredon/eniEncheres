@@ -1,10 +1,8 @@
 package fr.eni.eniEncheres.bll;
 
-import java.lang.System.Logger;
-
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import fr.eni.eniEncheres.bo.Utilisateur;
 import fr.eni.eniEncheres.dal.UtilisateurDAO;
@@ -33,6 +31,7 @@ public class CreditServiceImpl implements CreditService {
     }
 	
 	@Override
+	@Transactional
     public void transfererPoints(int noAcheteur, int noVendeur, int montant) throws BusinessException {
         verifierCredit(noAcheteur, montant);
         
@@ -40,16 +39,31 @@ public class CreditServiceImpl implements CreditService {
         Utilisateur vendeur = utilisateurDAO.read(noVendeur);
         
         BusinessException be = new BusinessException();
-        if (vendeur == null) {
-            be.addCleErreur("ERR_VENDEUR_INEXISTANT");
+        if (vendeur == null || acheteur == null) {
+            be.addCleErreur("ERR_UTILISATEUR_INEXISTANT");
             throw be;
         }
         
-        acheteur.setCredit(acheteur.getCredit() - montant);
-        vendeur.setCredit(vendeur.getCredit() + montant);
+        if (acheteur.getCredit() < montant) {
+            be.addCleErreur("ERR_CREDIT_INSUFFISANT");
+            throw be;
+        }
         
+        try {
+        acheteur.setCredit(acheteur.getCredit() - montant);
         utilisateurDAO.update(acheteur);
+        
+        vendeur.setCredit(vendeur.getCredit() + montant);
         utilisateurDAO.update(vendeur);
+        
+        System.out.println("Transfert effectué : " + montant + " points de " + acheteur.getPseudo() + " vers " + vendeur.getPseudo());
+        System.out.println("Nouveau solde " + acheteur.getPseudo() + " : " + vendeur.getCredit());
+        System.out.println("Nouveau solde " + acheteur.getPseudo() + " : " + vendeur.getCredit());
+        
+        } catch (Exception e) {
+            be.addCleErreur("ERR_TRANSFERT");
+            throw be;
+        }
     }
 	
 	@Override

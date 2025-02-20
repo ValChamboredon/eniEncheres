@@ -3,9 +3,6 @@ package fr.eni.eniEncheres.bo;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.data.annotation.Transient;
-
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -16,19 +13,19 @@ public class Utilisateur {
 	private int noUtilisateur;
 	
 	@NotBlank(message = "{FormulaireProfil.pseudo.NotBlank}")
-	@Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Le pseudonyme doit contenir uniquement des caractères alphanumériques.")
+	@Pattern(regexp = "^[a-zA-Z0-9]+$", message = "{FormulaireProfil.pseudo.AlphaNumeric}") //meesgaes.properties Le pseudonyme doit contenir uniquement des caractères alphanumériques 
 	private String pseudo;
 	
 	@NotBlank(message = "{FormulaireProfil.nom.NotBlank}")
-	@Pattern(regexp = "^[a-zA-ZÀ-ÿ]+([ '-][a-zA-ZÀ-ÿ]+)*$", message = "Le nom ne peut pas contenir de chiffre ou de caractères spéciaux.")
+	@Pattern(regexp = "^[a-zA-ZÀ-ÿ]+([ '-][a-zA-ZÀ-ÿ]+)*$", message = "{FormulaireProfil.nom.Invalid}") //meesgaes.properties : Le nom ne peut pas contenir de chiffre ou de caractères spéciaux.
 	private String nom;
 
 	@NotBlank(message = "{FormulaireProfil.prenom.NotBlank}")
-	@Pattern(regexp = "^[a-zA-ZÀ-ÿ]+([ '-][a-zA-ZÀ-ÿ]+)*$", message = "Le prénom ne peut pas contenir de chiffre ou de caractères spéciaux.")
+	@Pattern(regexp = "^[a-zA-ZÀ-ÿ]+([ '-][a-zA-ZÀ-ÿ]+)*$", message = "{FormulaireProfil.prenom.Invalid}" ) // Le prénom ne peut pas contenir de chiffre ou de caractères spéciaux.
 	private String prenom;
 
 	@NotBlank(message = "{FormulaireProfil.email.NotBlank}")
-	 @Pattern(regexp = "^[\\w\\-\\.]+@([\\w-]+\\.)+[\\w-]{2,}$", message = "L'adresse mail n'est pas valide.")
+	 @Pattern(regexp = "^[\\w\\-\\.]+@([\\w-]+\\.)+[\\w-]{2,}$", message = "{FormulaireProfil.email.Invalid}") //L'adresse mail n'est pas valide.
 	private String email;
 
 	@Pattern(regexp = "^(\\+33|0)[1-9](\\d{2}){4}$",message = "{FormulaireProfil.telephone.Format}")
@@ -38,7 +35,7 @@ public class Utilisateur {
 	private String rue;
 
 	@NotBlank(message = "{FormulaireProfil.codePostal.NotBlank}")
-	@Pattern(regexp = "^\\d{5}$", message = "Le code postal doit comprendre 5 chiffres.")
+	@Pattern(regexp = "^\\d{5}$", message = "{FormulaireProfil.codePostal.Invalid}") //Le code postal doit comprendre 5 chiffres.
 	private String codePostal;
 
 	@NotBlank(message = "{FormulaireProfil.ville.NotBlank}")
