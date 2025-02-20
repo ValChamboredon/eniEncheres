@@ -27,18 +27,29 @@ public class ArticleDAOImpl implements ArticleDAO {
 
 	@Override
 	public ArticleVendu getArticleById(int noArticle) {
-
 		String sql = "SELECT av.*, "
 				+ "u.pseudo, u.nom, u.prenom, u.email, u.telephone, u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, "
-				+ "c.libelle, " + "COALESCE(r.rue, u.rue) AS retrait_rue, "
-				+ "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, "
-				+ "COALESCE(r.ville, u.ville) AS retrait_ville " + "FROM ARTICLES_VENDUS av "
-				+ "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur "
+				+ "c.libelle, " + "r.rue AS retrait_rue, " + "r.code_postal AS retrait_code_postal, "
+				+ "r.ville AS retrait_ville, "
+				+ "CASE WHEN r.no_article IS NULL THEN u.rue ELSE r.rue END AS display_rue, "
+				+ "CASE WHEN r.no_article IS NULL THEN u.code_postal ELSE r.code_postal END AS display_code_postal, "
+				+ "CASE WHEN r.no_article IS NULL THEN u.ville ELSE r.ville END AS display_ville "
+				+ "FROM ARTICLES_VENDUS av " + "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur "
 				+ "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie "
 				+ "LEFT JOIN RETRAITS r ON av.no_article = r.no_article " + "WHERE av.no_article = :noArticle";
 
 		MapSqlParameterSource params = new MapSqlParameterSource("noArticle", noArticle);
-		return namedParameterJdbcTemplate.queryForObject(sql, params, new ArticleRowMapper());
+		ArticleVendu article = namedParameterJdbcTemplate.queryForObject(sql, params, new ArticleRowMapper());
+
+		// Pour debug
+		if (article != null && article.getLieuDeRetrait() != null) {
+			System.out.println("Lieu de retrait pour article " + noArticle + ":");
+			System.out.println("Rue: " + article.getLieuDeRetrait().getRue());
+			System.out.println("Code postal: " + article.getLieuDeRetrait().getCodePostal());
+			System.out.println("Ville: " + article.getLieuDeRetrait().getVille());
+		}
+
+		return article;
 	}
 
 	@Override
@@ -58,31 +69,52 @@ public class ArticleDAOImpl implements ArticleDAO {
 
 	@Override
 	public void addArticle(ArticleVendu article) {
-		KeyHolder keyholder = new GeneratedKeyHolder();
+	    KeyHolder keyholder = new GeneratedKeyHolder();
 
-		String requete = "INSERT INTO [ARTICLES_VENDUS] ([nom_article], [description], [date_debut_encheres], [date_fin_encheres], [prix_initial], [prix_vente], [etat_vente], [no_utilisateur], [no_categorie]) VALUES (:nom_article, :description, :date_debut_encheres, :date_fin_encheres, :prix_initial, :prix_vente, :etat_vente, :no_utilisateur, :no_categorie)";
+	    // 1. Insertion de l'article
+	    String requete = "INSERT INTO [ARTICLES_VENDUS] ([nom_article], [description], [date_debut_encheres], [date_fin_encheres], [prix_initial], [prix_vente], [etat_vente], [no_utilisateur], [no_categorie]) VALUES (:nom_article, :description, :date_debut_encheres, :date_fin_encheres, :prix_initial, :prix_vente, :etat_vente, :no_utilisateur, :no_categorie)";
 
-		MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+	    MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+	    namedParameters.addValue("nom_article", article.getNomArticle());
+	    namedParameters.addValue("description", article.getDescription());
+	    namedParameters.addValue("date_debut_encheres", article.getDateDebutEncheres());
+	    namedParameters.addValue("date_fin_encheres", article.getDateFinEncheres());
+	    namedParameters.addValue("prix_initial", article.getMiseAPrix());
+	    namedParameters.addValue("prix_vente", article.getPrixVente());
+	    namedParameters.addValue("no_utilisateur", article.getVendeur().getNoUtilisateur());
+	    namedParameters.addValue("no_categorie", article.getCategorie().getNoCategorie());
+	    namedParameters.addValue("etat_vente", article.getEtatVente().name());
 
-		namedParameters.addValue("nom_article", article.getNomArticle());
-		namedParameters.addValue("description", article.getDescription());
-		namedParameters.addValue("date_debut_encheres", article.getDateDebutEncheres());
-		namedParameters.addValue("date_fin_encheres", article.getDateFinEncheres());
-		namedParameters.addValue("prix_initial", article.getMiseAPrix());
-		namedParameters.addValue("prix_vente", article.getPrixVente());
+	    namedParameterJdbcTemplate.update(requete, namedParameters, keyholder, new String[]{"no_article"});
 
-		namedParameters.addValue("no_utilisateur", article.getVendeur().getNoUtilisateur());
-		namedParameters.addValue("no_categorie", article.getCategorie().getNoCategorie());
-		namedParameters.addValue("etat_vente", article.getEtatVente().name()); // Convertit l'Enum en String
+	    // Récupère l'ID de l'article créé
+	    if (keyholder.getKey() != null) {
+	        int articleId = keyholder.getKey().intValue();
+	        article.setNoArticle(articleId);
 
-		namedParameterJdbcTemplate.update(requete, namedParameters, keyholder);
+	        // 2. Insertion du lieu de retrait
+	        if (article.getLieuDeRetrait() != null) {
+	            String requeteRetrait = "INSERT INTO RETRAITS (no_article, rue, code_postal, ville) VALUES (:no_article, :rue, :code_postal, :ville)";
+	            
+	            MapSqlParameterSource retraitParams = new MapSqlParameterSource();
+	            retraitParams.addValue("no_article", articleId);
+	            retraitParams.addValue("rue", article.getLieuDeRetrait().getRue());
+	            retraitParams.addValue("code_postal", article.getLieuDeRetrait().getCodePostal());
+	            retraitParams.addValue("ville", article.getLieuDeRetrait().getVille());
 
-		if (keyholder != null && keyholder.getKey().intValue() > 0) {
-
-			// Si le no_article a été crée, on l'ajoute à article
-			article.setNoArticle(keyholder.getKey().intValue());
-		}
-
+	            try {
+	                namedParameterJdbcTemplate.update(requeteRetrait, retraitParams);
+	                System.out.println("Retrait enregistré pour l'article " + articleId + 
+	                    " à l'adresse: " + article.getLieuDeRetrait().getRue() + 
+	                    ", " + article.getLieuDeRetrait().getCodePostal() + 
+	                    " " + article.getLieuDeRetrait().getVille());
+	            } catch (Exception e) {
+	                System.err.println("Erreur lors de l'insertion du retrait pour l'article " + articleId + ": " + e.getMessage());
+	                throw e;
+	            }
+	           
+	        }
+	    }
 	}
 
 	@Override
@@ -108,7 +140,7 @@ public class ArticleDAOImpl implements ArticleDAO {
 			return jdbcTemplate.query(sql, new ArticleRowMapper());
 		} catch (Exception e) {
 			System.err.println("Erreur SQL : " + e.getMessage());
-			
+
 			return new ArrayList<>();
 		}
 	}
@@ -119,27 +151,23 @@ public class ArticleDAOImpl implements ArticleDAO {
 	@Override
 	public List<ArticleVendu> searchArticles(String keyword, int categoryId) {
 
-	    String sql = "SELECT av.*, " +
-	                 "u.no_utilisateur, u.pseudo, u.email, " +
-	                 "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, " +
-	                 "c.no_categorie, c.libelle, " +
-	                 "COALESCE(r.rue, u.rue) AS retrait_rue, " +
-	                 "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, " +
-	                 "COALESCE(r.ville, u.ville) AS retrait_ville " +
-	                 "FROM ARTICLES_VENDUS av " +
-	                 "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur " +
-	                 "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie " +
-	                 "LEFT JOIN RETRAITS r ON av.no_article = r.no_article " +
-	                 "WHERE (av.etat_vente = 'CREEE' AND av.date_debut_encheres <= CURRENT_TIMESTAMP) " + 
-	                 "   OR av.etat_vente = 'EN_COURS' " +
-	                 "AND (:keyword IS NULL OR av.nom_article LIKE :keyword) " +
-	                 "AND (:categoryId = 0 OR av.no_categorie = :categoryId)";
+		String sql = "SELECT av.*, " + "u.no_utilisateur, u.pseudo, u.email, "
+				+ "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, "
+				+ "c.no_categorie, c.libelle, " + "COALESCE(r.rue, u.rue) AS retrait_rue, "
+				+ "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, "
+				+ "COALESCE(r.ville, u.ville) AS retrait_ville " + "FROM ARTICLES_VENDUS av "
+				+ "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur "
+				+ "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie "
+				+ "LEFT JOIN RETRAITS r ON av.no_article = r.no_article "
+				+ "WHERE (av.etat_vente = 'CREEE' AND av.date_debut_encheres <= CURRENT_TIMESTAMP) "
+				+ "   OR av.etat_vente = 'EN_COURS' " + "AND (:keyword IS NULL OR av.nom_article LIKE :keyword) "
+				+ "AND (:categoryId = 0 OR av.no_categorie = :categoryId)";
 
-	    MapSqlParameterSource params = new MapSqlParameterSource();
-	    params.addValue("keyword", keyword != null && !keyword.isEmpty() ? "%" + keyword + "%" : null);
-	    params.addValue("categoryId", categoryId);
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("keyword", keyword != null && !keyword.isEmpty() ? "%" + keyword + "%" : null);
+		params.addValue("categoryId", categoryId);
 
-	    return namedParameterJdbcTemplate.query(sql, params, new ArticleRowMapper());
+		return namedParameterJdbcTemplate.query(sql, params, new ArticleRowMapper());
 
 	}
 
@@ -157,11 +185,9 @@ public class ArticleDAOImpl implements ArticleDAO {
 		params.addValue("etat_vente", nouvelEtat.name()); // Convertit l'Enum en String
 		params.addValue("no_article", noArticle);
 
-
-	    int rowsUpdated = namedParameterJdbcTemplate.update(sql, params);
-	    System.out.println("Mise à jour de l'état de vente - Article #" + noArticle + 
-	                       ", Nouvel état : " + nouvelEtat.name() + 
-	                       ", Lignes mises à jour : " + rowsUpdated);
+		int rowsUpdated = namedParameterJdbcTemplate.update(sql, params);
+		System.out.println("Mise à jour de l'état de vente - Article #" + noArticle + ", Nouvel état : "
+				+ nouvelEtat.name() + ", Lignes mises à jour : " + rowsUpdated);
 
 	}
 
@@ -183,103 +209,89 @@ public class ArticleDAOImpl implements ArticleDAO {
 
 	}
 
-
 	@Override
 	public void updatePrixVente(int noArticle, int nouveauPrix) {
-	    String sql = "UPDATE ARTICLES_VENDUS SET prix_vente = :prix_vente WHERE no_article = :no_article";
-	    
-	    MapSqlParameterSource params = new MapSqlParameterSource();
-	    params.addValue("prix_vente", nouveauPrix);
-	    params.addValue("no_article", noArticle);
+		String sql = "UPDATE ARTICLES_VENDUS SET prix_vente = :prix_vente WHERE no_article = :no_article";
 
-	    namedParameterJdbcTemplate.update(sql, params);
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("prix_vente", nouveauPrix);
+		params.addValue("no_article", noArticle);
+
+		namedParameterJdbcTemplate.update(sql, params);
 	}
-	
 
-
-	
-	//Methode pour filtrer les ventes en fonction de l'utilisateur co. Vente en cours,terminées et pas commencées.
+	// Methode pour filtrer les ventes en fonction de l'utilisateur co. Vente en
+	// cours,terminées et pas commencées.
 	@Override
-	public List<ArticleVendu> filtrerVentes(int userId, Boolean ventesEnCours, Boolean ventesNonDebutees, Boolean ventesTerminees) {
-	    StringBuilder sql = new StringBuilder(
-	        "SELECT av.*, " +
-	        "u.no_utilisateur, u.pseudo, u.email, " +
-	        "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, " +
-	        "c.no_categorie, c.libelle, " +
-	        "COALESCE(r.rue, u.rue) AS retrait_rue, " +
-	        "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, " +
-	        "COALESCE(r.ville, u.ville) AS retrait_ville " +
-	        "FROM ARTICLES_VENDUS av " +
-	        "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur " +
-	        "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie " +
-	        "LEFT JOIN RETRAITS r ON av.no_article = r.no_article " +  
-	        "WHERE av.no_utilisateur = :userId "
-	    );
+	public List<ArticleVendu> filtrerVentes(int userId, Boolean ventesEnCours, Boolean ventesNonDebutees,
+			Boolean ventesTerminees) {
+		StringBuilder sql = new StringBuilder("SELECT av.*, " + "u.no_utilisateur, u.pseudo, u.email, "
+				+ "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, "
+				+ "c.no_categorie, c.libelle, " + "COALESCE(r.rue, u.rue) AS retrait_rue, "
+				+ "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, "
+				+ "COALESCE(r.ville, u.ville) AS retrait_ville " + "FROM ARTICLES_VENDUS av "
+				+ "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur "
+				+ "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie "
+				+ "LEFT JOIN RETRAITS r ON av.no_article = r.no_article " + "WHERE av.no_utilisateur = :userId ");
 
-	    MapSqlParameterSource params = new MapSqlParameterSource("userId", userId);
-	    
-	    List<String> conditions = new ArrayList<>();
+		MapSqlParameterSource params = new MapSqlParameterSource("userId", userId);
 
-	    if (ventesEnCours != null && ventesEnCours) {
-	        conditions.add("av.etat_vente = 'EN_COURS'");
-	    }
-	    if (ventesNonDebutees != null && ventesNonDebutees) {
-	        conditions.add("av.etat_vente = 'CREEE'");
-	    }
-	    if (ventesTerminees != null && ventesTerminees) {
-	        conditions.add("av.etat_vente = 'ENCHERES_TERMINEES'");
-	    }
+		List<String> conditions = new ArrayList<>();
 
-	    // Vérifier s'il y a des conditions et les ajouter proprement
-	    // chatgpt j'ai pas compris pourquoi il faut faire ça
-	    if (!conditions.isEmpty()) {
-	        sql.append(" AND (").append(String.join(" OR ", conditions)).append(") ");
-	    }
+		if (ventesEnCours != null && ventesEnCours) {
+			conditions.add("av.etat_vente = 'EN_COURS'");
+		}
+		if (ventesNonDebutees != null && ventesNonDebutees) {
+			conditions.add("av.etat_vente = 'CREEE'");
+		}
+		if (ventesTerminees != null && ventesTerminees) {
+			conditions.add("av.etat_vente = 'ENCHERES_TERMINEES'");
+		}
 
-	    return namedParameterJdbcTemplate.query(sql.toString(), params, new ArticleRowMapper());
+		// Vérifier s'il y a des conditions et les ajouter proprement
+		// chatgpt j'ai pas compris pourquoi il faut faire ça
+		if (!conditions.isEmpty()) {
+			sql.append(" AND (").append(String.join(" OR ", conditions)).append(") ");
+		}
+
+		return namedParameterJdbcTemplate.query(sql.toString(), params, new ArticleRowMapper());
 	}
 
+	// filtrer les achats en fonction de l'utilisateur co. Toutes les enchères, les
+	// enchères auxquelles il participe et les enchères win
 
-
-	//filtrer les achats en fonction de l'utilisateur co. Toutes les enchères, les enchères auxquelles il participe et les enchères win
-	
 	@Override
-	public List<ArticleVendu> filtrerAchats(int userId, Boolean encheresOuvertes, Boolean mesEncheresEnCours, Boolean mesEncheresRemportees) {
-	    StringBuilder sql = new StringBuilder(
-	        "SELECT av.*, " +
-	        "u.no_utilisateur, u.pseudo, u.email, " +
-	        "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, " +
-	        "c.no_categorie, c.libelle, " +
-	        "COALESCE(r.rue, u.rue) AS retrait_rue, " +
-	        "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, " +
-	        "COALESCE(r.ville, u.ville) AS retrait_ville " +
-	        "FROM ARTICLES_VENDUS av " +
-	        "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur " +
-	        "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie " +
-	        "LEFT JOIN RETRAITS r ON av.no_article = r.no_article "
-	    );
+	public List<ArticleVendu> filtrerAchats(int userId, Boolean encheresOuvertes, Boolean mesEncheresEnCours,
+			Boolean mesEncheresRemportees) {
+		StringBuilder sql = new StringBuilder("SELECT av.*, " + "u.no_utilisateur, u.pseudo, u.email, "
+				+ "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, "
+				+ "c.no_categorie, c.libelle, " + "COALESCE(r.rue, u.rue) AS retrait_rue, "
+				+ "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, "
+				+ "COALESCE(r.ville, u.ville) AS retrait_ville " + "FROM ARTICLES_VENDUS av "
+				+ "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur "
+				+ "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie "
+				+ "LEFT JOIN RETRAITS r ON av.no_article = r.no_article ");
 
-	    MapSqlParameterSource params = new MapSqlParameterSource();
-	    List<String> conditions = new ArrayList<>();
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		List<String> conditions = new ArrayList<>();
 
-	    if (encheresOuvertes != null && encheresOuvertes) {
-	        conditions.add("av.etat_vente = 'EN_COURS'");
-	    }
-	    if (mesEncheresEnCours != null && mesEncheresEnCours) {
-	        conditions.add("av.no_article IN (SELECT e.no_article FROM ENCHERES e WHERE e.no_utilisateur = :userId)");
-	        params.addValue("userId", userId);
-	    }
-	    if (mesEncheresRemportees != null && mesEncheresRemportees) {
-	        //TODO
-	    }
+		if (encheresOuvertes != null && encheresOuvertes) {
+			conditions.add("av.etat_vente = 'EN_COURS'");
+		}
+		if (mesEncheresEnCours != null && mesEncheresEnCours) {
+			conditions.add("av.no_article IN (SELECT e.no_article FROM ENCHERES e WHERE e.no_utilisateur = :userId)");
+			params.addValue("userId", userId);
+		}
+		if (mesEncheresRemportees != null && mesEncheresRemportees) {
+			// TODO
+		}
 
-	    // Ajout des conditions seulement si elles existent
-	    if (!conditions.isEmpty()) {
-	        sql.append(" WHERE ").append(String.join(" OR ", conditions));
-	    }
+		// Ajout des conditions seulement si elles existent
+		if (!conditions.isEmpty()) {
+			sql.append(" WHERE ").append(String.join(" OR ", conditions));
+		}
 
-	    return namedParameterJdbcTemplate.query(sql.toString(), params, new ArticleRowMapper());
+		return namedParameterJdbcTemplate.query(sql.toString(), params, new ArticleRowMapper());
 	}
-	
 
 }

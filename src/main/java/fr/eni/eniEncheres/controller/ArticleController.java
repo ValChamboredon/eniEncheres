@@ -218,6 +218,8 @@ public class ArticleController {
 	        // Définir le lieu de retrait
 	        Retrait retrait = new Retrait(rue, codePostal, ville);
 	        article.setLieuDeRetrait(retrait);
+	        
+	        System.out.println(retrait);
 
 	        // Prix de vente initial = mise à prix
 	        article.setPrixVente(miseAPrix);
@@ -248,19 +250,44 @@ public class ArticleController {
     /**
      * Affiche le détail d'un article.
      */
-    @GetMapping("/article/detail/{noArticle}")
-    public String afficherDetailArticle(@PathVariable("noArticle") int noArticle, Model model, Principal principal) {
-        ArticleVendu article = articleService.getArticleById(noArticle);
-        if (article == null) {
-            return "redirect:/encheres";
-        }
-        if (article.getLieuDeRetrait() == null) {
-            article.setLieuDeRetrait(new Retrait(article.getVendeur().getRue(), article.getVendeur().getCodePostal(),
-                    article.getVendeur().getVille()));
-        }
-        model.addAttribute("article", article);
-        return "detailArticle";
-    }
+	@GetMapping("/article/detail/{noArticle}")
+	public String afficherDetailArticle(@PathVariable("noArticle") int noArticle, Model model, Principal principal) {
+	    ArticleVendu article = articleService.getArticleById(noArticle);
+	    if (article == null) {
+	        return "redirect:/encheres";
+	    }
+
+	    // Récupérer la meilleure enchère pour l'article
+	    Enchere meilleureEnchere = null;
+	    try {
+	        meilleureEnchere = enchereService.getMeilleureEnchere(noArticle);
+	        model.addAttribute("meilleureEnchere", meilleureEnchere);
+	    } catch (BusinessException e) {
+	        // Log l'erreur mais continue l'affichage de la page
+	        System.err.println("Erreur lors de la récupération de la meilleure enchère: " + e.getMessage());
+	        // Optionnel : ajouter un message d'erreur au modèle
+	        model.addAttribute("erreur", "Impossible de récupérer l'enchère la plus élevée");
+	    }
+
+	    // Si pas de lieu de retrait spécifique, utiliser l'adresse du vendeur
+	    if (article.getLieuDeRetrait() == null) {
+	        article.setLieuDeRetrait(new Retrait(
+	            article.getVendeur().getRue(),
+	            article.getVendeur().getCodePostal(),
+	            article.getVendeur().getVille()
+	        ));
+	    }
+
+	    model.addAttribute("article", article);
+	    
+	    // Si l'utilisateur est connecté, ajouter ses infos au modèle
+	    if (principal != null) {
+	        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+	        model.addAttribute("utilisateurConnecte", utilisateur);
+	    }
+
+	    return "detailArticle";
+	}
 
   
     

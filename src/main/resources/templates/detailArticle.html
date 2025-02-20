@@ -2,11 +2,11 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détail de l'Article</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Détail de l'Article</title>
 <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
-    <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 <body class="bg-gray-100">
@@ -14,7 +14,26 @@
 
 	<main class="container mx-auto p-4">
 		<div class="bg-white p-6 rounded-lg shadow-md">
-			<h1 th:text="${article.nomArticle}"
+			<!-- Titre dynamique selon l'état -->
+			<h1
+				th:if="${article.etatVente == T(fr.eni.eniEncheres.bo.EtatVente).ENCHERES_TERMINEES 
+                && meilleureEnchere != null 
+                && meilleureEnchere.utilisateur.email == #authentication.name}"
+				class="text-2xl font-bold mb-4 text-center">Vous avez remporté
+				la vente</h1>
+
+			<h1
+				th:if="${article.etatVente == T(fr.eni.eniEncheres.bo.EtatVente).ENCHERES_TERMINEES 
+                && meilleureEnchere != null 
+                && meilleureEnchere.utilisateur.email != #authentication.name}"
+				class="text-2xl font-bold mb-4 text-center">
+				<span th:text="${meilleureEnchere.utilisateur.pseudo}"></span> a
+				remporté l'enchère
+			</h1>
+
+			<h1
+				th:if="${article.etatVente != T(fr.eni.eniEncheres.bo.EtatVente).ENCHERES_TERMINEES}"
+				th:text="${article.nomArticle}"
 				class="text-2xl font-bold mb-4 text-center"></h1>
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -27,9 +46,13 @@
 						<strong>Catégorie :</strong> <span
 							th:text="${article.categorie != null ? article.categorie.libelle : 'Non spécifiée'}"></span>
 					</p>
+					<!-- Modifié pour afficher le pseudo de l'enchérisseur -->
 					<p>
 						<strong>Meilleure offre :</strong> <span
-							th:text="${article.prixVente}"></span> points
+							th:text="${article.prixVente}"></span> points <span
+							th:if="${meilleureEnchere != null}"> par <span
+							th:text="${meilleureEnchere.utilisateur.pseudo}"></span>
+						</span>
 					</p>
 					<p>
 						<strong>Mise à prix :</strong> <span
@@ -57,7 +80,9 @@
 						<p th:text="${article.vendeur.pseudo}"></p>
 					</div>
 
-					<div th:if="${#authentication.authenticated}"
+					<!-- Formulaire d'enchères uniquement si enchère en cours -->
+					<div
+						th:if="${#authentication.authenticated && article.etatVente == T(fr.eni.eniEncheres.bo.EtatVente).EN_COURS}"
 						class="border p-4 rounded-lg">
 						<h2 class="font-bold mb-2">Enchérir</h2>
 						<form method="post" th:action="@{/encheres/encherir}"
