@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
@@ -30,30 +31,35 @@ public class SecurityConfig {
   	@Autowired
 	private RememberMe rememberMe;
 
-    @Bean
-    SecurityFilterChain getFilterChain(HttpSecurity security) throws Exception {
-        security.authorizeHttpRequests(auth -> {
-            // Ressources statiques accessibles à tous
-            auth.requestMatchers("/css/*", "/images/*", "/img/*").permitAll();
-            
-            // Pages accessibles sans authentification
-            auth.requestMatchers("/", "/encheres", "/articles", "/inscription", "/connexion").permitAll();
-            // Pages nécessitant une authentification
-            auth.requestMatchers("/profil/**", "/articles/new", "/articles/edit/**").authenticated();
-            auth.requestMatchers("/encheres/encherir", "/encheres/article/*/encherir").authenticated();
-            auth.requestMatchers("/encheres/vendre").authenticated();
-            // Utilisation de anyRequest() en dernier
-            auth.anyRequest().authenticated();
-        });
+	@Bean
+	SecurityFilterChain getFilterChain(HttpSecurity security) throws Exception {
+		
+	    security.authorizeHttpRequests(auth -> {
+	    	
+	        // Ressources statiques accessibles à tous
+	        auth.requestMatchers("/css/*", "/images/*", "/img/*").permitAll();
+	        
+	        // Pages accessibles sans authentification
+	        auth.requestMatchers("/", "/encheres", "/articles", "/inscription", "/connexion", "/motdepasseoublie", "/motdepasseoublie/reset").permitAll();
+	        auth.requestMatchers(HttpMethod.POST, "/motdepasseoublie").permitAll();
+	        
+	        // Utilisation de anyRequest() en dernier
+	        auth.anyRequest().authenticated();
+	    	});
+	    
+	    security.formLogin(formLogin -> {
+	        formLogin
+	        	.loginPage("/connexion")
+	        	.loginProcessingUrl("/connexion")
+	        	.successHandler(rememberMe)
+	        	.permitAll();
+	    });
 
-        security.formLogin(formLogin -> {
-            formLogin.loginPage("/connexion").loginProcessingUrl("/connexion").defaultSuccessUrl("/encheres").permitAll();
-        });
+	    security.logout(logout -> logout.invalidateHttpSession(true)
+            .logoutRequestMatcher(new AntPathRequestMatcher("/deconnexion", "GET"))
+            .logoutSuccessUrl("/encheres")
+            .permitAll());
 
-        security.logout(logout -> logout.invalidateHttpSession(true)
-                .logoutRequestMatcher(new AntPathRequestMatcher("/deconnexion", "GET"))
-                .logoutSuccessUrl("/encheres")
-                .permitAll());
 
         // Désactivation du CSRF
         security.csrf(csrf -> csrf.disable());

@@ -10,8 +10,8 @@
 <body>
 <div th:replace="~{fragments/fragment-entete :: entete}"></div>
 
-
 <div class="bg-gray-100 flex items-center justify-center h-screen">
+
 	<main class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
 		<div>
 		
@@ -41,6 +41,7 @@
 						   th:value="${rememberedEmail}">
 				</div>
 				
+<<<<<<< HEAD
 				<!-- Password Field -->
 				<div class="mb-6">
 					<label for="idPassword" 
@@ -53,13 +54,16 @@
 				</div>
 				
                 <!-- "Remember Me" Checkbox -->
-				<label for="remember-me" class="inline-flex items-center mb-8">
-        			<input type="checkbox" 
-        				   id="remember-me" 
-        				   name="rememberMe" 
-        				   class="mmr-2">
-                    <span th:text="#{login.remember.me}">Se souvenir de moi</span>
-   				</label>
+                <div class="mb-4 flex justify-between">
+					<label for="remember-me" class="inline-flex items-center mb-8">
+	        			<input type="checkbox" 
+	        				   id="remember-me" 
+	        				   name="rememberMe" 
+	        				   class="mmr-2">
+	                    <span th:text="#{login.remember.me}">Se souvenir de moi</span>
+	   				</label>
+	   				<a th:href="@{/motdepasseoublie}" class="text-blue-600">Mot de passe oublié ?</a>
+   				</div>
 				
 				<div>
 					<button type="submit" 
