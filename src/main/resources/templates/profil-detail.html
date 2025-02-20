@@ -21,7 +21,7 @@
                 Profil
             </h2>
             
-            <form th:action="@{/profil/detail}"
+            <form th:action="@{/encheres/profil/detail}"
                   method="POST"
                   th:object="${utilisateur}"
                   class="space-y-4">
@@ -192,7 +192,7 @@
             </form>
             
             <!-- Delete Form -->
-            <form th:action="@{/profil/detail/supprimer}" 
+            <form th:action="@{/encheres/profil/detail/supprimer}" 
                   method="post" 
                   th:object="${utilisateur}">
                 <input type="hidden" th:field="*{noUtilisateur}" />

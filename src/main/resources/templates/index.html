@@ -17,7 +17,7 @@
     <div class="flex items-center space-x-2">
         <!-- Champ de recherche -->
         <input type="text" name="recherche" id="recherche"
-            placeholder="Le nom de l'article contient"
+            th:placeholder="#{home.search.article.placeholder}"
             class="border border-gray-300 p-2 rounded flex-grow">
     </div>
 
@@ -81,8 +81,7 @@
 					class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" th:text="#{home.search.button}">
 					Rechercher</button>
 			</form>
-
-		</div>
+s		</div>
 
 		<!-- Liste des articles -->
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
