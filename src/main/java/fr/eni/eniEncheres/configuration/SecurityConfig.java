@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,12 +30,15 @@ public class SecurityConfig {
 
 	@Bean
 	SecurityFilterChain getFilterChain(HttpSecurity security) throws Exception {
+		
 	    security.authorizeHttpRequests(auth -> {
+	    	
 	        // Ressources statiques accessibles à tous
 	        auth.requestMatchers("/css/*", "/images/*", "/img/*").permitAll();
 	        
 	        // Pages accessibles sans authentification
-	        auth.requestMatchers("/", "/encheres", "/articles", "/inscription", "/connexion").permitAll();
+	        auth.requestMatchers("/", "/encheres", "/articles", "/inscription", "/connexion", "/motdepasseoublie", "/motdepasseoublie/reset").permitAll();
+	        auth.requestMatchers(HttpMethod.POST, "/motdepasseoublie").permitAll();
 
 	        // Pages nécessitant une authentification
 	        auth.requestMatchers("/profil/**", "/articles/new", "/articles/edit/**").authenticated();
@@ -48,7 +52,6 @@ public class SecurityConfig {
 	        	.loginPage("/connexion")
 	        	.loginProcessingUrl("/connexion")
 	        	.successHandler(rememberMe)
-//	        	.defaultSuccessUrl("/encheres", true)
 	        	.permitAll();
 	    });
 
