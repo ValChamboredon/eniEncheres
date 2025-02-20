@@ -2,6 +2,7 @@ package fr.eni.eniEncheres.controller;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -61,29 +62,41 @@ public class ArticleController {
 	public String afficherLesArticles(
 	        @RequestParam(value = "recherche", required = false) String recherche,
 	        @RequestParam(value = "categorie", required = false, defaultValue = "0") Integer noCategorie,
+	        @RequestParam(value = "typeRecherche", required = false) String typeRecherche,
+	        @RequestParam(value = "encheresOuvertes", required = false) Boolean encheresOuvertes,
+	        @RequestParam(value = "mesEncheresEnCours", required = false) Boolean mesEncheresEnCours,
+	        @RequestParam(value = "mesEncheresRemportees", required = false) Boolean mesEncheresRemportees,
+	        @RequestParam(value = "ventesEnCours", required = false) Boolean ventesEnCours,
+	        @RequestParam(value = "ventesNonDebutees", required = false) Boolean ventesNonDebutees,
+	        @RequestParam(value = "ventesTerminees", required = false) Boolean ventesTerminees,
 	        Model model, Principal principal) {
 
-	    // Vérification et correction si `noCategorie` est null
-	    if (noCategorie == null) {
-	        noCategorie = 0; // Par défaut : "Toutes les catégories"
+	    List<ArticleVendu> articlesFiltres;
+
+	    if (principal != null && "mesVentes".equals(typeRecherche)) {
+	        // Filtrage des ventes personnelles
+	        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+	        articlesFiltres = articleService.filtrerVentes(
+	                utilisateur.getNoUtilisateur(), ventesEnCours, ventesNonDebutees, ventesTerminees);
+	        model.addAttribute("creditsUtilisateur", utilisateur.getCredit());
+	    } else if (principal != null && "achats".equals(typeRecherche)) {
+	        // Filtrage des achats personnels
+	        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+	        articlesFiltres = articleService.filtrerAchats(
+	                utilisateur.getNoUtilisateur(), encheresOuvertes, mesEncheresEnCours, mesEncheresRemportees);
+	    } else {
+	        // Recherche standard
+	        articlesFiltres = articleService.rechercherArticles(recherche, noCategorie);
 	    }
 
-	    // Récupération des articles filtrés
-	    List<ArticleVendu> articlesFiltres = articleService.rechercherArticles(recherche, noCategorie);
-
-	    // Ajouter les articles et les filtres au modèle
+	    // Ajout des articles et filtres au modèle
 	    model.addAttribute("articles", articlesFiltres);
 	    model.addAttribute("recherche", recherche);
 	    model.addAttribute("categorie", noCategorie);
 
-	    // Ajouter les crédits si l'utilisateur est connecté
-	    if (principal != null) {
-	        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
-	        model.addAttribute("creditsUtilisateur", utilisateur.getCredit());
-	    }
-
-	    return "index"; // Retourne la vue index.html
+	    return "index";
 	}
+
 
 //    /**
 //     * Affiche la liste des articles sur la page principale avec les filtres.
@@ -309,27 +322,32 @@ public class ArticleController {
 	 */
 	@PostMapping("/modifier")
 	public String modifierArticle(@RequestParam("articleId") int articleId,
-			@RequestParam("nomArticle") String nomArticle, @RequestParam("description") String description,
-			@RequestParam("miseAPrix") int miseAPrix,
-			@RequestParam("dateDebutEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime dateDebutEncheres,
-			@RequestParam("dateFinEncheres") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime dateFinEncheres,
-			Principal principal) {
+	                              @RequestParam("nomArticle") String nomArticle,
+	                              @RequestParam("description") String description,
+	                              @RequestParam("miseAPrix") int miseAPrix,
+	                              @RequestParam("dateDebutEncheres") 
+	                              @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime dateDebutEncheres,
+	                              @RequestParam("dateFinEncheres") 
+	                              @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime dateFinEncheres,
+	                              Principal principal) {
 
-		ArticleVendu article = articleService.getArticleById(articleId);
+	    ArticleVendu article = articleService.getArticleById(articleId);
 
-		if (article != null && article.getEtatVente() == EtatVente.CREEE
-				&& article.getVendeur().getEmail().equals(principal.getName())) {
-			article.setNomArticle(nomArticle);
-			article.setDescription(description);
-			article.setMiseAPrix(miseAPrix);
-			article.setDateDebutEncheres(dateDebutEncheres);
-			article.setDateFinEncheres(dateFinEncheres);
+	    if (article != null && article.getEtatVente() == EtatVente.CREEE
+	            && article.getVendeur().getEmail().equals(principal.getName())) {
 
-			articleService.modifierArticle(article);
-		}
+	        article.setNomArticle(nomArticle);
+	        article.setDescription(description);
+	        article.setMiseAPrix(miseAPrix);
+	        article.setDateDebutEncheres(dateDebutEncheres);
+	        article.setDateFinEncheres(dateFinEncheres);
 
-		return "redirect:/encheres/article/detail/" + articleId;
+	        articleService.modifierArticle(article);
+	    }
+
+	    return "redirect:/encheres/article/detail/" + articleId;
 	}
+
 
 	/**
 
@@ -453,4 +471,19 @@ public class ArticleController {
 		
 		return "vendeur-profil";
 	}
+
+    
+    @ModelAttribute("CategoriesEnSession")
+    public List<Categorie> chargerCategories() {
+        try {
+            return categorieService.getAllCategories();
+        } catch (BusinessException e) {
+            System.err.println("Erreur lors du chargement des catégories : " + e.getMessagesErreur());
+            return new ArrayList<>(); // Retourne une liste vide si erreur
+        }
+    }
+
+
+
 }
+

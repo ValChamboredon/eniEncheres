@@ -34,47 +34,51 @@
 
 				<div sec:authorize="isAuthenticated()" class="flex flex-wrap gap-6">
 					<!-- Bloc des Achats -->
-					<div>
-						<label class="font-semibold block"> <input type="radio"
-							name="typeRecherche" value="achats"
-							th:checked="${typeRecherche == 'achats'}" class="mr-2" th:text="#{home.search.purchases}">
-							Achats
-						</label>
-						<div class="ml-4 space-y-2">
-							<label class="flex items-center"> <input type="checkbox"
-								name="encheresOuvertes" th:checked="${encheresOuvertes}"
-								class="mr-2" th:text="#{home.search.openAuctions}"> Enchères ouvertes
-							</label> <label class="flex items-center"> <input type="checkbox"
-								name="mesEncheresEnCours" th:checked="${mesEncheresEnCours}"
-								class="mr-2" th:text="#{home.search.myOngoingAuctions}"> Mes enchères en cours
-							</label> <label class="flex items-center"> <input type="checkbox"
-								name="mesEncheresRemportees"
-								th:checked="${mesEncheresRemportees}" class="mr-2" th:text="#{home.search.myWonAuctions}"> Mes
-								enchères remportées
-							</label>
-						</div>
-					</div>
+<div>
+    <label class="font-semibold block">
+        <input type="radio" name="typeRecherche" value="achats"
+               th:checked="${typeRecherche == 'achats'}" class="mr-2">
+        <span th:text="#{home.search.purchases}">Achats</span>
+    </label>
+    <div class="ml-4 space-y-2">
+        <label class="flex items-center">
+            <input type="checkbox" name="encheresOuvertes" th:checked="${encheresOuvertes}" class="mr-2">
+            <span th:text="#{home.search.openAuctions}">Enchères ouvertes</span>
+        </label>
+        <label class="flex items-center">
+            <input type="checkbox" name="mesEncheresEnCours" th:checked="${mesEncheresEnCours}" class="mr-2">
+            <span th:text="#{home.search.myOngoingAuctions}">Mes enchères en cours</span>
+        </label>
+        <label class="flex items-center">
+            <input type="checkbox" name="mesEncheresRemportees" th:checked="${mesEncheresRemportees}" class="mr-2">
+            <span th:text="#{home.search.myWonAuctions}">Mes enchères remportées</span>
+        </label>
+    </div>
+</div>
 
-					<!-- Bloc des Ventes -->
-					<div>
-						<label class="font-semibold block"> <input type="radio"
-							name="typeRecherche" value="mesVentes"
-							th:checked="${typeRecherche == 'mesVentes'}" class="mr-2"  th:text="#{home.search.mySales}">
-							Mes ventes
-						</label>
-						<div class="ml-4 space-y-2">
-							<label class="flex items-center"> <input type="checkbox"
-								name="ventesEnCours" th:checked="${ventesEnCours}" class="mr-2" th:text="#{home.search.salesInProgress}">
-								Ventes en cours
-							</label> <label class="flex items-center"> <input type="checkbox"
-								name="ventesNonDebutees" th:checked="${ventesNonDebutees}"
-								class="mr-2" th:text="#{home.search.upcomingSales}"> Ventes non débutées
-							</label> <label class="flex items-center"> <input type="checkbox"
-								name="ventesTerminees" th:checked="${ventesTerminees}"
-								class="mr-2" th:text="#{home.search.finishedSales}"> Ventes terminées
-							</label>
-						</div>
-					</div>
+<!-- Bloc des Ventes -->
+<div>
+    <label class="font-semibold block">
+        <input type="radio" name="typeRecherche" value="mesVentes"
+               th:checked="${typeRecherche == 'mesVentes'}" class="mr-2">
+        <span th:text="#{home.search.mySales}">Mes ventes</span>
+    </label>
+    <div class="ml-4 space-y-2">
+        <label class="flex items-center">
+            <input type="checkbox" name="ventesEnCours" th:checked="${ventesEnCours}" class="mr-2">
+            <span th:text="#{home.search.salesInProgress}">Ventes en cours</span>
+        </label>
+        <label class="flex items-center">
+            <input type="checkbox" name="ventesNonDebutees" th:checked="${ventesNonDebutees}" class="mr-2">
+            <span th:text="#{home.search.upcomingSales}">Ventes non débutées</span>
+        </label>
+        <label class="flex items-center">
+            <input type="checkbox" name="ventesTerminees" th:checked="${ventesTerminees}" class="mr-2">
+            <span th:text="#{home.search.finishedSales}">Ventes terminées</span>
+        </label>
+    </div>
+</div>
+
 				</div>
 
 				<!-- Bouton de recherche -->

@@ -6,6 +6,7 @@
   <title th:text="#{articleDetail.page.title}">Détail de l'Article</title>
   <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
   <script src="https://cdn.tailwindcss.com"></script>
+
 </head>
 <body class="bg-gray-100 min-h-screen">
 
@@ -54,6 +55,7 @@
         <!-- Right Column: Pickup/Vendor/Bid -->
         <div class="space-y-4">
 
+
           <!-- Pickup Info -->
           <div class="border p-4 rounded-lg">
             <h2 class="font-bold mb-2" th:text="#{articleDetail.pickup}">Retrait</h2>
@@ -66,79 +68,81 @@
               Lieu de retrait non spécifié
             </p>
           </div>
-
-          <!-- Seller Info -->
+            <!-- Seller Info -->
           <div class="border p-4 rounded-lg">
             <h2 class="font-bold mb-2" th:text="#{articleDetail.seller}">Vendeur</h2>
             <p th:text="${article.vendeur.pseudo}"></p>
           </div>
 
-          <!-- Bidding Form (if user is authenticated) -->
-          <div th:if="${#authentication.authenticated}" class="border p-4 rounded-lg">
-            <h2 class="font-bold mb-2" th:text="#{articleDetail.bid}">Enchérir</h2>
-            <form method="post" th:action="@{/encheres/encherir}" class="space-y-4">
-              <input type="hidden" name="articleId" th:value="${article.noArticle}">
-              
-              <div class="flex flex-col">
-                <label for="montantEnchere"
-                       th:text="#{articleDetail.yourOffer}">
-                  Votre offre :
-                </label>
-                <input type="number"
-                       id="montantEnchere"
-                       name="montantEnchere"
-                       th:min="${article.prixVente + 1}"
-                       class="border rounded px-3 py-2"
-                       required>
-              </div>
-              <button type="submit"
-                      class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                      th:text="#{articleDetail.bidButton}">
-                Enchérir
-              </button>
-            </form>
-          </div>
+					<!-- Section Enchérir (visible uniquement si connecté) -->
+					<div th:if="${#authentication.authenticated}"
+						class="border p-4 rounded-lg">
+						<h2 class="font-bold mb-2">Enchérir</h2>
+						<form method="post" th:action="@{/encheres/encherir}"
+							class="space-y-4">
+							<input type="hidden" name="articleId"
+								th:value="${article.noArticle}">
+							<div class="flex flex-col">
+								<label for="montantEnchere">Votre offre :</label> <input
+									type="number" id="montantEnchere" name="montantEnchere"
+									th:min="${article.prixVente + 1}"
+									class="border rounded px-3 py-2" required>
+							</div>
+							<button type="submit"
+								class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+								Enchérir</button>
+						</form>
+					</div>
+					
+					<!-- Bouton "Supprimer l'article" (visible uniquement pour le vendeur et si l'état est "CREEE" ou "EN_COURS") -->
+					<div
+						th:if="${#authentication.principal != null 
+            and #authentication.principal.username == article.vendeur.email
+            and (article.etatVente.name() == 'CREEE' or article.etatVente.name() == 'EN_COURS')}">
+						<form th:action="@{/encheres/supprimer}" method="post"
+							onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
 
-          <!-- Delete Button (if current user is the vendor) -->
-          <div th:if="${#authentication.principal != null and #authentication.principal.username == article.vendeur.email}">
-            <form th:action="@{/encheres/article/supprimer/{id}(id=${article.noArticle})}"
-                  method="post"
-                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
-              <button type="submit"
-                      class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                      th:text="#{articleDetail.deleteArticle}">
-                Supprimer l'article
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
+							<input type="hidden" name="articleId"
+								th:value="${article.noArticle}" />
+							<button type="submit"
+								class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+								Supprimer l'article</button>
+						</form>
+					</div>
 
-      <!-- Best Bid Section -->
-      <div th:if="${meilleureEnchere != null}"
-           class="mt-6 p-4 bg-gray-50 rounded-lg">
-        <h2 class="font-bold mb-2" th:text="#{articleDetail.currentBestBid}">
-          Meilleure enchère actuelle
-        </h2>
-        <p>
-          <span th:text="${meilleureEnchere.utilisateur.pseudo}"></span>
-          <span th:text="#{articleDetail.bidOffered}">a proposé</span>
-          <span th:text="${meilleureEnchere.montantEnchere}">0</span>
-          <span th:text="#{articleDetail.points}">points</span>
-          <span th:text="#{articleDetail.bidOn}">le</span>
-          <span th:text="${#temporals.format(meilleureEnchere.dateEnchere, 'dd/MM/yyyy HH:mm')}"></span>
-        </p>
-      </div>
+					<!-- Bouton "Modifier l'article" (visible uniquement pour le vendeur et si l'état est "CREEE") -->
+					<div
+						th:if="${#authentication.principal != null 
+            and #authentication.principal.username == article.vendeur.email
+            and article.etatVente.name() == 'CREEE'}">
+						<a th:href="@{/encheres/modifier(articleId=${article.noArticle})}"
+							class="w-full bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 block text-center">
+							Modifier l'article </a>
+					</div>
 
-      <!-- Error Messages -->
-      <div th:if="${erreurs != null}"
-           class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
-        <ul>
-          <li th:each="erreur : ${erreurs}"
-              th:text="${erreur}"></li>
-        </ul>
-      </div>
-    </div>
-  </main>
+
+					<!-- Affichage de la meilleure enchère actuelle -->
+					<div th:if="${meilleureEnchere != null}"
+						class="mt-6 p-4 bg-gray-50 rounded-lg">
+						<h2 class="font-bold mb-2">Meilleure enchère actuelle</h2>
+						<p>
+							<span th:text="${meilleureEnchere.utilisateur.pseudo}"></span> a
+							proposé <span th:text="${meilleureEnchere.montantEnchere}"></span>
+							points le <span
+								th:text="${#temporals.format(meilleureEnchere.dateEnchere, 'dd/MM/yyyy HH:mm')}"></span>
+						</p>
+					</div>
+
+					<!-- Gestion des erreurs -->
+					<div th:if="${erreurs != null}"
+						class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
+						<ul>
+							<li th:each="erreur : ${erreurs}" th:text="${erreur}"></li>
+						</ul>
+					</div>
+				</div>
+	</main>
 </body>
 </html>
+
+
