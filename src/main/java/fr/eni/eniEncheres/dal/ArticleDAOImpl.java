@@ -193,8 +193,13 @@ public class ArticleDAOImpl implements ArticleDAO {
 
 	@Override
 	public void deleteArticle(int articleId) {
-		String sql = "DELETE FROM ARTICLES_VENDUS WHERE no_article = ?";
-		jdbcTemplate.update(sql, articleId);
+		// Supprimer d'abord l'entrée de RETRAITS associée à l'article
+	    String sqlRetrait = "DELETE FROM RETRAITS WHERE no_article = ?";
+	    jdbcTemplate.update(sqlRetrait, articleId);
+
+	    // Ensuite, supprimer l'article
+	    String sqlArticle = "DELETE FROM ARTICLES_VENDUS WHERE no_article = ?";
+	    jdbcTemplate.update(sqlArticle, articleId);
 	}
 
 	@Override
