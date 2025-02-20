@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détail de l'Article</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Détail de l'Article</title>
 <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
-    <script src="https://cdn.tailwindcss.com"></script>
-
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
 	<div th:replace="~{fragments/fragment-entete :: entete}"></div>
@@ -45,7 +43,7 @@
 					<div class="border p-4 rounded-lg">
 						<h2 class="font-bold mb-2">Retrait</h2>
 						<p th:if="${article.lieuDeRetrait != null}">
-							<span th:text="${article.lieuDeRetrait.rue}"></span><br /> <span
+							<span th:text="${article.lieuDeRetrait.rue}"></span><br> <span
 								th:text="${article.lieuDeRetrait.codePostal + ' ' + article.lieuDeRetrait.ville}"></span>
 						</p>
 						<p th:if="${article.lieuDeRetrait == null}">Lieu de retrait
@@ -57,6 +55,7 @@
 						<p th:text="${article.vendeur.pseudo}"></p>
 					</div>
 
+					<!-- Section Enchérir (visible uniquement si connecté) -->
 					<div th:if="${#authentication.authenticated}"
 						class="border p-4 rounded-lg">
 						<h2 class="font-bold mb-2">Enchérir</h2>
@@ -75,39 +74,83 @@
 								Enchérir</button>
 						</form>
 					</div>
+					<!-- Debugging -->
+					<div class="bg-gray-200 p-2 rounded-md">
+						<p>
+							<strong>Debugging :</strong>
+						</p>
+						<p>
+							État de l'article : <span th:text="${article.etatVente}"></span>
+						</p>
+						<p>
+							Utilisateur connecté : <span
+								th:text="${#authentication.principal.username}"></span>
+						</p>
+						<p>
+							Vendeur de l'article : <span th:text="${article.vendeur.email}"></span>
+						</p>
+						<p>
+							Égalité utilisateur-vendeur : <span
+								th:text="${#authentication.principal.username == article.vendeur.email}"></span>
+						</p>
+						<p>
+							État égal à 'CREEE' : <span
+								th:text="${article.etatVente.name() == 'CREEE'}"></span>
+						</p>
+						<p>
+							État égal à 'EN_COURS' : <span
+								th:text="${article.etatVente.name() == 'EN_COURS'}"></span>
+						</p>
+					</div>
 
+					<!-- Bouton "Supprimer l'article" (visible uniquement pour le vendeur et si l'état est "CREEE" ou "EN_COURS") -->
 					<div
-						th:if="${#authentication.principal != null and #authentication.principal.username == article.vendeur.email}">
-						<form
-							th:action="@{/encheres/article/supprimer/{id}(id=${article.noArticle})}"
-							method="post"
+						th:if="${#authentication.principal != null 
+            and #authentication.principal.username == article.vendeur.email
+            and (article.etatVente.name() == 'CREEE' or article.etatVente.name() == 'EN_COURS')}">
+						<form th:action="@{/encheres/supprimer}" method="post"
 							onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+
+							<input type="hidden" name="articleId"
+								th:value="${article.noArticle}" />
 							<button type="submit"
 								class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
 								Supprimer l'article</button>
 						</form>
 					</div>
+
+					<!-- Bouton "Modifier l'article" (visible uniquement pour le vendeur et si l'état est "CREEE") -->
+					<div
+						th:if="${#authentication.principal != null 
+            and #authentication.principal.username == article.vendeur.email
+            and article.etatVente.name() == 'CREEE'}">
+						<a th:href="@{/encheres/modifier(articleId=${article.noArticle})}"
+							class="w-full bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 block text-center">
+							Modifier l'article </a>
+					</div>
+
+
+					<!-- Affichage de la meilleure enchère actuelle -->
+					<div th:if="${meilleureEnchere != null}"
+						class="mt-6 p-4 bg-gray-50 rounded-lg">
+						<h2 class="font-bold mb-2">Meilleure enchère actuelle</h2>
+						<p>
+							<span th:text="${meilleureEnchere.utilisateur.pseudo}"></span> a
+							proposé <span th:text="${meilleureEnchere.montantEnchere}"></span>
+							points le <span
+								th:text="${#temporals.format(meilleureEnchere.dateEnchere, 'dd/MM/yyyy HH:mm')}"></span>
+						</p>
+					</div>
+
+					<!-- Gestion des erreurs -->
+					<div th:if="${erreurs != null}"
+						class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
+						<ul>
+							<li th:each="erreur : ${erreurs}" th:text="${erreur}"></li>
+						</ul>
+					</div>
 				</div>
-			</div>
-
-			<div th:if="${meilleureEnchere != null}"
-				class="mt-6 p-4 bg-gray-50 rounded-lg">
-				<h2 class="font-bold mb-2">Meilleure enchère actuelle</h2>
-				<p>
-					<span th:text="${meilleureEnchere.utilisateur.pseudo}"></span> a
-					proposé <span th:text="${meilleureEnchere.montantEnchere}"></span>
-					points le <span
-						th:text="${#temporals.format(meilleureEnchere.dateEnchere, 'dd/MM/yyyy HH:mm')}"></span>
-				</p>
-			</div>
-
-			<div th:if="${erreurs != null}"
-				class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
-				<ul>
-					<li th:each="erreur : ${erreurs}" th:text="${erreur}"></li>
-				</ul>
-			</div>
-		</div>
 	</main>
 </body>
 </html>
+

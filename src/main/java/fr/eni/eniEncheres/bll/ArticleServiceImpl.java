@@ -172,20 +172,32 @@ public class ArticleServiceImpl implements ArticleService {
 		return articleDAO.searchArticles(recherche, noCategorie);
 	}
 
-//	@Override
-//	public List<ArticleVendu> filtrerVentes(int userId, Boolean ventesEnCours, Boolean ventesNonDebutees,
-//			Boolean ventesTerminees) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
+	@Override
+	public List<ArticleVendu> filtrerVentes(int userId, Boolean ventesEnCours, Boolean ventesNonDebutees, Boolean ventesTerminees) {
+	    // Vérification des valeurs null
+	    if (ventesEnCours == null) ventesEnCours = false;
+	    if (ventesNonDebutees == null) ventesNonDebutees = false;
+	    if (ventesTerminees == null) ventesTerminees = false;
+
+	    // Appel au DAO pour récupérer les articles filtrés
+	    return articleDAO.filtrerVentes(userId, ventesEnCours, ventesNonDebutees, ventesTerminees);
+	}
 
 
-//	@Override
-//	public List<ArticleVendu> filtrerAchats(int userId, Boolean encheresOuvertes, Boolean mesEncheresEnCours,
-//			Boolean mesEncheresRemportees) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
+	@Override
+	public List<ArticleVendu> filtrerAchats(int userId, Boolean encheresOuvertes, Boolean mesEncheresEnCours,
+			Boolean mesEncheresRemportees) {
+		// Vérification des valeurs null
+	    if (encheresOuvertes == null) encheresOuvertes = false;
+	    if (mesEncheresEnCours == null) mesEncheresEnCours = false;
+	    if (mesEncheresRemportees == null) mesEncheresRemportees = false;
+
+	    // Appel au DAO pour récupérer les articles filtrés
+	    return articleDAO.filtrerAchats(userId, encheresOuvertes, mesEncheresEnCours, mesEncheresRemportees);
+	}
+
+	
+
 
 
 	}
