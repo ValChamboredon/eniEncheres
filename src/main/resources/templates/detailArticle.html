@@ -42,65 +42,34 @@
 				th:text="${article.nomArticle}"
 				class="text-2xl font-bold mb-4 text-center"></h1>
 
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 				<div class="space-y-4">
 					<p>
-						<strong>Description :</strong> <span
+						<strong th:text="#{articleDetail.description}">Description :</strong> <span
 							th:text="${article.description}"></span>
 					</p>
 					<p>
-						<strong>Catégorie :</strong> <span
+						<strong th:text="#{articleDetail.category}">Catégorie :</strong> <span
 							th:text="${article.categorie != null ? article.categorie.libelle : 'Non spécifiée'}"></span>
 					</p>
 					<!-- Modifié pour afficher le pseudo de l'enchérisseur -->
 					<p>
-						<strong>Meilleure offre :</strong> <span
+						<strong th:text="#{articleDetail.bestOffer}">Meilleure offre :</strong> <span
 							th:text="${article.prixVente}"></span> points <span
 							th:if="${meilleureEnchere != null}"> par <span
 							th:text="${meilleureEnchere.utilisateur.pseudo}"></span>
 						</span>
 					</p>
 					<p>
-						<strong>Mise à prix :</strong> <span
+						<strong th:text="#{articleDetail.startingPrice}">Mise à prix :</strong> <span
 							th:text="${article.miseAPrix}"></span> points
 					</p>
 					<p>
-						<strong>Fin de l'enchère :</strong> <span
+						<strong th:text="#{articleDetail.endAuction}">Fin de l'enchère :</strong> <span
 							th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}"></span>
 					</p>
 				</div>
 
-
-
-	  
-      <!-- Main Grid (1 col on mobile, 2 cols on md+) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        
-        <!-- Left Column: Article Details -->
-        <div class="space-y-4">
-          <p>
-            <strong th:text="#{articleDetail.description}">Description :</strong>
-            <span th:text="${article.description}"></span>
-          </p>
-          <p>
-            <strong th:text="#{articleDetail.category}">Catégorie :</strong>
-            <span th:text="${article.categorie != null ? article.categorie.libelle : 'Non spécifiée'}"></span>
-          </p>
-          <p>
-            <strong th:text="#{articleDetail.bestOffer}">Meilleure offre :</strong>
-            <span th:text="${article.prixVente}">0</span>
-            <span th:text="#{articleDetail.points}">points</span>
-          </p>
-          <p>
-            <strong th:text="#{articleDetail.startingPrice}">Mise à prix :</strong>
-            <span th:text="${article.miseAPrix}">0</span>
-            <span th:text="#{articleDetail.points}">points</span>
-          </p>
-          <p>
-            <strong th:text="#{articleDetail.endAuction}">Fin de l'enchère :</strong>
-            <span th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}"></span>
-          </p>
-        </div>
         
         <!-- Right Column: Pickup/Vendor/Bid -->
         <div class="space-y-4">
