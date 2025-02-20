@@ -30,14 +30,15 @@
                        class="border rounded w-full px-3 py-2 mb-2" required/>
 
                 <label class="block font-semibold">Date de début des enchères :</label>
-                <input type="date" name="dateDebutEncheres"
-                       th:value="${#temporals.format(article.dateDebutEncheres, 'yyyy-MM-dd')}"
-                       class="border rounded w-full px-3 py-2 mb-2" required/>
+<input type="datetime-local" name="dateDebutEncheres"
+       th:value="${#temporals.format(article.dateDebutEncheres, 'yyyy-MM-dd''T''HH:mm')}"
+       class="border rounded w-full px-3 py-2 mb-2" required/>
 
-                <label class="block font-semibold">Date de fin des enchères :</label>
-                <input type="date" name="dateFinEncheres"
-                       th:value="${#temporals.format(article.dateFinEncheres, 'yyyy-MM-dd')}"
-                       class="border rounded w-full px-3 py-2 mb-2" required/>
+<label class="block font-semibold">Date de fin des enchères :</label>
+<input type="datetime-local" name="dateFinEncheres"
+       th:value="${#temporals.format(article.dateFinEncheres, 'yyyy-MM-dd''T''HH:mm')}"
+       class="border rounded w-full px-3 py-2 mb-2" required/>
+
 
                 <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                     Enregistrer les modifications

@@ -1,7 +1,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Page d'accueil</title>
+<title th:text="#{home.page.title}">Page d'accueil</title>
 <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -10,27 +10,22 @@
 
 <div class="container w-full">
     <div class="bg-white p-6 shadow-md rounded-lg mb-6">
-        <p class="font-bold mt-4">Filtres :</p>
+        <p class="font-bold mt-4" th:text="#{home.filters}">Filtres :</p>
 
 <form th:action="@{/encheres}" method="get" class="flex flex-col space-y-4">
     <!-- Ligne de recherche et bouton -->
     <div class="flex items-center space-x-2">
+    
         <!-- Champ de recherche -->
         <input type="text" name="recherche" id="recherche"
-            placeholder="Le nom de l'article contient"
-            class="border border-gray-300 p-2 rounded flex-grow">
-
-        <!-- Bouton de recherche -->
-        <button type="submit"
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Rechercher
-        </button>
+            th:placeholder="#{home.search.article.placeholder}"
+            class="border border-gray-300 p-2 rounded flex-grow"  >
     </div>
 
 				<!-- Sélecteur de catégorie -->
 				<select name="categorie" id="categorie"
 					class="border border-gray-300 p-2 rounded">
-					<option value="">Toutes les catégories</option>
+					<option value="" th:text="#{home.search.allCategories}">Toutes les catégories</option>
 					<option th:each="cat : ${CategoriesEnSession}"
 						th:value="${cat.noCategorie}" th:text="${cat.libelle}"
 						th:selected="${categorie != null and categorie == cat.noCategorie}">
@@ -39,52 +34,56 @@
 
 				<div sec:authorize="isAuthenticated()" class="flex flex-wrap gap-6">
 					<!-- Bloc des Achats -->
-					<div>
-						<label class="font-semibold block"> <input type="radio"
-							name="typeRecherche" value="achats"
-							th:checked="${typeRecherche == 'achats'}" class="mr-2">
-							Achats
-						</label>
-						<div class="ml-4 space-y-2">
-							<label class="flex items-center"> <input type="checkbox"
-								name="encheresOuvertes" th:checked="${encheresOuvertes}"
-								class="mr-2"> Enchères ouvertes
-							</label> <label class="flex items-center"> <input type="checkbox"
-								name="mesEncheresEnCours" th:checked="${mesEncheresEnCours}"
-								class="mr-2"> Mes enchères en cours
-							</label> <label class="flex items-center"> <input type="checkbox"
-								name="mesEncheresRemportees"
-								th:checked="${mesEncheresRemportees}" class="mr-2"> Mes
-								enchères remportées
-							</label>
-						</div>
-					</div>
+<div>
+    <label class="font-semibold block">
+        <input type="radio" name="typeRecherche" value="achats"
+               th:checked="${typeRecherche == 'achats'}" class="mr-2">
+        <span th:text="#{home.search.purchases}">Achats</span>
+    </label>
+    <div class="ml-4 space-y-2">
+        <label class="flex items-center">
+            <input type="checkbox" name="encheresOuvertes" th:checked="${encheresOuvertes}" class="mr-2">
+            <span th:text="#{home.search.openAuctions}">Enchères ouvertes</span>
+        </label>
+        <label class="flex items-center">
+            <input type="checkbox" name="mesEncheresEnCours" th:checked="${mesEncheresEnCours}" class="mr-2">
+            <span th:text="#{home.search.myOngoingAuctions}">Mes enchères en cours</span>
+        </label>
+        <label class="flex items-center">
+            <input type="checkbox" name="mesEncheresRemportees" th:checked="${mesEncheresRemportees}" class="mr-2">
+            <span th:text="#{home.search.myWonAuctions}">Mes enchères remportées</span>
+        </label>
+    </div>
+</div>
 
-					<!-- Bloc des Ventes -->
-					<div>
-						<label class="font-semibold block"> <input type="radio"
-							name="typeRecherche" value="mesVentes"
-							th:checked="${typeRecherche == 'mesVentes'}" class="mr-2">
-							Mes ventes
-						</label>
-						<div class="ml-4 space-y-2">
-							<label class="flex items-center"> <input type="checkbox"
-								name="ventesEnCours" th:checked="${ventesEnCours}" class="mr-2">
-								Ventes en cours
-							</label> <label class="flex items-center"> <input type="checkbox"
-								name="ventesNonDebutees" th:checked="${ventesNonDebutees}"
-								class="mr-2"> Ventes non débutées
-							</label> <label class="flex items-center"> <input type="checkbox"
-								name="ventesTerminees" th:checked="${ventesTerminees}"
-								class="mr-2"> Ventes terminées
-							</label>
-						</div>
-					</div>
+<!-- Bloc des Ventes -->
+<div>
+    <label class="font-semibold block">
+        <input type="radio" name="typeRecherche" value="mesVentes"
+               th:checked="${typeRecherche == 'mesVentes'}" class="mr-2">
+        <span th:text="#{home.search.mySales}">Mes ventes</span>
+    </label>
+    <div class="ml-4 space-y-2">
+        <label class="flex items-center">
+            <input type="checkbox" name="ventesEnCours" th:checked="${ventesEnCours}" class="mr-2">
+            <span th:text="#{home.search.salesInProgress}">Ventes en cours</span>
+        </label>
+        <label class="flex items-center">
+            <input type="checkbox" name="ventesNonDebutees" th:checked="${ventesNonDebutees}" class="mr-2">
+            <span th:text="#{home.search.upcomingSales}">Ventes non débutées</span>
+        </label>
+        <label class="flex items-center">
+            <input type="checkbox" name="ventesTerminees" th:checked="${ventesTerminees}" class="mr-2">
+            <span th:text="#{home.search.finishedSales}">Ventes terminées</span>
+        </label>
+    </div>
+</div>
+
 				</div>
 
 				<!-- Bouton de recherche -->
 				<button type="submit"
-					class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+					class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" th:text="#{home.search.button}">
 					Rechercher</button>
 			</form>
 
@@ -101,24 +100,27 @@
 							data-th-href="@{/encheres/article/detail/{id}(id=${article.noArticle})}"
 							data-th-text="${article.nomArticle}"></a>
 					</h2>
-					<p class="text-gray-700">
-						Prix : <span class="font-semibold"
-							data-th-text="${article.prixVente}"></span> points
-					</p>
+					 <p class="text-gray-700">
+                            <span th:text="#{home.articles.price}">Price:</span>
+                            <span class="font-semibold"
+                                  data-th-text="${article.prixVente}"></span>
+                            <span th:text="#{home.search.points}">points</span>
+                    </p>
 					<p class="text-gray-600">
-						Fin de l'enchère : <span class="italic"
-							th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}"></span>
-					</p>
+                            <span th:text="#{home.articles.auctionEnds}">End of the auction:</span>
+                            <span class="italic"
+                                  th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}">
+                            </span>
+                        </p>
 
 					<p class="text-gray-800">
-						<a th:href="@{encheres/vendeur(pseudo=${article.vendeur.pseudo})}"
-							class="text-blue-500 hover:text-blue-700 font-medium">Vendeur
-							: <span th:text="${article.vendeur.pseudo}"></span>
-						</a>
+                            <a th:href="@{encheres/vendeur(pseudo=${article.vendeur.pseudo})}"
+                               class="text-blue-500 hover:text-blue-700 font-medium">
+                                <span th:text="#{home.articles.seller}">Seller:</span>
+                                <span th:text="${article.vendeur.pseudo}"></span>
+                            </a>
 					</p>
 				</div>
 			</div>
 		</div>
 	</div>
-
-</main>

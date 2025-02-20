@@ -2,47 +2,51 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Vendeur</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{vendor.page.title}">Vendeur</title>
 <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-<p><strong>Debug :</strong> Crédits utilisateur = <span th:text="${creditsUtilisateur}"></span></p>
+<body class="bg-gray-100">
 
 	<div th:replace="~{/fragments/fragment-entete :: entete}"></div>
-    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h2 class="text-xl font-bold mb-4">Profil</h2>
+    
+     <div class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+        
+      <div class="bg-white shadow-lg rounded-lg w-full max-w-xl md:max-w-4xl p-4 sm:p-6 md:p-8 mt-4">
+               
+               <h2 class="text-center text-2xl font-bold mb-6"th:text="#{vendor.title}">Profil</h2>
         <form class="space-y-4">
             <div>
-                <label class="block font-medium">Pseudo</label>
+                <label class="block font-medium" th:text="#{vendor.form.pseudo}">Pseudo</label>
                 <input type="text" name="pseudo" class="w-full p-2 border rounded-lg" th:value="${vendeur.pseudo}" required readonly>
             </div>
             <div>
-                <label class="block font-medium">Nom</label>
+                <label class="block font-medium" th:text="#{vendor.form.nom}">Nom</label>
                 <input type="text" name="nom" class="w-full p-2 border rounded-lg" th:value="${vendeur.nom}" required readonly>
             </div>
             <div>
-                <label class="block font-medium">Prénom</label>
+                <label class="block font-medium" th:text="#{vendor.form.prenom}">Prénom</label>
                 <input type="text" name="prenom" class="w-full p-2 border rounded-lg" th:value="${vendeur.prenom}" required readonly>
             </div>
             <div>
-                <label class="block font-medium">Email</label>
+                <label class="block font-medium" th:text="#{vendor.form.prenom}">Email</label>
                 <input type="email" name="email" class="w-full p-2 border rounded-lg" th:value="${vendeur.email}" required readonly>
             </div>
             <div>
-                <label class="block font-medium">Téléphone</label>
+                <label class="block font-medium" th:text="#{vendor.form.telephone}">Téléphone</label>
                 <input type="tel" name="telephone" class="w-full p-2 border rounded-lg" th:value="${vendeur.telephone}" required readonly>
             </div>
             <div>
-                <label class="block font-medium">Rue</label>
+                <label class="block font-medium" th:text="#{vendor.form.rue}">Rue</label>
                 <input type="text" name="rue" class="w-full p-2 border rounded-lg" th:value="${vendeur.rue}" required readonly>
             </div>
             <div>
-                <label class="block font-medium">Code Postal</label>
+                <label class="block font-medium" th:text="#{vendor.form.codePostal}">Code Postal</label>
                 <input type="text" name="code_postal" class="w-full p-2 border rounded-lg" th:value="${vendeur.codePostal}" required readonly>
             </div>
             <div>
-                <label class="block font-medium">Ville</label>
+                <label class="block font-medium" th:text="#{vendor.form.ville}">Ville</label>
                 <input type="text" name="ville" class="w-full p-2 border rounded-lg" th:value="${vendeur.ville}" required readonly>
             </div>
         </form>
@@ -50,9 +54,12 @@
         <form th:action="@{/encheres/vendeur/supprimer}" method="post" th:value="${vendeur}">
         	<th:block th:if="${isAdmin}">
         		<input type="hidden" th:value="${vendeur.noUtilisateur}" />
-            	<button type="submit" class="w-full bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50 mt-4">Supprimer le compte</button>
+            	<button type="submit" 
+            			class="w-full bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50 mt-4" 
+            			th:text="#{vendor.form.button.delete}">Supprimer le compte</button>
 			</th:block>
         </form>
+       </div>
     </div>
 </body>
 </html>

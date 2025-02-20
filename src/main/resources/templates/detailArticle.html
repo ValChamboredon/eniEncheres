@@ -2,18 +2,24 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Détail de l'Article</title>
-<link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
-<script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="#{articleDetail.page.title}">Détail de l'Article</title>
+  <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.png}">
+  <script src="https://cdn.tailwindcss.com"></script>
+
 
 </head>
-<body class="bg-gray-100">
-	<div th:replace="~{fragments/fragment-entete :: entete}"></div>
+<body class="bg-gray-100 min-h-screen">
+  <!-- Header Fragment -->
+  <div th:replace="~{fragments/fragment-entete :: entete}"></div>
 
-	<main class="container mx-auto p-4">
-		<div class="bg-white p-6 rounded-lg shadow-md">
+  <!-- Main Container -->
+  <main class="container mx-auto px-4 py-6 md:py-8">
+
+    <!-- Card -->
+    <div class="bg-white p-6 md:p-8 rounded-lg shadow-md max-w-4xl mx-auto">
+
 			<!-- Titre dynamique selon l'état -->
 			<h1
 				th:if="${article.etatVente == T(fr.eni.eniEncheres.bo.EtatVente).ENCHERES_TERMINEES 
@@ -64,25 +70,65 @@
 					</p>
 				</div>
 
-				<div class="space-y-4">
-					<div class="border p-4 rounded-lg">
-						<h2 class="font-bold mb-2">Retrait</h2>
-						<p th:if="${article.lieuDeRetrait != null}">
-							<span th:text="${article.lieuDeRetrait.rue}"></span><br /> <span
-								th:text="${article.lieuDeRetrait.codePostal + ' ' + article.lieuDeRetrait.ville}"></span>
-						</p>
-						<p th:if="${article.lieuDeRetrait == null}">Lieu de retrait
-							non spécifié</p>
-					</div>
 
-					<div class="border p-4 rounded-lg">
-						<h2 class="font-bold mb-2">Vendeur</h2>
-						<p th:text="${article.vendeur.pseudo}"></p>
-					</div>
 
-					<!-- Formulaire d'enchères uniquement si enchère en cours -->
-					<div
-						th:if="${#authentication.authenticated && article.etatVente == T(fr.eni.eniEncheres.bo.EtatVente).EN_COURS}"
+	  
+      <!-- Main Grid (1 col on mobile, 2 cols on md+) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- Left Column: Article Details -->
+        <div class="space-y-4">
+          <p>
+            <strong th:text="#{articleDetail.description}">Description :</strong>
+            <span th:text="${article.description}"></span>
+          </p>
+          <p>
+            <strong th:text="#{articleDetail.category}">Catégorie :</strong>
+            <span th:text="${article.categorie != null ? article.categorie.libelle : 'Non spécifiée'}"></span>
+          </p>
+          <p>
+            <strong th:text="#{articleDetail.bestOffer}">Meilleure offre :</strong>
+            <span th:text="${article.prixVente}">0</span>
+            <span th:text="#{articleDetail.points}">points</span>
+          </p>
+          <p>
+            <strong th:text="#{articleDetail.startingPrice}">Mise à prix :</strong>
+            <span th:text="${article.miseAPrix}">0</span>
+            <span th:text="#{articleDetail.points}">points</span>
+          </p>
+          <p>
+            <strong th:text="#{articleDetail.endAuction}">Fin de l'enchère :</strong>
+            <span th:text="${#temporals.format(article.dateFinEncheres, 'dd/MM/yyyy')}"></span>
+          </p>
+        </div>
+        
+        <!-- Right Column: Pickup/Vendor/Bid -->
+        <div class="space-y-4">
+
+
+
+			
+          <!-- Pickup Info -->
+          <div class="border p-4 rounded-lg">
+            <h2 class="font-bold mb-2" th:text="#{articleDetail.pickup}">Retrait</h2>
+            <p th:if="${article.lieuDeRetrait != null}">
+              <span th:text="${article.lieuDeRetrait.rue}"></span><br>
+              <span th:text="${article.lieuDeRetrait.codePostal + ' ' + article.lieuDeRetrait.ville}"></span>
+            </p>
+            <p th:if="${article.lieuDeRetrait == null}"
+               th:text="#{articleDetail.pickupMissing}">
+              Lieu de retrait non spécifié
+            </p>
+          </div>
+            <!-- Seller Info -->
+          <div class="border p-4 rounded-lg">
+            <h2 class="font-bold mb-2" th:text="#{articleDetail.seller}">Vendeur</h2>
+            <p th:text="${article.vendeur.pseudo}"></p>
+          </div>
+
+					<!-- Section Enchérir (visible uniquement si connecté) -->
+					<div th:if="${#authentication.authenticated}"
+
 						class="border p-4 rounded-lg">
 						<h2 class="font-bold mb-2">Enchérir</h2>
 						<form method="post" th:action="@{/encheres/encherir}"
@@ -100,39 +146,56 @@
 								Enchérir</button>
 						</form>
 					</div>
-
+					
+					<!-- Bouton "Supprimer l'article" (visible uniquement pour le vendeur et si l'état est "CREEE" ou "EN_COURS") -->
 					<div
-						th:if="${#authentication.principal != null and #authentication.principal.username == article.vendeur.email}">
-						<form
-							th:action="@{/encheres/article/supprimer/{id}(id=${article.noArticle})}"
-							method="post"
+						th:if="${#authentication.principal != null 
+            and #authentication.principal.username == article.vendeur.email
+            and (article.etatVente.name() == 'CREEE' or article.etatVente.name() == 'EN_COURS')}">
+						<form th:action="@{/encheres/supprimer}" method="post"
 							onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+
+							<input type="hidden" name="articleId"
+								th:value="${article.noArticle}" />
 							<button type="submit"
 								class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
 								Supprimer l'article</button>
 						</form>
 					</div>
+
+					<!-- Bouton "Modifier l'article" (visible uniquement pour le vendeur et si l'état est "CREEE") -->
+					<div
+						th:if="${#authentication.principal != null 
+            and #authentication.principal.username == article.vendeur.email
+            and article.etatVente.name() == 'CREEE'}">
+						<a th:href="@{/encheres/modifier(articleId=${article.noArticle})}"
+							class="w-full bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 block text-center">
+							Modifier l'article </a>
+					</div>
+
+
+					<!-- Affichage de la meilleure enchère actuelle -->
+					<div th:if="${meilleureEnchere != null}"
+						class="mt-6 p-4 bg-gray-50 rounded-lg">
+						<h2 class="font-bold mb-2">Meilleure enchère actuelle</h2>
+						<p>
+							<span th:text="${meilleureEnchere.utilisateur.pseudo}"></span> a
+							proposé <span th:text="${meilleureEnchere.montantEnchere}"></span>
+							points le <span
+								th:text="${#temporals.format(meilleureEnchere.dateEnchere, 'dd/MM/yyyy HH:mm')}"></span>
+						</p>
+					</div>
+
+					<!-- Gestion des erreurs -->
+					<div th:if="${erreurs != null}"
+						class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
+						<ul>
+							<li th:each="erreur : ${erreurs}" th:text="${erreur}"></li>
+						</ul>
+					</div>
 				</div>
-			</div>
-
-			<div th:if="${meilleureEnchere != null}"
-				class="mt-6 p-4 bg-gray-50 rounded-lg">
-				<h2 class="font-bold mb-2">Meilleure enchère actuelle</h2>
-				<p>
-					<span th:text="${meilleureEnchere.utilisateur.pseudo}"></span> a
-					proposé <span th:text="${meilleureEnchere.montantEnchere}"></span>
-					points le <span
-						th:text="${#temporals.format(meilleureEnchere.dateEnchere, 'dd/MM/yyyy HH:mm')}"></span>
-				</p>
-			</div>
-
-			<div th:if="${erreurs != null}"
-				class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
-				<ul>
-					<li th:each="erreur : ${erreurs}" th:text="${erreur}"></li>
-				</ul>
-			</div>
-		</div>
 	</main>
 </body>
 </html>
+
+

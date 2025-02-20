@@ -27,5 +27,4 @@ public interface ArticleDAO {
 			Boolean ventesTerminees);
 	List<ArticleVendu> filtrerAchats(int userId, Boolean encheresOuvertes, Boolean mesEncheresEnCours,
 			Boolean mesEncheresRemportees);
-
 }
