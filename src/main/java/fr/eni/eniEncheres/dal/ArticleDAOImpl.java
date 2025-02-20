@@ -261,37 +261,54 @@ public class ArticleDAOImpl implements ArticleDAO {
 	// enchères auxquelles il participe et les enchères win
 
 	@Override
-	public List<ArticleVendu> filtrerAchats(int userId, Boolean encheresOuvertes, Boolean mesEncheresEnCours,
-			Boolean mesEncheresRemportees) {
-		StringBuilder sql = new StringBuilder("SELECT av.*, " + "u.no_utilisateur, u.pseudo, u.email, "
-				+ "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, "
-				+ "c.no_categorie, c.libelle, " + "COALESCE(r.rue, u.rue) AS retrait_rue, "
-				+ "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, "
-				+ "COALESCE(r.ville, u.ville) AS retrait_ville " + "FROM ARTICLES_VENDUS av "
-				+ "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur "
-				+ "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie "
-				+ "LEFT JOIN RETRAITS r ON av.no_article = r.no_article ");
+	public List<ArticleVendu> filtrerAchats(int userId, Boolean encheresOuvertes, Boolean mesEncheresEnCours, Boolean mesEncheresRemportees) {
+	    StringBuilder sql = new StringBuilder(
+	        "SELECT av.*, " +
+	        "u.no_utilisateur, u.pseudo, u.email, " +
+	        "u.rue AS user_rue, u.code_postal AS user_code_postal, u.ville AS user_ville, " +
+	        "c.no_categorie, c.libelle, " +
+	        "COALESCE(r.rue, u.rue) AS retrait_rue, " +
+	        "COALESCE(r.code_postal, u.code_postal) AS retrait_code_postal, " +
+	        "COALESCE(r.ville, u.ville) AS retrait_ville " +
+	        "FROM ARTICLES_VENDUS av " +
+	        "JOIN UTILISATEURS u ON av.no_utilisateur = u.no_utilisateur " +
+	        "JOIN CATEGORIES c ON av.no_categorie = c.no_categorie " +
+	        "LEFT JOIN RETRAITS r ON av.no_article = r.no_article "
+	    );
 
-		MapSqlParameterSource params = new MapSqlParameterSource();
-		List<String> conditions = new ArrayList<>();
+	    MapSqlParameterSource params = new MapSqlParameterSource();
+	    List<String> conditions = new ArrayList<>();
 
-		if (encheresOuvertes != null && encheresOuvertes) {
-			conditions.add("av.etat_vente = 'EN_COURS'");
-		}
-		if (mesEncheresEnCours != null && mesEncheresEnCours) {
-			conditions.add("av.no_article IN (SELECT e.no_article FROM ENCHERES e WHERE e.no_utilisateur = :userId)");
-			params.addValue("userId", userId);
-		}
-		if (mesEncheresRemportees != null && mesEncheresRemportees) {
-			// TODO
-		}
+	    if (encheresOuvertes != null && encheresOuvertes) {
+	        conditions.add("av.etat_vente = 'EN_COURS'");
+	    }
+	    if (mesEncheresEnCours != null && mesEncheresEnCours) {
+	        conditions.add("av.no_article IN (SELECT e.no_article FROM ENCHERES e WHERE e.no_utilisateur = :userId)");
+	        params.addValue("userId", userId);
+	    }
+	    if (mesEncheresRemportees != null && mesEncheresRemportees) {
+	        conditions.add(
+	            "av.no_article IN ( " +
+	            "    SELECT e.no_article FROM ENCHERES e " +
+	            "    WHERE e.no_utilisateur = :userId " +
+	            "    AND e.montant_enchere = ( " +
+	            "        SELECT MAX(e2.montant_enchere) FROM ENCHERES e2 " +
+	            "        WHERE e2.no_article = e.no_article " +
+	            "    ) " +
+	            ") " +
+	            "AND av.etat_vente = 'ENCHERES_TERMINEES'"
+	        );
+	        params.addValue("userId", userId);
+	    }
 
-		// Ajout des conditions seulement si elles existent
-		if (!conditions.isEmpty()) {
-			sql.append(" WHERE ").append(String.join(" OR ", conditions));
-		}
 
-		return namedParameterJdbcTemplate.query(sql.toString(), params, new ArticleRowMapper());
+	    // Ajout des conditions seulement si elles existent
+	    if (!conditions.isEmpty()) {
+	        sql.append(" WHERE ").append(String.join(" OR ", conditions));
+	    }
+
+	    return namedParameterJdbcTemplate.query(sql.toString(), params, new ArticleRowMapper());
 	}
+
 
 }
