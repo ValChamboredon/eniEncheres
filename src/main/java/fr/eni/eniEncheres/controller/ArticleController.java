@@ -78,7 +78,7 @@ public class ArticleController {
 	        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
 	        articlesFiltres = articleService.filtrerVentes(
 	                utilisateur.getNoUtilisateur(), ventesEnCours, ventesNonDebutees, ventesTerminees);
-	        model.addAttribute("creditsUtilisateur", utilisateur.getCredit());
+	        
 	    } else if (principal != null && "achats".equals(typeRecherche)) {
 	        // Filtrage des achats personnels
 	        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());

@@ -60,20 +60,20 @@
 <div>
     <label class="font-semibold block">
         <input type="radio" name="typeRecherche" value="mesVentes"
-               th:checked="${typeRecherche == 'mesVentes'}" class="mr-2">
+               class="mr-2">
         <span th:text="#{home.search.mySales}">Mes ventes</span>
     </label>
     <div class="ml-4 space-y-2">
         <label class="flex items-center">
-            <input type="checkbox" name="ventesEnCours" th:checked="${ventesEnCours}" class="mr-2">
+            <input type="checkbox" name="ventesEnCours" class="mr-2">
             <span th:text="#{home.search.salesInProgress}">Ventes en cours</span>
         </label>
         <label class="flex items-center">
-            <input type="checkbox" name="ventesNonDebutees" th:checked="${ventesNonDebutees}" class="mr-2">
+            <input type="checkbox" name="ventesNonDebutees" class="mr-2">
             <span th:text="#{home.search.upcomingSales}">Ventes non débutées</span>
         </label>
         <label class="flex items-center">
-            <input type="checkbox" name="ventesTerminees" th:checked="${ventesTerminees}" class="mr-2">
+            <input type="checkbox" name="ventesTerminees" class="mr-2">
             <span th:text="#{home.search.finishedSales}">Ventes terminées</span>
         </label>
     </div>
