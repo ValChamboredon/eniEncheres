@@ -61,7 +61,7 @@ public class UtilisateurDAOImpl implements UtilisateurDAO {
 
 	@Override
 	public void save(Utilisateur utilisateur) {
-		//récupère la clé auto incrémentée
+		//récupère la clé auto incrémentée CECI EST UN TEST
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		
 		MapSqlParameterSource namedParameters = new MapSqlParameterSource();
